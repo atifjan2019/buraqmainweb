@@ -1,26 +1,179 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ------------------------------------------------------------------
+   Midnight Performance — design tokens
+   Dark cinematic canvas, warm amber accent, glass surfaces.
+------------------------------------------------------------------ */
+@theme {
+  /* Surfaces */
+  --color-canvas: #0a0a0b;
+  --color-canvas-deep: #050506;
+  --color-surface: #141417;
+  --color-surface-2: #1c1c21;
+  --color-line: #26262c;
+  --color-line-soft: #1e1e23;
+
+  /* Accent */
+  --color-amber: #f5a524;
+  --color-amber-bright: #ffb840;
+  --color-amber-dim: #b9791a;
+
+  /* Text */
+  --color-ink: #fafafa;
+  --color-muted: #a1a1aa;
+  --color-faint: #6b6b74;
+
+  /* Type */
+  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Motion */
+  --animate-marquee: marquee 42s linear infinite;
+  --animate-float: float 7s ease-in-out infinite;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
   }
 }
 
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+/* ------------------------------------------------------------------
+   Base
+------------------------------------------------------------------ */
+html {
+  scroll-behavior: smooth;
+  /* Offset anchor targets so the sticky header never covers a heading. */
+  scroll-padding-top: 6rem;
+  background-color: var(--color-canvas);
+  color-scheme: dark;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: color-mix(in oklab, var(--color-amber) 30%, transparent);
+  color: var(--color-ink);
+}
+
+/* Amber focus ring for keyboard users on every interactive element. */
+:where(a, button, input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--color-amber);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Slim dark scrollbar so it doesn't break the cinematic look. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-canvas-deep);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-2);
+  border-radius: 999px;
+  border: 2px solid var(--color-canvas-deep);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-line);
+}
+
+/* ------------------------------------------------------------------
+   Utilities
+------------------------------------------------------------------ */
+
+/* Fine film grain — lifts flat black into something filmic. */
+@utility grain-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+}
+
+/* Gold gradient text for the hero headline. */
+@utility text-gold {
+  background-image: linear-gradient(
+    100deg,
+    #fff6e3 0%,
+    var(--color-amber-bright) 42%,
+    var(--color-amber) 64%,
+    #8a5b12 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Glass card surface used across vehicle + feature cards. */
+@utility glass {
+  background-color: color-mix(in oklab, var(--color-surface) 78%, transparent);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--color-line-soft);
+}
+
+/* Hairline gradient divider. */
+@utility rule-glow {
+  background-image: linear-gradient(
+    to right,
+    transparent,
+    var(--color-line),
+    transparent
+  );
+}
+
+/* ------------------------------------------------------------------
+   Scroll reveal — driven by IntersectionObserver in useReveal().
+   Elements start hidden and settle into place once seen.
+------------------------------------------------------------------ */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+[data-reveal="shown"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Anyone who asks for less motion gets none of it. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
 }

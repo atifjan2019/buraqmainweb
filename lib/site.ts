@@ -1,0 +1,191 @@
+/**
+ * Static business configuration.
+ *
+ * Anything in `contact` is real-world business data — it must never be
+ * guessed. Values still marked TODO are being pulled off the current live
+ * site; leave them empty rather than inventing a plausible number.
+ */
+
+export const site = {
+  name: "Burraq Motors",
+  tagline: "Premium Japanese Cars in Manchester",
+  description:
+    "Browse quality hybrid and imported vehicles in Manchester. Finance available on selected cars. Every vehicle HPI checked, warranty available, nationwide delivery.",
+  url: "https://burraqmotors.co.uk",
+} as const;
+
+interface ContactDetails {
+  /** As shown to visitors. */
+  phone: string;
+  /** E.164 for the tel: href. */
+  phoneHref: string;
+  whatsappDisplay: string;
+  /** Digits only, international format, for wa.me. */
+  whatsapp: string;
+  email: string;
+  addressLines: string[];
+  city: string;
+  country: string;
+  openingHours: string;
+  trustpilot: string;
+}
+
+/**
+ * Taken verbatim from the current live site. An empty string means the detail
+ * is unverified — the UI hides that control rather than showing a guess.
+ *
+ * Note: the live site's footer links WhatsApp to 07414 984700 while its
+ * confirmation email uses 07462 187617. We use the publicly displayed number;
+ * worth confirming with the client which one is monitored.
+ */
+export const contact: ContactDetails = {
+  phone: "07462 187617",
+  phoneHref: "+447462187617",
+  whatsappDisplay: "+44 7414 984700",
+  whatsapp: "447414984700",
+  email: "contactus@burraqmotors.co.uk",
+  addressLines: ["Unit 3 Fern Street", "Bury", "Lancashire BL9 5BP"],
+  city: "Manchester",
+  country: "United Kingdom",
+  openingHours: "09:00 – 18:00",
+  trustpilot: "https://uk.trustpilot.com/review/burraqmotors.co.uk",
+};
+
+/** Builds a wa.me link, or null when we don't have a verified number. */
+export function whatsappLink(message?: string): string | null {
+  if (!contact.whatsapp) return null;
+  const text = message ? `?text=${encodeURIComponent(message)}` : "";
+  return `https://wa.me/${contact.whatsapp}${text}`;
+}
+
+export const nav = [
+  { label: "Home", href: "/" },
+  { label: "Our Cars", href: "/cars" },
+  { label: "Finance", href: "/finance" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
+] as const;
+
+/** Headline numbers shown in the hero and stat strip. */
+export const stats = [
+  { value: "200+", label: "Happy Customers" },
+  { value: "98%", label: "Satisfaction Rate" },
+  { value: "200+", label: "Cars Sold" },
+  { value: "24/7", label: "Support" },
+] as const;
+
+/** Trust badges under the hero. */
+export const trustBadges = [
+  "FCA Authorised",
+  "Finance Available",
+  "HPI Checked Vehicles",
+  "Warranty Available",
+] as const;
+
+/** Scrolling marquee of specialisations. */
+export const specialisms = [
+  "Japanese Car Specialist",
+  "Warranty",
+  "All Cars HPI Clear",
+  "Vehicle Sourcing",
+  "6/12 Months MOT",
+  "Nationwide Delivery",
+  "Finance",
+] as const;
+
+export const financeSteps = [
+  {
+    step: "01",
+    title: "Choose your car",
+    body: "Browse our stock and pick the vehicle that fits your needs and budget.",
+  },
+  {
+    step: "02",
+    title: "Submit a quick enquiry",
+    body: "Send us a few details. It takes a couple of minutes and costs nothing.",
+  },
+  {
+    step: "03",
+    title: "We check suitable options",
+    body: "Our team reviews the finance options available to you and comes back with the detail.",
+  },
+  {
+    step: "04",
+    title: "Drive away",
+    body: "Complete the paperwork with us and collect your car, or have it delivered nationwide.",
+  },
+] as const;
+
+export const whyUs = [
+  {
+    title: "Quality Assured",
+    body: "Every vehicle undergoes rigorous inspection to ensure it meets our high standards of quality and reliability.",
+  },
+  {
+    title: "Competitive Prices",
+    body: "We offer the best value for money with transparent pricing and no hidden fees.",
+  },
+  {
+    title: "Expert Service",
+    body: "Our experienced team provides personalised service to help you find the perfect vehicle.",
+  },
+  {
+    title: "Warranty",
+    body: "Comprehensive warranty coverage on our vehicles for genuine peace of mind.",
+  },
+  {
+    title: "Transparent Process",
+    body: "No hidden fees and no surprises. We believe in honest, straightforward car sales.",
+  },
+  {
+    title: "After-Sales Support",
+    body: "We're here for you after the sale too, with ongoing support and maintenance services.",
+  },
+] as const;
+
+/** Customer reviews carried across from the current site. */
+export const testimonials = [
+  {
+    quote:
+      "Bought my 2019 Toyota Corolla from Burraq Motors last month. The car was exactly as described, and the team was incredibly helpful throughout the process. No hidden fees, which was refreshing!",
+    name: "Ahmed Khan",
+    car: "Toyota Corolla",
+  },
+  {
+    quote:
+      "After visiting 3 other dealers, I finally found my perfect 2020 Toyota Prius at Burraq Motors. The finance team helped me get a great rate, and the car has been running perfectly for 6 months now. Amazing fuel efficiency!",
+    name: "Sarah Ahmed",
+    car: "Toyota Prius",
+  },
+  {
+    quote:
+      "I was skeptical about buying a used car, but Burraq Motors' 12-month warranty gave me confidence. My 2018 Toyota Camry has been flawless, and their service team is always helpful.",
+    name: "Mohammed Ali",
+    car: "Toyota Camry",
+  },
+  {
+    quote:
+      "Traded in my old car and got a fantastic deal on a 2021 Toyota Prius. The team was honest about the trade-in value and helped me understand all the paperwork. Very professional service.",
+    name: "James Wilson",
+    car: "Toyota Prius",
+  },
+  {
+    quote:
+      "My family needed a reliable 7-seater and we found the perfect 2019 Toyota Voxy at Burraq Motors. The kids love it, and it's been trouble-free for over a year. Great value for money!",
+    name: "Lisa Thompson",
+    car: "Toyota Voxy",
+  },
+  {
+    quote:
+      "First-time car buyer here! The team at Burraq Motors made everything so simple. They explained every step, helped with insurance, and even showed me how to use all the features. Couldn't be happier.",
+    name: "Rachel Green",
+    car: "Toyota Corolla",
+  },
+] as const;
+
+/**
+ * FCA requires finance advertising to carry a status qualifier. Keep this
+ * wording on every finance call-to-action.
+ */
+export const financeDisclaimer =
+  "Finance subject to status, terms and conditions, and affordability.";
