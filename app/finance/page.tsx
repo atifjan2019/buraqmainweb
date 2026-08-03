@@ -3,6 +3,7 @@ import Image from "next/image";
 import FinanceCalculator from "@/components/FinanceCalculator";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
+import VideoEmbed from "@/components/VideoEmbed";
 import { financeDisclaimer, financeSteps, financeVideos } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -53,9 +54,9 @@ export default function FinancePage() {
             </Reveal>
             <Reveal delay={140}>
               <p className="mt-6 max-w-lg text-base leading-relaxed text-muted">
-                Put in a vehicle price and see illustrative monthly payments
-                across the finance products available. Figures are for
-                illustration only and carry no obligation.
+                Put in a vehicle price and see illustrative Hire Purchase
+                payments. Figures are for illustration only, carry no
+                obligation, and are not an offer of finance.
               </p>
             </Reveal>
           </div>
@@ -120,15 +121,8 @@ export default function FinancePage() {
             {financeVideos.map((video, i) => (
               <Reveal key={video.id} delay={(i % 3) * 90}>
                 <figure className="glass overflow-hidden rounded-2xl transition-colors hover:border-amber/30">
-                  <div className="aspect-video w-full bg-surface-2">
-                    <iframe
-                      src={`https://player.vimeo.com/video/${video.id}`}
-                      title={video.title}
-                      loading="lazy"
-                      allow="fullscreen; picture-in-picture"
-                      allowFullScreen
-                      className="h-full w-full border-0"
-                    />
+                  <div className="aspect-video w-full overflow-hidden bg-surface-2">
+                    <VideoEmbed id={video.id} title={video.title} />
                   </div>
                   <figcaption className="p-5 font-display text-base font-semibold text-ink">
                     {video.title}

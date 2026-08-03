@@ -6,6 +6,24 @@
  * site; leave them empty rather than inventing a plausible number.
  */
 
+/**
+ * Registered entity behind the trading name. Confirmed by Codeweavers in
+ * writing during the finance integration.
+ *
+ * TODO before launch — these are legally required on a UK trading site and on
+ * the privacy notice, and nobody has supplied them yet:
+ *   companyNumber   Companies House registration number
+ *   icoNumber       ICO data protection register reference
+ *   fcaNumber       FCA firm reference number (the site claims "FCA Authorised")
+ */
+export const company = {
+  legalName: "Burraq Traders Ltd",
+  tradingAs: "Burraq Motors",
+  companyNumber: "",
+  icoNumber: "",
+  fcaNumber: "",
+} as const;
+
 export const site = {
   name: "Burraq Motors",
   tagline: "Premium Japanese Cars in Manchester",

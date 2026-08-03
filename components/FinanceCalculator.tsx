@@ -134,8 +134,7 @@ export default function FinanceCalculator({
           What's the vehicle price?
         </label>
         <p className="mt-2 text-sm text-muted">
-          Enter a price and we'll show you illustrative monthly payments across
-          the finance products available.
+          Enter a price and we'll show you illustrative Hire Purchase payments.
         </p>
 
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
