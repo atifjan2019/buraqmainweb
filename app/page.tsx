@@ -3,6 +3,7 @@ import FeaturedVehicles from "@/components/FeaturedVehicles";
 import FinanceSection from "@/components/FinanceSection";
 import Hero from "@/components/Hero";
 import Marquee from "@/components/Marquee";
+import Showcase from "@/components/Showcase";
 import Testimonials from "@/components/Testimonials";
 import TrustBar from "@/components/TrustBar";
 import WhyUs from "@/components/WhyUs";
@@ -13,6 +14,7 @@ export default function Home() {
       <Hero />
       <TrustBar />
       <FeaturedVehicles />
+      <Showcase />
       <FinanceSection />
       <Marquee />
       <WhyUs />

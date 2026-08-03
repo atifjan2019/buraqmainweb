@@ -109,13 +109,15 @@ body {
 }
 
 /* Gold gradient text for the hero headline. */
+/* Stays bright across its whole run — an over-dark tail makes the last
+   word of a headline unreadable against the near-black canvas. */
 @utility text-gold {
   background-image: linear-gradient(
     100deg,
-    #fff6e3 0%,
-    var(--color-amber-bright) 42%,
-    var(--color-amber) 64%,
-    #8a5b12 100%
+    #fff3d6 0%,
+    var(--color-amber-bright) 34%,
+    var(--color-amber) 68%,
+    #e0921c 100%
   );
   background-clip: text;
   -webkit-background-clip: text;

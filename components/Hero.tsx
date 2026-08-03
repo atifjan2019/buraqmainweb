@@ -1,5 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 import { financeDisclaimer, whatsappLink } from "@/lib/site";
+import { getFeaturedVehicles, formatPrice, vehicleTitle } from "@/lib/vehicles";
 import { ArrowRight, Check, Sparkle, WhatsApp } from "./Icons";
 import Reveal from "./Reveal";
 
@@ -9,67 +11,64 @@ const heroStats = [
   { value: "24/7", label: "Support" },
 ];
 
-export default function Hero() {
+/** Low-angle shot of the black Prius — reads well against the dark canvas. */
+const HERO_IMAGE = "/cars/112-toyota-prius/03.jpeg";
+
+export default async function Hero() {
   const wa = whatsappLink("Hi Burraq Motors, I'd like to enquire about a car.");
+  const [spotlight] = await getFeaturedVehicles(1);
 
   return (
-    <section className="relative isolate flex min-h-[92svh] items-center overflow-hidden pt-28 pb-20">
-      {/* Ambient light */}
+    <section className="relative isolate flex min-h-[94svh] items-center overflow-hidden pt-28 pb-20">
+      {/* Photography */}
+      <div aria-hidden className="absolute inset-0 -z-30">
+        <Image
+          src={HERO_IMAGE}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[62%_center] opacity-70 lg:object-[70%_center]"
+        />
+      </div>
+
+      {/* Scrims — keep the headline legible over the photo on every breakpoint */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-20 bg-canvas"
+        className="absolute inset-0 -z-20 bg-linear-to-r from-canvas via-canvas/85 to-canvas/25 lg:via-canvas/70 lg:to-transparent"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[-18%] -z-20 h-[70rem] w-[70rem] -translate-x-1/2 rounded-full opacity-60 blur-3xl"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(245,165,36,0.16) 0%, rgba(245,165,36,0.05) 38%, transparent 68%)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute bottom-[-30%] left-[-10%] -z-20 h-[45rem] w-[45rem] rounded-full opacity-40 blur-3xl"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(120,80,255,0.10) 0%, transparent 65%)",
-        }}
+        className="absolute inset-0 -z-20 bg-linear-to-t from-canvas via-transparent to-canvas/85"
       />
 
-      {/* Perspective grid floor */}
+      {/* Ambient amber light */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[38svh] opacity-[0.13]"
+        className="pointer-events-none absolute right-[-10%] top-[-15%] -z-10 h-[60rem] w-[60rem] rounded-full opacity-50 blur-3xl"
         style={{
-          backgroundImage:
-            "linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)",
-          backgroundSize: "64px 64px",
-          maskImage:
-            "linear-gradient(to top, black 0%, transparent 92%), linear-gradient(to right, transparent, black 22%, black 78%, transparent)",
-          maskComposite: "intersect",
-          WebkitMaskImage:
-            "linear-gradient(to top, black 0%, transparent 92%), linear-gradient(to right, transparent, black 22%, black 78%, transparent)",
-          WebkitMaskComposite: "source-in",
+          background:
+            "radial-gradient(circle, rgba(245,165,36,0.20) 0%, rgba(245,165,36,0.06) 40%, transparent 70%)",
         }}
       />
 
       {/* Film grain */}
       <div
         aria-hidden
-        className="grain-overlay pointer-events-none absolute inset-0 -z-10 opacity-[0.16] mix-blend-overlay"
+        className="grain-overlay pointer-events-none absolute inset-0 -z-10 opacity-[0.14] mix-blend-overlay"
       />
 
       <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
-        <div className="max-w-4xl">
+        <div className="max-w-2xl">
           <Reveal>
-            <span className="inline-flex items-center gap-2 rounded-full border border-amber/25 bg-amber/5 px-4 py-1.5 text-xs font-medium tracking-wide text-amber">
+            <span className="inline-flex items-center gap-2 rounded-full border border-amber/25 bg-canvas/60 px-4 py-1.5 text-xs font-medium tracking-wide text-amber backdrop-blur">
               <Sparkle className="h-3.5 w-3.5" />
               Trusted by 200+ Customers
             </span>
           </Reveal>
 
           <Reveal delay={80}>
-            <h1 className="mt-7 font-display text-[clamp(2.6rem,7.4vw,5.6rem)] font-bold leading-[0.98] tracking-[-0.03em]">
+            <h1 className="mt-7 font-display text-[clamp(2.6rem,7.4vw,5.4rem)] font-bold leading-[0.98] tracking-[-0.03em] [text-shadow:0_2px_40px_rgba(0,0,0,0.6)]">
               <span className="block text-ink">Premium</span>
               <span className="block text-gold">Japanese Cars</span>
               <span className="block text-ink">in Manchester</span>
@@ -77,7 +76,7 @@ export default function Hero() {
           </Reveal>
 
           <Reveal delay={160}>
-            <p className="mt-7 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
+            <p className="mt-7 max-w-lg text-base leading-relaxed text-muted sm:text-lg">
               Browse quality hybrid and imported vehicles, each one HPI checked
               and prepared to a standard we'd happily drive ourselves. Finance
               available on selected cars.
@@ -95,9 +94,9 @@ export default function Hero() {
               </Link>
               <Link
                 href="/finance"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-line bg-surface/40 px-8 py-4 font-semibold text-ink backdrop-blur transition-colors hover:border-amber/40 hover:text-amber"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-line bg-canvas/50 px-8 py-4 font-semibold text-ink backdrop-blur transition-colors hover:border-amber/40 hover:text-amber"
               >
-                Apply for Finance
+                Calculate Finance
               </Link>
               {wa && (
                 <a
@@ -117,11 +116,13 @@ export default function Hero() {
             <p className="mt-5 text-xs text-faint">{financeDisclaimer}</p>
           </Reveal>
 
-          {/* Stat strip */}
           <Reveal delay={400}>
-            <dl className="mt-14 grid max-w-2xl grid-cols-3 gap-px overflow-hidden rounded-2xl border border-line-soft bg-line-soft">
+            <dl className="mt-12 grid max-w-xl grid-cols-3 gap-px overflow-hidden rounded-2xl border border-line-soft bg-line-soft">
               {heroStats.map((s) => (
-                <div key={s.label} className="bg-canvas/90 px-4 py-6 sm:px-6">
+                <div
+                  key={s.label}
+                  className="bg-canvas/80 px-4 py-6 backdrop-blur sm:px-6"
+                >
                   <dt className="font-display text-2xl font-bold text-amber sm:text-3xl">
                     {s.value}
                   </dt>
@@ -135,28 +136,51 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Corner trust list — desktop only, keeps the hero balanced */}
-      <div className="pointer-events-none absolute right-8 bottom-24 hidden xl:block">
-        <Reveal delay={480}>
-          <ul className="flex flex-col gap-3 text-right">
-            {[
-              "FCA Authorised",
-              "HPI Checked Vehicles",
-              "Warranty Available",
-              "Nationwide Delivery",
-            ].map((item) => (
+      {/* Spotlight card — anchors the photo to a real car you can buy */}
+      {spotlight && (
+        <div className="absolute right-8 bottom-16 z-10 hidden xl:block">
+          <Reveal delay={520}>
+            <Link
+              href={`/cars/${spotlight.slug}`}
+              className="group glass block w-64 rounded-2xl p-5 transition-all duration-500 hover:-translate-y-1 hover:border-amber/40"
+            >
+              <span className="text-[0.65rem] font-semibold tracking-[0.2em] text-amber">
+                IN THE SPOTLIGHT
+              </span>
+              <p className="mt-3 font-display text-lg font-semibold leading-tight text-ink">
+                {vehicleTitle(spotlight)}
+              </p>
+              <p className="mt-1 text-xs text-muted">
+                {spotlight.year} · {spotlight.fuelType} ·{" "}
+                {spotlight.transmission}
+              </p>
+              <p className="mt-4 font-display text-2xl font-bold text-gold">
+                {formatPrice(spotlight.price)}
+              </p>
+              <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-muted transition-colors group-hover:text-amber">
+                View details
+                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </Link>
+          </Reveal>
+        </div>
+      )}
+
+      {/* Trust strip pinned to the bottom edge of the hero */}
+      <div className="absolute inset-x-0 bottom-0 hidden lg:block xl:hidden">
+        <ul className="mx-auto flex max-w-7xl flex-wrap gap-x-7 gap-y-2 px-8 pb-6">
+          {["FCA Authorised", "HPI Checked", "Warranty Available"].map(
+            (item) => (
               <li
                 key={item}
-                className="flex items-center justify-end gap-2.5 text-sm text-muted"
+                className="flex items-center gap-2 text-xs text-muted"
               >
+                <Check className="h-3.5 w-3.5 text-amber" />
                 {item}
-                <span className="grid h-5 w-5 place-items-center rounded-full border border-amber/30 bg-amber/10">
-                  <Check className="h-3 w-3 text-amber" />
-                </span>
               </li>
-            ))}
-          </ul>
-        </Reveal>
+            ),
+          )}
+        </ul>
       </div>
     </section>
   );

@@ -47,7 +47,8 @@ export const contact: ContactDetails = {
   addressLines: ["Unit 3 Fern Street", "Bury", "Lancashire BL9 5BP"],
   city: "Manchester",
   country: "United Kingdom",
-  openingHours: "09:00 – 18:00",
+  // Taken from the showroom signage in the dealership's own photography.
+  openingHours: "Monday to Saturday, 9am – 6pm",
   trustpilot: "https://uk.trustpilot.com/review/burraqmotors.co.uk",
 };
 
@@ -189,3 +190,37 @@ export const testimonials = [
  */
 export const financeDisclaimer =
   "Finance subject to status, terms and conditions, and affordability.";
+
+/**
+ * Longer disclosure shown alongside the quote calculator.
+ *
+ * Codeweavers explicitly do not supply a disclaimer and state the site is not
+ * FCA compliant without the dealer's own wording, so this must be reviewed and
+ * signed off by Burraq Motors before launch. The FCA firm reference number is
+ * still outstanding — see the TODO below.
+ */
+export const financeFullDisclaimer =
+  "Figures are illustrative only and do not constitute an offer of finance. " +
+  "Finance is subject to status, affordability and lender approval. Terms and " +
+  "conditions apply. Written quotations available on request. Burraq Motors is " +
+  "a credit broker, not a lender, and may receive a commission from lenders.";
+
+/** Codeweavers finance plugin. The API key is a public, client-side embed key. */
+export const codeweavers = {
+  apiKey: process.env.NEXT_PUBLIC_CODEWEAVERS_API_KEY ?? "SuvI8TJFiT4Y1i8ff6",
+  scriptBase: "https://plugins.codeweavers.app/scripts/v1/platform/finance",
+} as const;
+
+export function codeweaversScriptUrl(): string {
+  return `${codeweavers.scriptBase}?ApiKey=${codeweavers.apiKey}`;
+}
+
+/** Codeweavers' finance explainer films, embedded on the finance page. */
+export const financeVideos = [
+  { id: "866686746", title: "Why finance through a dealership?" },
+  { id: "887241645", title: "What is Conditional Sale?" },
+  { id: "838572663", title: "What is Hire Purchase?" },
+  { id: "810874993", title: "What is Personal Contract Purchase?" },
+  { id: "848713929", title: "What is Personal Contract Hire?" },
+  { id: "912895855", title: "What is Lease Purchase?" },
+] as const;

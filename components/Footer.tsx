@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { contact, financeDisclaimer, nav, site } from "@/lib/site";
 import { Mail, Phone, Pin } from "./Icons";
+import Logo from "./Logo";
 
 const year = new Date().getFullYear();
 
@@ -14,18 +15,8 @@ export default function Footer() {
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr]">
           {/* Brand */}
           <div>
-            <Link href="/" className="flex items-center gap-3">
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-linear-to-br from-amber-bright to-amber-dim font-display text-lg font-bold text-canvas">
-                B
-              </span>
-              <span className="flex flex-col leading-none">
-                <span className="font-display text-base font-semibold tracking-tight text-ink">
-                  BURRAQ
-                </span>
-                <span className="text-[0.62rem] font-medium tracking-[0.32em] text-amber">
-                  MOTORS
-                </span>
-              </span>
+            <Link href="/" className="group inline-block">
+              <Logo />
             </Link>
 
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted">

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { contact, nav, whatsappLink } from "@/lib/site";
 import { Close, Menu, Phone, WhatsApp } from "./Icons";
+import Logo from "./Logo";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -44,22 +45,8 @@ export default function Header() {
       }`}
     >
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8">
-        <Link
-          href="/"
-          className="group flex items-center gap-3"
-          onClick={() => setOpen(false)}
-        >
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-linear-to-br from-amber-bright to-amber-dim font-display text-lg font-bold text-canvas">
-            B
-          </span>
-          <span className="flex flex-col leading-none">
-            <span className="font-display text-base font-semibold tracking-tight text-ink">
-              BURRAQ
-            </span>
-            <span className="text-[0.62rem] font-medium tracking-[0.32em] text-amber">
-              MOTORS
-            </span>
-          </span>
+        <Link href="/" className="group" onClick={() => setOpen(false)}>
+          <Logo />
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
