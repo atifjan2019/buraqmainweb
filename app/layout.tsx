@@ -63,6 +63,17 @@ export default function RootLayout({
       lang="en-GB"
       className={`${sora.variable} ${inter.variable} h-full antialiased`}
     >
+      <head>
+        {/*
+          Arms the scroll-reveal styles. Runs before paint, so there's no flash,
+          and if scripting is unavailable the content simply stays visible.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `document.documentElement.setAttribute('data-js','')`,
+          }}
+        />
+      </head>
       <body className="flex min-h-full flex-col bg-canvas text-ink">
         <Header />
         <main className="flex-1">{children}</main>
