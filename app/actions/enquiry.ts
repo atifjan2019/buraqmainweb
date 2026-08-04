@@ -9,28 +9,14 @@
  */
 
 import { submitEnquiry } from "@/lib/crm";
+import type { EnquiryFormState } from "@/lib/enquiry-state";
 
-export interface EnquiryFormState {
-  status: "idle" | "sent" | "error";
-  /** CRM reference (e.g. "ENQ-00042"), shown back to the customer on success. */
-  reference?: string;
-  /** Form-level message, for problems that aren't tied to one field. */
-  message?: string;
-  /** Keyed by input name, so each field can render its own error. */
-  fieldErrors?: Record<string, string>;
-  /**
-   * Echoed back so a rejected submission doesn't wipe what was typed —
-   * React resets an uncontrolled form once the action resolves.
-   */
-  values?: {
-    name: string;
-    email: string;
-    phone: string;
-    message: string;
-  };
-}
-
-export const initialEnquiryState: EnquiryFormState = { status: "idle" };
+/*
+ * Nothing but `sendEnquiry` may be exported from this file. A `"use server"`
+ * module can only export async functions; any other export throws at runtime
+ * the first time an action is invoked, which `next build` will not catch.
+ * The state type and its initial value live in `lib/enquiry-state.ts`.
+ */
 
 /** Mirrors the API's own limits so obvious mistakes never cost a round trip. */
 const LIMITS = { name: 255, phone: 50, message: 2000 } as const;

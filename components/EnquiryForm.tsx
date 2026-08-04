@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useActionState, useId } from "react";
+import { sendEnquiry } from "@/app/actions/enquiry";
 import {
   initialEnquiryState,
-  sendEnquiry,
   type EnquiryFormState,
-} from "@/app/actions/enquiry";
+} from "@/lib/enquiry-state";
 import { contact } from "@/lib/site";
 import { Check } from "./Icons";
 
