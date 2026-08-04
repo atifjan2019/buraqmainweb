@@ -6,18 +6,30 @@ import {
   vehicleTitle,
   type Vehicle,
 } from "@/lib/vehicles";
-import { ArrowRight, Calendar, Car, Fuel, Gauge, Gear } from "./Icons";
+import { ArrowRight, Calendar, Fuel, Gauge, Gear } from "./Icons";
+import VehiclePlaceholder from "./VehiclePlaceholder";
+
+interface VehicleCardProps {
+  vehicle: Vehicle;
+  /**
+   * Set on the first card of the grid only. That card is the page's LCP
+   * element, and lazy-loading an LCP image delays it measurably.
+   */
+  priority?: boolean;
+}
 
 /**
  * Stock card.
  *
- * The CRM API exposes no photography, so the media panel is a branded
- * placeholder carrying the registration. When the API gains image URLs, this
- * block is the only part that needs to change.
+ * Photography is served straight from the CRM's own URLs — never proxied or
+ * re-hosted, so a photo swapped in the CRM appears here immediately rather than
+ * being pinned to a stale cached copy. That rules out `next/image`, whose
+ * default loader re-fetches and re-encodes through `/_next/image`.
  */
-export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
+export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
   const title = vehicleTitle(vehicle);
   const reserved = vehicle.status === "reserved";
+  const photo = vehicle.featuredImage;
 
   const specs = [
     { icon: Calendar, label: String(vehicle.year) },
@@ -28,18 +40,26 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
 
   return (
     <article className="group glass relative flex h-full flex-col overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-1.5 hover:border-amber/30 hover:shadow-[0_24px_60px_-24px_rgba(245,165,36,0.35)]">
-      {/* Media */}
-      <div className="relative aspect-16/10 overflow-hidden bg-surface-2">
-        <div
-          aria-hidden
-          className="grid h-full w-full place-items-center"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 50% 120%, rgba(245,165,36,0.14), transparent 60%)",
-          }}
-        >
-          <Car className="h-14 w-14 text-line" strokeWidth={1} />
-        </div>
+      {/* Media — fixed 4:3 box so mixed-shape photos can't make the grid
+          ragged, and so nothing reflows as images arrive. */}
+      <div className="relative aspect-4/3 overflow-hidden bg-surface-2">
+        {photo ? (
+          /* eslint-disable-next-line @next/next/no-img-element --
+             next/image would proxy these through /_next/image; the CRM already
+             serves correctly-sized, cached JPEGs. */
+          <img
+            src={photo.thumb}
+            alt={photo.alt}
+            width={400}
+            height={300}
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : "auto"}
+            decoding="async"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+        ) : (
+          <VehiclePlaceholder make={vehicle.make} model={vehicle.model} />
+        )}
 
         {/* Fade so badges and price stay legible whatever sits behind them */}
         <div

@@ -13,6 +13,7 @@ import {
 } from "@/components/Icons";
 import Reveal from "@/components/Reveal";
 import StockNotice from "@/components/StockNotice";
+import VehicleGallery from "@/components/VehicleGallery";
 import { CrmError, getVehicle } from "@/lib/crm";
 import { financeDisclaimer, site } from "@/lib/site";
 import {
@@ -144,8 +145,16 @@ export default async function VehiclePage({ params }: PageProps) {
       : []),
   ];
 
+  const mainImage = vehicle.images[0] ?? vehicle.featuredImage;
+
   return (
     <section className="relative pt-32 pb-24 sm:pt-40 sm:pb-32">
+      {/* Starts the LCP image downloading before the gallery markup is parsed.
+          React hoists this into <head>. */}
+      {mainImage && (
+        <link rel="preload" as="image" href={mainImage.display} fetchPriority="high" />
+      )}
+
       <script
         type="application/ld+json"
         // Built server-side from CRM fields only. Note there is no purchase,
@@ -198,6 +207,14 @@ export default async function VehiclePage({ params }: PageProps) {
               <h1 className="mt-5 font-display text-[clamp(2rem,5vw,3.4rem)] font-bold leading-[1.04] tracking-[-0.03em] text-ink">
                 {vehicleTitle(vehicle)}
               </h1>
+
+              <div className="mt-7">
+                <VehicleGallery
+                  images={vehicle.images}
+                  make={vehicle.make}
+                  model={vehicle.model}
+                />
+              </div>
 
               <p className="mt-3 text-base text-muted">
                 {vehicle.year} · {vehicle.color} ·{" "}
@@ -295,6 +312,12 @@ function vehicleJsonLd(vehicle: Vehicle) {
     color: vehicle.color,
     fuelType: vehicle.fuelType,
     vehicleTransmission: vehicle.transmission,
+    // Google's vehicle listing results want at least one image and prefer
+    // several. Full-resolution URLs, omitted entirely when unphotographed
+    // rather than emitted as an empty array.
+    ...(vehicle.images.length > 0
+      ? { image: vehicle.images.map((image) => image.full) }
+      : {}),
     mileageFromOdometer: {
       "@type": "QuantitativeValue",
       value: vehicle.mileage,

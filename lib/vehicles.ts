@@ -21,6 +21,22 @@ export type Transmission = "Manual" | "Automatic";
  */
 export type VehicleStatus = "in_stock" | "reserved";
 
+/**
+ * One photograph, in the three sizes the CRM renders. All absolute URLs on the
+ * CRM's own storage — they are served directly and never proxied or re-hosted,
+ * so replacing a photo in the CRM changes it on the site immediately.
+ */
+export interface VehicleImage {
+  /** 400px — listing cards and the gallery strip. */
+  thumb: string;
+  /** 1200px — the detail page's main image. */
+  display: string;
+  /** 2000px — lightbox only. Never put this in a grid. */
+  full: string;
+  /** Year, make and model, as the CRM writes it. */
+  alt: string;
+}
+
 export interface Vehicle {
   /**
    * Canonical SEO slug, owned by the CRM — e.g.
@@ -53,6 +69,15 @@ export interface Vehicle {
   /** ISO date (YYYY-MM-DD), or null when the CRM has nothing recorded. */
   motExpiry: string | null;
   serviceDue: string | null;
+  /**
+   * The hero shot the dealership picked, or null when the car has not been
+   * photographed yet. Stock is routinely listed before the photographer sees
+   * it, so null is an ordinary state that must render a placeholder — never a
+   * broken image, never an error.
+   */
+  featuredImage: VehicleImage | null;
+  /** Full gallery in CRM order, featured first. Empty until photographed. */
+  images: VehicleImage[];
 }
 
 /** The subset of Laravel's paginator `meta` block the UI actually uses. */

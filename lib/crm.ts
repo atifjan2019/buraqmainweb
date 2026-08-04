@@ -16,6 +16,7 @@ import type {
   StockFilters,
   Transmission,
   Vehicle,
+  VehicleImage,
   VehiclePage,
   VehicleStatus,
 } from "./vehicles";
@@ -49,6 +50,14 @@ export class CrmError extends Error {
 /* Wire format                                                       */
 /* ---------------------------------------------------------------- */
 
+/** One image as the API sends it. Every field is treated as untrusted. */
+interface RawImage {
+  thumb?: string | null;
+  display?: string | null;
+  full?: string | null;
+  alt?: string | null;
+}
+
 /** A vehicle exactly as the API sends it, before camel-casing. */
 interface RawVehicle {
   slug: string;
@@ -66,6 +75,28 @@ interface RawVehicle {
   is_featured: boolean;
   mot_expiry: string | null;
   service_due: string | null;
+  featured_image?: RawImage | null;
+  images?: RawImage[] | null;
+}
+
+/**
+ * Rejects any image missing a size, so a half-populated record renders the
+ * placeholder rather than a broken `<img>`. `alt` falls back to the car's own
+ * description — never "car photo", which helps neither screen readers nor
+ * search engines.
+ */
+function toImage(
+  raw: RawImage | null | undefined,
+  fallbackAlt: string,
+): VehicleImage | null {
+  if (!raw?.thumb || !raw.display || !raw.full) return null;
+
+  return {
+    thumb: raw.thumb,
+    display: raw.display,
+    full: raw.full,
+    alt: raw.alt?.trim() || fallbackAlt,
+  };
 }
 
 interface RawPaginator<T> {
@@ -84,7 +115,19 @@ interface RawPaginator<T> {
  * compile-time narrowing, never runtime behaviour.
  */
 function toVehicle(raw: RawVehicle): Vehicle {
+  const fallbackAlt = `${raw.year} ${raw.make} ${raw.model}`;
+
+  const images = (raw.images ?? [])
+    .map((image) => toImage(image, fallbackAlt))
+    .filter((image): image is VehicleImage => image !== null);
+
+  // The API sends the featured shot as `images[0]` too, but falling back to the
+  // gallery keeps a car with photos visible even if that field is ever absent.
+  const featuredImage = toImage(raw.featured_image, fallbackAlt) ?? images[0] ?? null;
+
   return {
+    featuredImage,
+    images,
     slug: raw.slug,
     registration: raw.registration,
     make: raw.make,

@@ -158,7 +158,9 @@ export default async function CarsPage({
             <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {stock.vehicles.map((vehicle, index) => (
                 <Reveal key={vehicle.registration} delay={(index % 3) * 90}>
-                  <VehicleCard vehicle={vehicle} />
+                  {/* The first card is this page's LCP element — it must not
+                      be lazy-loaded. */}
+                  <VehicleCard vehicle={vehicle} priority={index === 0} />
                 </Reveal>
               ))}
             </div>
