@@ -22,7 +22,21 @@ export type Transmission = "Manual" | "Automatic";
 export type VehicleStatus = "in_stock" | "reserved";
 
 export interface Vehicle {
-  /** As held in the CRM, e.g. "MA71 KGV". Unique, and this car's identity. */
+  /**
+   * Canonical SEO slug, owned by the CRM — e.g.
+   * "2021-tesla-model-3-standard-range-plus-lt21vhx". This is the URL.
+   *
+   * Never derive it here. Only the trailing plate identifies the car; the words
+   * before it are cosmetic, so the CRM can restyle a slug when staff correct a
+   * model name and old links keep resolving. A second implementation on this
+   * side would drift the moment either algorithm changed, breaking every
+   * indexed and shared link.
+   */
+  slug: string;
+  /**
+   * As held in the CRM, e.g. "MA71 KGV". Still the human-facing identifier —
+   * plate badge, spec table, and the enquiry payload — but no longer the URL.
+   */
   registration: string;
   make: string;
   model: string;
@@ -66,19 +80,16 @@ export interface StockFilters {
 }
 
 /* ---------------------------------------------------------------- */
-/* Registrations and URLs                                            */
+/* URLs                                                              */
 /* ---------------------------------------------------------------- */
 
 /**
- * Turns "MA71 KGV" into "ma71kgv" for the URL. The API resolves registrations
- * ignoring case and spacing, so the slug round-trips without a lookup table.
+ * The canonical detail URL, straight from the API's slug.
+ *
+ * There is deliberately no slug-building helper here — see `Vehicle.slug`.
  */
-export function vehicleSlug(registration: string): string {
-  return registration.replace(/[^a-z0-9]/gi, "").toLowerCase();
-}
-
 export function vehicleHref(vehicle: Vehicle): string {
-  return `/cars/${vehicleSlug(vehicle.registration)}`;
+  return `/cars/${vehicle.slug}`;
 }
 
 /* ---------------------------------------------------------------- */

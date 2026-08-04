@@ -51,6 +51,7 @@ export class CrmError extends Error {
 
 /** A vehicle exactly as the API sends it, before camel-casing. */
 interface RawVehicle {
+  slug: string;
   registration: string;
   make: string;
   model: string;
@@ -84,6 +85,7 @@ interface RawPaginator<T> {
  */
 function toVehicle(raw: RawVehicle): Vehicle {
   return {
+    slug: raw.slug,
     registration: raw.registration,
     make: raw.make,
     model: raw.model,
@@ -218,17 +220,22 @@ export async function getFeaturedVehicles(limit = 6): Promise<Vehicle[]> {
 }
 
 /**
- * A single car by registration. Spacing and case are ignored by the API.
+ * A single car by canonical slug *or* bare registration — the API accepts
+ * either, ignoring case and spacing, and only the trailing plate selects the
+ * car. So whatever is in the URL is forwarded verbatim and the API decides.
+ *
+ * `encodeURIComponent` is what keeps a crafted path segment (`../`, an
+ * embedded `?`) from escaping into a different upstream endpoint.
  *
  * Returns null for 404 — the car has been sold or unpublished, which is an
  * expected outcome rather than a failure. Other errors still throw.
  */
 export async function getVehicle(
-  registration: string,
+  slugOrRegistration: string,
 ): Promise<Vehicle | null> {
   try {
     const payload = await readJson<{ data: RawVehicle }>(
-      `/vehicles/${encodeURIComponent(registration)}`,
+      `/vehicles/${encodeURIComponent(slugOrRegistration)}`,
     );
     return toVehicle(payload.data);
   } catch (error) {

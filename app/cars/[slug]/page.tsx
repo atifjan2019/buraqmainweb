@@ -1,8 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import EnquiryForm from "@/components/EnquiryForm";
-import { ArrowRight, Calendar, Car, Fuel, Gauge, Gear, Shield } from "@/components/Icons";
+import {
+  ArrowRight,
+  Calendar,
+  Car,
+  Fuel,
+  Gauge,
+  Gear,
+  Shield,
+} from "@/components/Icons";
 import Reveal from "@/components/Reveal";
 import StockNotice from "@/components/StockNotice";
 import { CrmError, getVehicle } from "@/lib/crm";
@@ -12,63 +20,88 @@ import {
   formatMileage,
   formatPrice,
   vehicleHeadline,
-  vehicleSlug,
   vehicleTitle,
+  type Vehicle,
 } from "@/lib/vehicles";
 
 interface PageProps {
-  params: Promise<{ registration: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 /**
- * The API resolves registrations ignoring case and spacing, so the URL slug
- * ("ma71kgv") is handed straight over without a lookup.
+ * Forwards the route param to the API untouched — it accepts the canonical
+ * slug, a bare plate, or a stale slug from before a model name was corrected,
+ * and only the trailing plate selects the car. Parsing it here would just be a
+ * second, drifting implementation of the CRM's rule.
  *
  * Both this and `generateMetadata` call it with the same argument, and
  * identical fetches are memoised within a render, so it costs one request.
  */
-async function loadVehicle(registration: string) {
+async function loadVehicle(slug: string) {
   try {
-    return { vehicle: await getVehicle(registration), reachable: true };
+    return { vehicle: await getVehicle(slug), reachable: true };
   } catch (error) {
     if (error instanceof CrmError) {
-      console.error(`[cars] could not load ${registration}`, error);
+      console.error(`[cars] could not load ${slug}`, error);
       return { vehicle: null, reachable: false };
     }
     throw error;
   }
 }
 
+/** ~155 characters of the CRM description, cut on a word boundary. */
+function metaDescription(vehicle: Vehicle): string {
+  const source = vehicle.description?.replace(/\s+/g, " ").trim();
+
+  if (!source) {
+    return (
+      `${vehicleHeadline(vehicle)} in ${vehicle.color}, ` +
+      `${formatMileage(vehicle.mileage)}, ${vehicle.fuelType}, ` +
+      `${vehicle.transmission}. Available now at ${site.name} in Manchester.`
+    );
+  }
+
+  if (source.length <= 155) return source;
+
+  const clipped = source.slice(0, 155);
+  const lastSpace = clipped.lastIndexOf(" ");
+  return `${(lastSpace > 60 ? clipped.slice(0, lastSpace) : clipped).trimEnd()}…`;
+}
+
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const { registration } = await params;
-  const { vehicle } = await loadVehicle(registration);
+  const { slug } = await params;
+  const { vehicle } = await loadVehicle(slug);
 
   if (!vehicle) {
     return { title: "Vehicle no longer available", robots: { index: false } };
   }
 
-  const title = `${vehicleHeadline(vehicle)} — ${formatPrice(vehicle.price)}`;
-  const description =
-    `${vehicleHeadline(vehicle)} in ${vehicle.color}, ` +
-    `${formatMileage(vehicle.mileage)}, ${vehicle.fuelType}, ` +
-    `${vehicle.transmission}. Available now at ${site.name} in Manchester.`;
+  const title = `${vehicle.year} ${vehicleTitle(vehicle)} for sale in Manchester`;
+  const description = metaDescription(vehicle);
 
   return {
     title,
     description,
-    alternates: { canonical: `/cars/${vehicleSlug(vehicle.registration)}` },
-    openGraph: { title, description, type: "website" },
+    // Always the canonical slug, never the URL that was requested — this is
+    // what stops one car being indexed under several addresses.
+    alternates: { canonical: `/cars/${vehicle.slug}` },
+    openGraph: {
+      title: `${title} | ${site.name}`,
+      description,
+      url: `/cars/${vehicle.slug}`,
+      type: "website",
+    },
   };
 }
 
 export default async function VehiclePage({ params }: PageProps) {
-  const { registration } = await params;
-  const { vehicle, reachable } = await loadVehicle(registration);
+  const { slug } = await params;
+  const { vehicle, reachable } = await loadVehicle(slug);
 
   // The CRM is down: we can't tell whether this car exists, so we mustn't
-  // claim it's gone.
+  // claim it's gone — and mustn't redirect anywhere either.
   if (!reachable) {
     return (
       <section className="pt-32 pb-24 sm:pt-40">
@@ -85,6 +118,12 @@ export default async function VehiclePage({ params }: PageProps) {
 
   // Sold or unpublished — a car can go while someone has the page open.
   if (!vehicle) notFound();
+
+  // Arrived on a bare plate or a stale slug: send humans and crawlers to the
+  // one canonical address. 308 rather than `redirect`'s 307, so the move reads
+  // as permanent and link equity consolidates. Deliberately outside the
+  // try/catch above, since this throws to unwind rendering.
+  if (slug !== vehicle.slug) permanentRedirect(`/cars/${vehicle.slug}`);
 
   const reserved = vehicle.status === "reserved";
   const motExpiry = formatDate(vehicle.motExpiry);
@@ -107,6 +146,16 @@ export default async function VehiclePage({ params }: PageProps) {
 
   return (
     <section className="relative pt-32 pb-24 sm:pt-40 sm:pb-32">
+      <script
+        type="application/ld+json"
+        // Built server-side from CRM fields only. Note there is no purchase,
+        // prep or margin figure anywhere in this payload — `price` is the only
+        // money the public site is allowed to know.
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(vehicleJsonLd(vehicle)),
+        }}
+      />
+
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-0 h-[40rem] w-[60rem] -translate-x-1/2 opacity-50 blur-3xl"
@@ -140,6 +189,7 @@ export default async function VehiclePage({ params }: PageProps) {
                     Featured
                   </span>
                 )}
+                {/* Still the plate: the human-facing identifier, just not the URL. */}
                 <span className="rounded-md border border-line bg-canvas/70 px-2.5 py-1 font-mono text-xs font-semibold uppercase tracking-widest text-muted">
                   {vehicle.registration}
                 </span>
@@ -150,7 +200,8 @@ export default async function VehiclePage({ params }: PageProps) {
               </h1>
 
               <p className="mt-3 text-base text-muted">
-                {vehicle.year} · {vehicle.color} · {formatMileage(vehicle.mileage)}
+                {vehicle.year} · {vehicle.color} ·{" "}
+                {formatMileage(vehicle.mileage)}
               </p>
 
               <p className="mt-6 font-display text-4xl font-bold text-gold sm:text-5xl">
@@ -159,9 +210,9 @@ export default async function VehiclePage({ params }: PageProps) {
 
               {reserved && (
                 <p className="mt-4 max-w-lg rounded-xl border border-amber/25 bg-amber/5 px-4 py-3 text-sm leading-relaxed text-muted">
-                  This car is currently reserved for another customer. Reservations
-                  do fall through — send us an enquiry and we&apos;ll let you know
-                  if it becomes available.
+                  This car is currently reserved for another customer.
+                  Reservations do fall through — send us an enquiry and
+                  we&apos;ll let you know if it becomes available.
                 </p>
               )}
             </Reveal>
@@ -198,7 +249,7 @@ export default async function VehiclePage({ params }: PageProps) {
             <Reveal delay={200}>
               <div className="mt-12 flex flex-wrap items-center gap-3">
                 <Link
-                  href={`/finance?vehicle=${vehicleSlug(vehicle.registration)}`}
+                  href={`/finance?vehicle=${vehicle.slug}`}
                   className="group inline-flex items-center gap-2 rounded-full border border-line px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-amber/40 hover:text-amber"
                 >
                   Calculate finance
@@ -212,6 +263,8 @@ export default async function VehiclePage({ params }: PageProps) {
           {/* Enquiry */}
           <div className="lg:sticky lg:top-28 lg:self-start">
             <Reveal delay={120}>
+              {/* Registration, not slug — it's what the sales team recognises
+                  on an incoming lead. */}
               <EnquiryForm
                 registration={vehicle.registration}
                 vehicleHeadline={vehicleHeadline(vehicle)}
@@ -222,4 +275,43 @@ export default async function VehiclePage({ params }: PageProps) {
       </div>
     </section>
   );
+}
+
+/**
+ * schema.org `Car` — a subtype of both Vehicle and Product — with an Offer, so
+ * the listing is eligible for rich results.
+ */
+function vehicleJsonLd(vehicle: Vehicle) {
+  const url = `${site.url}/cars/${vehicle.slug}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Car",
+    name: vehicleHeadline(vehicle),
+    url,
+    brand: { "@type": "Brand", name: vehicle.make },
+    model: vehicle.model,
+    vehicleModelDate: String(vehicle.year),
+    color: vehicle.color,
+    fuelType: vehicle.fuelType,
+    vehicleTransmission: vehicle.transmission,
+    mileageFromOdometer: {
+      "@type": "QuantitativeValue",
+      value: vehicle.mileage,
+      unitCode: "SMI", // UN/CEFACT code for the statute mile
+    },
+    ...(vehicle.description ? { description: vehicle.description } : {}),
+    offers: {
+      "@type": "Offer",
+      url,
+      price: vehicle.price,
+      priceCurrency: "GBP",
+      availability:
+        vehicle.status === "reserved"
+          ? "https://schema.org/OutOfStock"
+          : "https://schema.org/InStock",
+      itemCondition: "https://schema.org/UsedCondition",
+      seller: { "@type": "AutoDealer", name: site.name },
+    },
+  };
 }

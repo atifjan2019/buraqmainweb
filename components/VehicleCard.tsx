@@ -3,7 +3,6 @@ import {
   formatMileage,
   formatPrice,
   vehicleHref,
-  vehicleSlug,
   vehicleTitle,
   type Vehicle,
 } from "@/lib/vehicles";
@@ -94,7 +93,7 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-0.5" />
           </Link>
           <Link
-            href={`/finance?vehicle=${vehicleSlug(vehicle.registration)}`}
+            href={`/finance?vehicle=${vehicle.slug}`}
             className="rounded-full border border-line px-4 py-2.5 text-sm font-medium text-muted transition-colors hover:border-amber/40 hover:text-amber"
           >
             Finance
