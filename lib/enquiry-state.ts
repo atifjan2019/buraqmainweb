@@ -13,10 +13,14 @@
  * Keeping the constant here means the action file exports nothing but the
  * function itself.
  */
+/**
+ * There is no "sent" state: a successful submission redirects to /thank-you
+ * from the Server Action, so the form only ever holds its idle or error state.
+ * The CRM reference travels in the receipt cookie instead — see
+ * `lib/enquiry-receipt.ts`.
+ */
 export interface EnquiryFormState {
-  status: "idle" | "sent" | "error";
-  /** CRM reference (e.g. "ENQ-00042"), shown back to the customer on success. */
-  reference?: string;
+  status: "idle" | "error";
   /** Form-level message, for problems that aren't tied to one field. */
   message?: string;
   /** Keyed by input name, so each field can render its own error. */

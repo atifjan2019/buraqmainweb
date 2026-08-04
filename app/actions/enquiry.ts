@@ -8,8 +8,16 @@
  * component itself never sees it, and never talks to the CRM directly.
  */
 
-import { submitEnquiry } from "@/lib/crm";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { getVehicle, submitEnquiry } from "@/lib/crm";
+import {
+  ENQUIRY_RECEIPT_COOKIE,
+  ENQUIRY_RECEIPT_MAX_AGE,
+  encodeReceipt,
+} from "@/lib/enquiry-receipt";
 import type { EnquiryFormState } from "@/lib/enquiry-state";
+import { vehicleHeadline } from "@/lib/vehicles";
 
 /*
  * Nothing but `sendEnquiry` may be exported from this file. A `"use server"`
@@ -55,8 +63,21 @@ export async function sendEnquiry(
     fieldErrors.email = "That doesn't look like a valid email address.";
   }
 
-  if (values.phone.length > LIMITS.phone) {
+  /*
+   * The CRM treats phone as optional; requiring it is this site's own rule, so
+   * it is enforced here as well as in the markup — an HTML `required` attribute
+   * is trivially bypassed. The digit count is deliberately loose: UK numbers get
+   * typed with spaces, +44, and leading zeros, and rejecting a real customer's
+   * number is far more costly than accepting an odd format.
+   */
+  const phoneDigits = values.phone.replace(/\D/g, "");
+
+  if (!values.phone) {
+    fieldErrors.phone = "Please give us a phone number so we can call you back.";
+  } else if (values.phone.length > LIMITS.phone) {
     fieldErrors.phone = `Please keep your number under ${LIMITS.phone} characters.`;
+  } else if (phoneDigits.length < 7) {
+    fieldErrors.phone = "That doesn't look like a complete phone number.";
   }
 
   if (values.message.length > LIMITS.message) {
@@ -75,10 +96,52 @@ export async function sendEnquiry(
     message: values.message,
   });
 
-  switch (outcome.status) {
-    case "sent":
-      return { status: "sent", reference: outcome.reference };
+  if (outcome.status === "sent") {
+    /*
+     * Look up the car purely to personalise the thank-you page. The lead is
+     * already in the CRM at this point, so this must never be able to turn a
+     * successful submission into an error — hence the catch and the blank
+     * fallback. The read is normally free: the visitor just loaded this car's
+     * page, so the response is still in the 2-minute data cache.
+     */
+    let vehicle = "";
+    let slug = "";
 
+    if (registration) {
+      try {
+        const found = await getVehicle(registration);
+        if (found) {
+          vehicle = vehicleHeadline(found);
+          slug = found.slug;
+        }
+      } catch (error) {
+        console.error("[enquiry] could not resolve vehicle for receipt", error);
+      }
+    }
+
+    const store = await cookies();
+    store.set(
+      ENQUIRY_RECEIPT_COOKIE,
+      encodeReceipt({
+        name: values.name,
+        reference: outcome.reference,
+        vehicle,
+        slug,
+      }),
+      {
+        httpOnly: true,
+        sameSite: "lax", // survives the redirect; not needed cross-site
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: ENQUIRY_RECEIPT_MAX_AGE,
+      },
+    );
+
+    // Throws to unwind, so it sits outside every try/catch above.
+    redirect("/thank-you");
+  }
+
+  switch (outcome.status) {
     case "invalid":
       return {
         status: "error",

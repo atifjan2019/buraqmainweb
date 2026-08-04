@@ -204,13 +204,19 @@ export default function VehicleGallery({
             </>
           )}
 
-          {/* Only here is `full` (2000px) ever requested. */}
+          {/* Only here is `full` (2000px) ever requested.
+              Sized in viewport units, not `max-h-full`/`max-w-full`: a
+              percentage max-size does not reliably clamp a replaced element
+              inside a padded, fixed, flex-centred parent, so the 2000px photo
+              rendered at close to natural size and overflowed the screen. The
+              inset also keeps the photo clear of the close and arrow controls
+              rather than putting them on top of it. */}
           {/* eslint-disable-next-line @next/next/no-img-element -- see file header */}
           <img
             src={current.full}
             alt={current.alt}
             onClick={(event) => event.stopPropagation()}
-            className="max-h-full max-w-full cursor-default rounded-lg object-contain"
+            className="h-auto w-auto max-h-[78vh] max-w-[86vw] cursor-default rounded-lg object-contain shadow-2xl sm:max-h-[82vh] sm:max-w-[80vw]"
           />
 
           {count > 1 && (

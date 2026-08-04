@@ -7,8 +7,6 @@ import {
   initialEnquiryState,
   type EnquiryFormState,
 } from "@/lib/enquiry-state";
-import { contact } from "@/lib/site";
-import { Check } from "./Icons";
 
 interface EnquiryFormProps {
   /** The car this enquiry is about, passed to the CRM as context. */
@@ -38,43 +36,11 @@ export default function EnquiryForm({
   const errorId = (name: string) => `${ids}-${name}-error`;
   const errors = state.fieldErrors ?? {};
 
-  if (state.status === "sent") {
-    return (
-      <div className="glass rounded-2xl p-7 text-center">
-        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-amber/15">
-          <Check className="h-6 w-6 text-amber" />
-        </span>
-
-        <h3 className="mt-5 font-display text-xl font-semibold text-ink">
-          Enquiry received
-        </h3>
-        <p className="mt-3 text-sm leading-relaxed text-muted">
-          Thanks — our team will be in touch about the {vehicleHeadline} shortly.
-        </p>
-
-        {state.reference && (
-          <p className="mt-5 text-sm text-muted">
-            Your reference:{" "}
-            <span className="font-display font-semibold tracking-wide text-gold">
-              {state.reference}
-            </span>
-          </p>
-        )}
-
-        <p className="mt-5 text-xs text-faint">
-          Need us sooner? Call{" "}
-          <a
-            href={`tel:${contact.phoneHref}`}
-            className="text-muted transition-colors hover:text-amber"
-          >
-            {contact.phone}
-          </a>
-          .
-        </p>
-      </div>
-    );
-  }
-
+  /*
+   * There is no success branch here: a successful submission redirects to
+   * /thank-you from the Server Action, so this component only ever renders the
+   * form or its errors.
+   */
   return (
     <form action={formAction} className="glass rounded-2xl p-6 sm:p-7">
       <h3 className="font-display text-xl font-semibold text-ink">
@@ -139,12 +105,13 @@ export default function EnquiryForm({
 
         <div>
           <label className={labelClass} htmlFor={fieldId("phone")}>
-            Phone <span className="font-normal text-faint">(optional)</span>
+            Phone
           </label>
           <input
             id={fieldId("phone")}
             name="phone"
             type="tel"
+            required
             maxLength={50}
             autoComplete="tel"
             defaultValue={state.values?.phone}
