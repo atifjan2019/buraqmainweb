@@ -87,9 +87,15 @@ export interface StockFilters {
  * The canonical detail URL, straight from the API's slug.
  *
  * There is deliberately no slug-building helper here — see `Vehicle.slug`.
+ *
+ * The fallback is not a second slug algorithm: the bare plate is a form the API
+ * documents and accepts, and the detail page will 308 it on to the canonical
+ * URL. It only exists so a slug missing from the API degrades to a working link
+ * rather than putting `/cars/undefined` in the stock grid.
  */
 export function vehicleHref(vehicle: Vehicle): string {
-  return `/cars/${vehicle.slug}`;
+  const identifier = vehicle.slug || encodeURIComponent(vehicle.registration);
+  return `/cars/${identifier}`;
 }
 
 /* ---------------------------------------------------------------- */
