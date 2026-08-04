@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getFeaturedVehicles } from "@/lib/vehicles";
+import { getFeaturedVehicles } from "@/lib/crm";
 import { ArrowRight } from "./Icons";
 import Reveal from "./Reveal";
 import SectionHeading from "./SectionHeading";
@@ -28,7 +28,7 @@ export default async function FeaturedVehicles() {
         ) : (
           <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {vehicles.map((vehicle, i) => (
-              <Reveal key={vehicle.slug} delay={(i % 3) * 90}>
+              <Reveal key={vehicle.registration} delay={(i % 3) * 90}>
                 <VehicleCard vehicle={vehicle} />
               </Reveal>
             ))}

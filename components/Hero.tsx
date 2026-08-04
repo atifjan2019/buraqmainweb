@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { financeDisclaimer, whatsappLink } from "@/lib/site";
-import { getFeaturedVehicles, formatPrice, vehicleTitle } from "@/lib/vehicles";
+import { getFeaturedVehicles } from "@/lib/crm";
+import { formatPrice, vehicleHref, vehicleTitle } from "@/lib/vehicles";
 import { ArrowRight, Check, Sparkle, WhatsApp } from "./Icons";
 import Reveal from "./Reveal";
 
@@ -11,12 +12,18 @@ const heroStats = [
   { value: "24/7", label: "Support" },
 ];
 
-/** Low-angle shot of the black Prius — reads well against the dark canvas. */
+/**
+ * Brand photography, not stock — a low-angle shot from the dealership's own
+ * library that reads well against the dark canvas. The car it shows may no
+ * longer be for sale, so nothing here claims it is.
+ */
 const HERO_IMAGE = "/cars/112-toyota-prius/03.jpeg";
 
 export default async function Hero() {
   const wa = whatsappLink("Hi Burraq Motors, I'd like to enquire about a car.");
-  const [spotlight] = await getFeaturedVehicles(1);
+
+  // Same request the featured section makes, so the two share one fetch.
+  const [spotlight] = await getFeaturedVehicles(6);
 
   return (
     <section className="relative isolate flex min-h-[94svh] items-center overflow-hidden pt-28 pb-20">
@@ -141,7 +148,7 @@ export default async function Hero() {
         <div className="absolute right-8 bottom-16 z-10 hidden xl:block">
           <Reveal delay={520}>
             <Link
-              href={`/cars/${spotlight.slug}`}
+              href={vehicleHref(spotlight)}
               className="group glass block w-64 rounded-2xl p-5 transition-all duration-500 hover:-translate-y-1 hover:border-amber/40"
             >
               <span className="text-[0.65rem] font-semibold tracking-[0.2em] text-amber">
