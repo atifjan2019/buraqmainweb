@@ -42,11 +42,19 @@ export default function VideoEmbed({ id, title }: VideoEmbedProps) {
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-60"
         style={{
+          // --color-glow, not --color-amber: this wash carries no text, so it
+          // has no contrast requirement and keeps the brand's vivid amber on
+          // both themes. The light palette's darkened amber would settle into
+          // a muddy tan over the near-white poster.
           background:
-            "radial-gradient(circle at 50% 50%, rgba(245,165,36,0.14), transparent 62%)",
+            "radial-gradient(circle at 50% 50%, color-mix(in oklab, var(--color-glow) 14%, transparent), transparent 62%)",
         }}
       />
-      <span className="relative grid h-16 w-16 place-items-center rounded-full border border-amber/40 bg-canvas/70 backdrop-blur transition-all duration-300 group-hover/play:scale-110 group-hover/play:border-amber group-hover/play:shadow-[0_0_36px_-6px_var(--color-amber)]">
+      {/* The ring and the soft lift are what separate this disc from the
+          poster on light, where a translucent canvas fill is near-white on a
+          near-white surface. On dark the poster is already far darker than
+          both, so neither is doing any work there. */}
+      <span className="relative grid h-16 w-16 place-items-center rounded-full border border-amber/60 bg-canvas/70 shadow-(--shadow-card) backdrop-blur transition-all duration-300 group-hover/play:scale-110 group-hover/play:border-amber group-hover/play:shadow-(--shadow-glow)">
         <svg
           viewBox="0 0 24 24"
           fill="currentColor"

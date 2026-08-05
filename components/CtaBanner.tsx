@@ -12,8 +12,12 @@ export default function CtaBanner() {
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-1/2 h-[40rem] w-[70rem] -translate-x-1/2 -translate-y-1/2 opacity-70 blur-3xl"
         style={{
+          /* --color-glow, not --color-amber: this wash carries no text, so it
+             has no contrast requirement and keeps the brand's vivid amber on
+             both themes. The light palette's darkened amber would settle into
+             a muddy tan here rather than the warm blush this is meant to be. */
           background:
-            "radial-gradient(ellipse, rgba(245,165,36,0.14) 0%, transparent 62%)",
+            "radial-gradient(ellipse, color-mix(in oklab, var(--color-glow) 14%, transparent) 0%, transparent 62%)",
         }}
       />
 
@@ -35,7 +39,7 @@ export default function CtaBanner() {
           <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
               href="/cars"
-              className="group inline-flex items-center justify-center gap-2 rounded-full bg-amber px-8 py-4 font-semibold text-canvas transition-all hover:bg-amber-bright hover:shadow-[0_0_44px_-8px_var(--color-amber)]"
+              className="group inline-flex items-center justify-center gap-2 rounded-full bg-amber px-8 py-4 font-semibold text-on-amber transition-all hover:bg-amber-bright hover:shadow-(--shadow-glow)"
             >
               Browse All Cars
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

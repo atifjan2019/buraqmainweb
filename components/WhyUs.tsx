@@ -18,8 +18,8 @@ export default function WhyUs() {
           {whyUs.map((item, i) => (
             <Reveal key={item.title} delay={(i % 3) * 90}>
               <div className="group glass h-full rounded-2xl p-7 transition-all duration-500 hover:-translate-y-1 hover:border-amber/30">
-                <span className="grid h-11 w-11 place-items-center rounded-xl border border-amber/25 bg-amber/10 transition-colors group-hover:bg-amber group-hover:text-canvas">
-                  <Check className="h-5 w-5 text-amber transition-colors group-hover:text-canvas" />
+                <span className="grid h-11 w-11 place-items-center rounded-xl border border-amber/25 bg-amber/10 transition-colors group-hover:bg-amber group-hover:text-on-amber">
+                  <Check className="h-5 w-5 text-amber transition-colors group-hover:text-on-amber" />
                 </span>
                 <h3 className="mt-5 font-display text-lg font-semibold text-ink">
                   {item.title}

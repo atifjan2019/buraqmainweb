@@ -39,7 +39,7 @@ export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
   ];
 
   return (
-    <article className="group glass relative flex h-full flex-col overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-1.5 hover:border-amber/30 hover:shadow-[0_24px_60px_-24px_rgba(245,165,36,0.35)]">
+    <article className="group glass relative flex h-full flex-col overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-1.5 hover:border-amber/30 hover:shadow-(--shadow-card)">
       {/* Media — fixed 4:3 box so mixed-shape photos can't make the grid
           ragged, and so nothing reflows as images arrive. */}
       <div className="relative aspect-4/3 overflow-hidden bg-surface-2">
@@ -74,7 +74,7 @@ export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
             </span>
           )}
           {vehicle.isFeatured && (
-            <span className="rounded-full bg-amber px-2.5 py-1 text-[0.68rem] font-semibold tracking-wide text-canvas">
+            <span className="rounded-full bg-amber px-2.5 py-1 text-[0.68rem] font-semibold tracking-wide text-on-amber">
               Featured
             </span>
           )}
@@ -107,7 +107,7 @@ export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
         <div className="mt-5 flex items-center gap-2 border-t border-line-soft pt-4">
           <Link
             href={vehicleHref(vehicle)}
-            className="group/btn inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-surface-2 px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-amber hover:text-canvas"
+            className="group/btn inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-surface-2 px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-amber hover:text-on-amber"
           >
             View Details
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-0.5" />

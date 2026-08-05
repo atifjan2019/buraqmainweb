@@ -17,12 +17,16 @@ export default function ComingSoon({ eyebrow, title, body }: ComingSoonProps) {
 
   return (
     <section className="relative flex min-h-[80svh] items-center overflow-hidden pt-32 pb-24">
+      {/* Mood lighting behind the headline, mixed off --color-glow rather than
+          --color-amber: it carries no text, so it has no contrast requirement
+          and keeps the brand's vivid amber on both themes. The light palette's
+          darkened amber would land as a muddy tan instead of a warm tint. */}
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-0 h-[45rem] w-[60rem] -translate-x-1/2 opacity-60 blur-3xl"
         style={{
           background:
-            "radial-gradient(ellipse, rgba(245,165,36,0.13) 0%, transparent 65%)",
+            "radial-gradient(ellipse, color-mix(in oklab, var(--color-glow) 13%, transparent) 0%, transparent 65%)",
         }}
       />
 
@@ -44,7 +48,7 @@ export default function ComingSoon({ eyebrow, title, body }: ComingSoonProps) {
         <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
           <Link
             href="/"
-            className="group inline-flex items-center justify-center gap-2 rounded-full bg-amber px-8 py-4 font-semibold text-canvas transition-all hover:bg-amber-bright hover:shadow-[0_0_40px_-8px_var(--color-amber)]"
+            className="group inline-flex items-center justify-center gap-2 rounded-full bg-amber px-8 py-4 font-semibold text-on-amber transition-all hover:bg-amber-bright hover:shadow-(--shadow-glow)"
           >
             Back to Home
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

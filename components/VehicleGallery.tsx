@@ -216,7 +216,7 @@ export default function VehicleGallery({
             src={current.full}
             alt={current.alt}
             onClick={(event) => event.stopPropagation()}
-            className="h-auto w-auto max-h-[78vh] max-w-[86vw] cursor-default rounded-lg object-contain shadow-2xl sm:max-h-[82vh] sm:max-w-[80vw]"
+            className="h-auto w-auto max-h-[78vh] max-w-[86vw] cursor-default rounded-lg object-contain shadow-(--shadow-card) sm:max-h-[82vh] sm:max-w-[80vw]"
           />
 
           {count > 1 && (

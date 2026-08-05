@@ -28,9 +28,13 @@ export default function VehiclePlaceholder({
     <div
       aria-hidden
       className="flex h-full w-full flex-col items-center justify-center gap-3 bg-surface-2"
+      /* Warm glow from below, mixed off --color-glow rather than
+         --color-amber: it carries no text, so it has no contrast requirement
+         and keeps the brand's vivid amber on both themes. The light palette's
+         darkened amber would stain the tile rather than warm it. */
       style={{
         backgroundImage:
-          "radial-gradient(circle at 50% 120%, rgba(245,165,36,0.14), transparent 60%)",
+          "radial-gradient(circle at 50% 120%, color-mix(in oklab, var(--color-glow) 14%, transparent), transparent 60%)",
       }}
     >
       <Car

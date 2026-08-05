@@ -86,7 +86,7 @@ export default function Pagination({
                 aria-label={`Page ${page}`}
                 className={
                   page === currentPage
-                    ? "grid h-10 w-10 place-items-center rounded-full bg-amber text-sm font-semibold text-canvas"
+                    ? "grid h-10 w-10 place-items-center rounded-full bg-amber text-sm font-semibold text-on-amber"
                     : "grid h-10 w-10 place-items-center rounded-full border border-line text-sm font-medium text-muted transition-colors hover:border-amber/40 hover:text-amber"
                 }
               >

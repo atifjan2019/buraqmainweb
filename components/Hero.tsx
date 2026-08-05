@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { financeDisclaimer, whatsappLink } from "@/lib/site";
+import { financeDisclaimer } from "@/lib/site";
 import { getFeaturedVehicles } from "@/lib/crm";
 import { formatPrice, vehicleHref, vehicleTitle } from "@/lib/vehicles";
-import { ArrowRight, Check, Sparkle, WhatsApp } from "./Icons";
+import { ArrowRight, Check, Sparkle } from "./Icons";
 import Reveal from "./Reveal";
 
 const heroStats = [
@@ -20,8 +20,6 @@ const heroStats = [
 const HERO_IMAGE = "/cars/112-toyota-prius/03.jpeg";
 
 export default async function Hero() {
-  const wa = whatsappLink("Hi Burraq Motors, I'd like to enquire about a car.");
-
   // Same request the featured section makes, so the two share one fetch.
   const [spotlight] = await getFeaturedVehicles(6);
 
@@ -49,20 +47,26 @@ export default async function Hero() {
         className="absolute inset-0 -z-20 bg-linear-to-t from-canvas via-transparent to-canvas/85"
       />
 
-      {/* Ambient amber light */}
+      {/* Ambient amber light. Mixed off --color-glow, which stays the brand's
+          vivid amber on both themes: this wash carries no text, and the light
+          palette's darkened amber would turn it into a muddy tan rather than
+          the warm tint it is meant to be. */}
       <div
         aria-hidden
         className="pointer-events-none absolute right-[-10%] top-[-15%] -z-10 h-[60rem] w-[60rem] rounded-full opacity-50 blur-3xl"
         style={{
           background:
-            "radial-gradient(circle, rgba(245,165,36,0.20) 0%, rgba(245,165,36,0.06) 40%, transparent 70%)",
+            "radial-gradient(circle, color-mix(in oklab, var(--color-glow) 20%, transparent) 0%, color-mix(in oklab, var(--color-glow) 6%, transparent) 40%, transparent 70%)",
         }}
       />
 
-      {/* Film grain */}
+      {/* Film grain — strength and blend come from the utility's own tokens,
+          which zero it out on light, where the same noise reads as a dirty
+          screen rather than as film stock. Repeating them here would pin the
+          grain to its dark values and defeat that. */}
       <div
         aria-hidden
-        className="grain-overlay pointer-events-none absolute inset-0 -z-10 opacity-[0.14] mix-blend-overlay"
+        className="grain-overlay pointer-events-none absolute inset-0 -z-10"
       />
 
       <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
@@ -75,7 +79,12 @@ export default async function Hero() {
           </Reveal>
 
           <Reveal delay={80}>
-            <h1 className="mt-7 font-display text-[clamp(2.6rem,7.4vw,5.4rem)] font-bold leading-[0.98] tracking-[-0.03em] [text-shadow:0_2px_40px_rgba(0,0,0,0.6)]">
+            {/* The halo separates the headline from the photo behind it, so it
+                inverts with the theme — a black bloom under near-black text
+                would smear it rather than lift it. Kept tight: past a few
+                pixels from the glyph edge a wider blur adds no legibility, it
+                just puts a cloud behind the whole word. See globals.css. */}
+            <h1 className="mt-7 font-display text-[clamp(2.6rem,7.4vw,5.4rem)] font-bold leading-[0.98] tracking-[-0.03em] [text-shadow:var(--hero-text-shadow)]">
               <span className="block text-ink">Premium</span>
               <span className="block text-gold">Japanese Cars</span>
               <span className="block text-ink">in Manchester</span>
@@ -85,7 +94,7 @@ export default async function Hero() {
           <Reveal delay={160}>
             <p className="mt-7 max-w-lg text-base leading-relaxed text-muted sm:text-lg">
               Browse quality hybrid and imported vehicles, each one HPI checked
-              and prepared to a standard we'd happily drive ourselves. Finance
+              and prepared to a standard we&apos;d happily drive ourselves. Finance
               available on selected cars.
             </p>
           </Reveal>
@@ -94,7 +103,7 @@ export default async function Hero() {
             <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <Link
                 href="/cars"
-                className="group inline-flex items-center justify-center gap-2 rounded-full bg-amber px-8 py-4 font-semibold text-canvas transition-all hover:bg-amber-bright hover:shadow-[0_0_44px_-8px_var(--color-amber)]"
+                className="group inline-flex items-center justify-center gap-2 rounded-full bg-amber px-8 py-4 font-semibold text-on-amber transition-all hover:bg-amber-bright hover:shadow-(--shadow-glow)"
               >
                 Browse Cars
                 <ArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-1" />
@@ -105,17 +114,6 @@ export default async function Hero() {
               >
                 Calculate Finance
               </Link>
-              {wa && (
-                <a
-                  href={wa}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-4 font-semibold text-muted transition-colors hover:text-ink"
-                >
-                  <WhatsApp className="h-5 w-5" />
-                  WhatsApp Us
-                </a>
-              )}
             </div>
           </Reveal>
 

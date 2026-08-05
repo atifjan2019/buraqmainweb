@@ -30,7 +30,8 @@ export default function Showcase() {
         />
       </div>
 
-      {/* Scrims: darken overall, then bias contrast toward the copy column */}
+      {/* Scrims: flatten the photo toward canvas — which darkens on dark and
+          lightens on light — then bias contrast toward the copy column */}
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-linear-to-r from-canvas via-canvas/90 to-canvas/55"
@@ -39,9 +40,12 @@ export default function Showcase() {
         aria-hidden
         className="absolute inset-0 -z-10 bg-linear-to-b from-canvas via-transparent to-canvas"
       />
+      {/* Strength and blend are left to the grain tokens instead of being set
+          here: local values outrank the utility, which would keep the noise on
+          in light mode, where it reads as a dirty screen rather than as film. */}
       <div
         aria-hidden
-        className="grain-overlay pointer-events-none absolute inset-0 -z-10 opacity-[0.12] mix-blend-overlay"
+        className="grain-overlay pointer-events-none absolute inset-0 -z-10"
       />
 
       <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 sm:py-32">
@@ -88,7 +92,7 @@ export default function Showcase() {
               href="/cars"
               className="group mt-10 inline-flex items-center gap-2 rounded-full border border-line bg-canvas/60 px-7 py-3.5 font-semibold text-ink backdrop-blur transition-all hover:border-amber/50 hover:text-amber"
             >
-              See what's in stock
+              See what&apos;s in stock
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </Reveal>

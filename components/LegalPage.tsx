@@ -23,12 +23,17 @@ export default function LegalPage({
   return (
     <>
       <section className="relative overflow-hidden border-b border-line-soft pt-36 pb-14">
+        {/* Ambient warmth behind the masthead, mixed off --color-glow rather
+            than --color-amber: it carries no text, so it has no contrast
+            requirement and keeps the brand's vivid amber on both themes.
+            Mixing against transparent leaves the dark value exactly the
+            rgba(245,165,36,0.10) it has always been. */}
         <div
           aria-hidden
           className="pointer-events-none absolute left-1/2 top-0 h-[34rem] w-[54rem] -translate-x-1/2 opacity-50 blur-3xl"
           style={{
             background:
-              "radial-gradient(ellipse, rgba(245,165,36,0.10) 0%, transparent 65%)",
+              "radial-gradient(ellipse, color-mix(in oklab, var(--color-glow) 10%, transparent) 0%, transparent 65%)",
           }}
         />
         <div className="relative mx-auto max-w-3xl px-5 sm:px-8">

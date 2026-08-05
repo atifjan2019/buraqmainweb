@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { contact, nav, whatsappLink } from "@/lib/site";
 import { Close, Menu, Phone, WhatsApp } from "./Icons";
 import Logo from "./Logo";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -62,43 +63,32 @@ export default function Header() {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          {contact.phone && (
-            <a
-              href={`tel:${contact.phoneHref}`}
-              className="flex items-center gap-2 rounded-full border border-line px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:border-amber/50 hover:text-amber"
-            >
-              <Phone className="h-4 w-4" />
-              {contact.phone}
-            </a>
-          )}
           {wa && (
             <a
               href={wa}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-full bg-amber px-5 py-2.5 text-sm font-semibold text-canvas transition-all hover:bg-amber-bright hover:shadow-[0_0_28px_-6px_var(--color-amber)]"
+              className="flex items-center gap-2 rounded-full bg-amber px-5 py-2.5 text-sm font-semibold text-on-amber transition-all hover:bg-amber-bright hover:shadow-(--shadow-glow)"
             >
               <WhatsApp className="h-4 w-4" />
               WhatsApp
             </a>
           )}
-          <Link
-            href="/cars"
-            className="rounded-full border border-amber/40 px-5 py-2.5 text-sm font-semibold text-amber transition-colors hover:bg-amber hover:text-canvas"
-          >
-            Browse Cars
-          </Link>
+          <ThemeToggle />
         </div>
 
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-label={open ? "Close menu" : "Open menu"}
-          aria-expanded={open}
-          className="grid h-11 w-11 place-items-center rounded-xl border border-line text-ink lg:hidden"
-        >
-          {open ? <Close className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        <div className="flex items-center gap-2 lg:hidden">
+          <ThemeToggle />
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            className="grid h-11 w-11 place-items-center rounded-xl border border-line text-ink"
+          >
+            {open ? <Close className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile drawer */}
@@ -114,7 +104,9 @@ export default function Header() {
             type="button"
             onClick={() => setOpen(false)}
             aria-label="Close menu"
-            className="mb-2 ml-auto grid h-10 w-10 place-items-center rounded-xl border border-line text-muted"
+            /* 44px minimum — this is a touch-only control, so it never gets
+               the precision of a cursor. */
+            className="mb-2 ml-auto grid h-11 w-11 place-items-center rounded-xl border border-line text-muted"
           >
             <Close className="h-5 w-5" />
           </button>
@@ -134,7 +126,7 @@ export default function Header() {
             <Link
               href="/cars"
               onClick={() => setOpen(false)}
-              className="rounded-full bg-amber px-6 py-4 text-center font-semibold text-canvas"
+              className="rounded-full bg-amber px-6 py-4 text-center font-semibold text-on-amber"
             >
               Browse Cars
             </Link>

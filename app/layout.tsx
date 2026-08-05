@@ -50,9 +50,13 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
+/*
+  The dark canvas, matching the default the inline script applies. `colorScheme`
+  is deliberately not declared here: globals.css sets it per theme on <html>, and
+  a meta tag pinning it to dark would describe the light theme incorrectly.
+*/
 export const viewport: Viewport = {
   themeColor: "#0a0a0b",
-  colorScheme: "dark",
 };
 
 export default function RootLayout({
@@ -62,15 +66,31 @@ export default function RootLayout({
     <html
       lang="en-GB"
       className={`${sora.variable} ${inter.variable} h-full antialiased`}
+      /*
+        The script below stamps `data-js` on this element before React hydrates,
+        so the server HTML deliberately lacks an attribute the client DOM has.
+        Rendering it server-side instead would hide every revealed section for
+        anyone without scripting — the exact failure the flag exists to prevent.
+      */
+      suppressHydrationWarning
     >
       <head>
         {/*
-          Arms the scroll-reveal styles. Runs before paint, so there's no flash,
-          and if scripting is unavailable the content simply stays visible.
+          Arms the scroll-reveal styles and selects the colour theme. Both have
+          to happen before first paint: the reveal flag so content isn't shown
+          and then hidden, and the theme so a visitor who chose light doesn't
+          get a black flash on every navigation.
+
+          Dark is the default, and an unreadable or absent preference falls back
+          to it — the dark palette is the brand's own look, so the light one is
+          opt-in rather than something the OS setting turns on unasked.
+
+          If scripting is unavailable neither runs: content stays visible and
+          the site stays dark, which are both correct resting states.
         */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `document.documentElement.setAttribute('data-js','')`,
+            __html: `document.documentElement.setAttribute('data-js','');try{var t=localStorage.getItem('theme');document.documentElement.dataset.theme=t==='light'?'light':'dark'}catch(e){document.documentElement.dataset.theme='dark'}`,
           }}
         />
       </head>

@@ -33,9 +33,12 @@ export default function FinancePage() {
           aria-hidden
           className="absolute inset-0 -z-20 bg-linear-to-b from-canvas/95 via-canvas/85 to-canvas"
         />
+        {/* Opacity and blend come from the utility's own tokens — repeating
+            them here pinned the grain on in light mode, where it reads as a
+            dirty screen rather than as film stock. */}
         <div
           aria-hidden
-          className="grain-overlay pointer-events-none absolute inset-0 -z-10 opacity-[0.14] mix-blend-overlay"
+          className="grain-overlay pointer-events-none absolute inset-0 -z-10"
         />
 
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
@@ -85,7 +88,13 @@ export default function FinancePage() {
               <li key={step.step}>
                 <Reveal delay={i * 90}>
                   <div className="group glass h-full rounded-2xl p-6 transition-colors hover:border-amber/30">
-                    <span className="font-display text-5xl font-bold leading-none text-line transition-colors group-hover:text-amber/30">
+                    {/* Ghost numeral. `line` only works as a ghost on dark,
+                        where it is lighter than the card; on a near-white card
+                        it is lighter still and the digit disappears. A grey
+                        that recedes on black advances on white, so this is a
+                        token pair — and hover has to deepen it on light where
+                        it brightened on dark. */}
+                    <span className="font-display text-5xl font-bold leading-none text-(--ghost-numeral) transition-colors group-hover:text-(--ghost-numeral-hover)">
                       {step.step}
                     </span>
                     <h3 className="mt-5 font-display text-lg font-semibold text-ink">

@@ -12,12 +12,18 @@ export default function FinanceSection() {
       id="finance"
       className="relative overflow-hidden border-y border-line-soft py-24 sm:py-32"
     >
+      {/*
+        Ambient warmth behind the heading, mixed off --color-glow rather than
+        --color-amber: it carries no text, so it has no contrast requirement
+        and keeps the brand's vivid amber on both themes. The light palette's
+        darkened amber would turn this into a muddy tan.
+      */}
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-0 h-[36rem] w-[60rem] -translate-x-1/2 opacity-50 blur-3xl"
         style={{
           background:
-            "radial-gradient(ellipse, rgba(245,165,36,0.10) 0%, transparent 65%)",
+            "radial-gradient(ellipse, color-mix(in oklab, var(--color-glow) 10%, transparent) 0%, transparent 65%)",
         }}
       />
 
@@ -34,7 +40,15 @@ export default function FinanceSection() {
             <li key={step.step}>
               <Reveal delay={i * 90}>
                 <div className="group glass relative h-full rounded-2xl p-6 transition-colors hover:border-amber/30">
-                  <span className="font-display text-5xl font-bold leading-none text-line transition-colors group-hover:text-amber/30">
+                  {/*
+                    A ghost numeral, not a label. `line` only worked here
+                    because it is lighter than the card behind it; on light it
+                    becomes a pale grey on near-white and all but disappears.
+                    A grey that recedes on black advances on white, so this is
+                    a token pair rather than one colour at a low alpha — and
+                    hover has to deepen it on light where it brightened on dark.
+                  */}
+                  <span className="font-display text-5xl font-bold leading-none text-(--ghost-numeral) transition-colors group-hover:text-(--ghost-numeral-hover)">
                     {step.step}
                   </span>
                   <h3 className="mt-5 font-display text-lg font-semibold text-ink">
@@ -54,7 +68,7 @@ export default function FinanceSection() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/finance"
-                className="group inline-flex items-center justify-center gap-2 rounded-full bg-amber px-8 py-4 font-semibold text-canvas transition-all hover:bg-amber-bright hover:shadow-[0_0_40px_-8px_var(--color-amber)]"
+                className="group inline-flex items-center justify-center gap-2 rounded-full bg-amber px-8 py-4 font-semibold text-on-amber transition-all hover:bg-amber-bright hover:shadow-(--shadow-glow)"
               >
                 Apply for Finance
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

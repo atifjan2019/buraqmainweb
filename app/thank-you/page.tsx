@@ -40,12 +40,18 @@ export default async function ThankYouPage() {
 
   return (
     <section className="relative flex min-h-[80svh] items-center overflow-hidden pt-32 pb-24">
+      {/*
+        Ambient warmth behind the confirmation, mixed off --color-glow rather
+        than --color-amber: it carries no text, so it has no contrast
+        requirement and keeps the brand's vivid amber on both themes. The light
+        palette's darkened amber would turn this into a muddy tan.
+      */}
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-0 h-[45rem] w-[60rem] -translate-x-1/2 opacity-60 blur-3xl"
         style={{
           background:
-            "radial-gradient(ellipse, rgba(245,165,36,0.13) 0%, transparent 65%)",
+            "radial-gradient(ellipse, color-mix(in oklab, var(--color-glow) 13%, transparent) 0%, transparent 65%)",
         }}
       />
 
@@ -90,7 +96,7 @@ export default async function ThankYouPage() {
         <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
           <a
             href={`tel:${contact.phoneHref}`}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-amber px-7 py-3.5 font-semibold text-canvas transition-all hover:bg-amber-bright hover:shadow-[0_0_40px_-8px_var(--color-amber)]"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-amber px-7 py-3.5 font-semibold text-on-amber transition-all hover:bg-amber-bright hover:shadow-(--shadow-glow)"
           >
             <Phone className="h-4.5 w-4.5" />
             {contact.phone}

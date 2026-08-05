@@ -21,7 +21,7 @@ export default async function FeaturedVehicles() {
         {vehicles.length === 0 ? (
           <Reveal>
             <p className="mt-16 text-center text-muted">
-              Our next vehicles are being prepared. Get in touch and we'll let
+              Our next vehicles are being prepared. Get in touch and we&apos;ll let
               you know the moment they land.
             </p>
           </Reveal>

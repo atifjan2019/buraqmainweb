@@ -35,7 +35,7 @@ export default function StockNotice({ title, body, action }: StockNoticeProps) {
         {action && (
           <Link
             href={action.href}
-            className="inline-flex items-center justify-center rounded-full bg-amber px-6 py-3 text-sm font-semibold text-canvas transition-colors hover:bg-amber-bright"
+            className="inline-flex items-center justify-center rounded-full bg-amber px-6 py-3 text-sm font-semibold text-on-amber transition-colors hover:bg-amber-bright"
           >
             {action.label}
           </Link>

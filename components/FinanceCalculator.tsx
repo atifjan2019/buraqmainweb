@@ -131,10 +131,10 @@ export default function FinanceCalculator({
           htmlFor={`${containerId}-price`}
           className="block font-display text-lg font-semibold text-ink"
         >
-          What's the vehicle price?
+          What&apos;s the vehicle price?
         </label>
         <p className="mt-2 text-sm text-muted">
-          Enter a price and we'll show you illustrative Hire Purchase payments.
+          Enter a price and we&apos;ll show you illustrative Hire Purchase payments.
         </p>
 
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
@@ -155,7 +155,7 @@ export default function FinanceCalculator({
           </div>
           <button
             type="submit"
-            className="rounded-full bg-amber px-8 py-4 font-semibold text-canvas transition-all hover:bg-amber-bright hover:shadow-[0_0_36px_-8px_var(--color-amber)]"
+            className="rounded-full bg-amber px-8 py-4 font-semibold text-on-amber transition-all hover:bg-amber-bright hover:shadow-(--shadow-glow)"
           >
             Calculate
           </button>
@@ -167,6 +167,12 @@ export default function FinanceCalculator({
         live it gets a light panel rather than fighting the dark canvas. The
         container must stay mounted at all times because the plugin looks it up
         by id before rendering into it.
+
+        That panel colour is deliberately a literal and not a surface token: the
+        plugin's markup is light in both of our themes, so a token — which would
+        flip to near-black on dark — would put its dark text on a dark ground.
+        The value is the light theme's `canvas-deep`, so on light it reads as a
+        recessed panel rather than a patch of foreign grey.
       */}
       <div className={status === "ready" ? "bg-[#f4f4f5] p-3 sm:p-5" : ""}>
         <div
@@ -187,14 +193,14 @@ export default function FinanceCalculator({
                   {status === "unauthorised"
                     ? "Our live quote calculator isn't available on this address yet."
                     : "The finance calculator couldn't load — an ad blocker or privacy extension may be blocking it."}{" "}
-                  Call or message us and we'll run the figures for you straight
+                  Call or message us and we&apos;ll run the figures for you straight
                   away.
                 </p>
                 <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
                   {contact.phone && (
                     <a
                       href={`tel:${contact.phoneHref}`}
-                      className="inline-flex items-center justify-center gap-2 rounded-full bg-amber px-6 py-3 text-sm font-semibold text-canvas transition-colors hover:bg-amber-bright"
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-amber px-6 py-3 text-sm font-semibold text-on-amber transition-colors hover:bg-amber-bright"
                     >
                       <Phone className="h-4 w-4" />
                       {contact.phone}

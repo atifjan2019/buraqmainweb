@@ -82,12 +82,16 @@ export default async function CarsPage({
 
   return (
     <section className="relative pt-32 pb-24 sm:pt-40 sm:pb-32">
+      {/* Ambient bloom behind the heading, mixed off --color-glow rather than
+          --color-amber: it carries no text, so it has no contrast requirement
+          and keeps the brand's vivid amber on both themes. The light palette's
+          darkened amber would land as a muddy tan, not a warm lift. */}
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-0 h-[40rem] w-[60rem] -translate-x-1/2 opacity-50 blur-3xl"
         style={{
           background:
-            "radial-gradient(ellipse, rgba(245,165,36,0.12) 0%, transparent 65%)",
+            "radial-gradient(ellipse, color-mix(in oklab, var(--color-glow) 12%, transparent) 0%, transparent 65%)",
         }}
       />
 

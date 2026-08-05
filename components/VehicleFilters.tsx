@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import type { FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useTransition, type FormEvent } from "react";
 import type { StockFilters } from "@/lib/vehicles";
 
 /**
@@ -11,10 +12,13 @@ import type { StockFilters } from "@/lib/vehicles";
  * values that currently have stock behind them — so no single choice here can
  * land the visitor on an empty page.
  *
- * It's a plain GET form, so it works with JavaScript disabled and every
- * filtered view has its own shareable, indexable URL. With JavaScript on, the
- * form submits as soon as a control changes and drops empty fields from the
- * query string.
+ * The markup stays a plain GET form, so with JavaScript disabled it still
+ * filters and every filtered view keeps its own shareable, indexable URL.
+ * With JavaScript on, the native submit is intercepted and the same URL is
+ * pushed through the router instead: the server re-renders the listing and
+ * only that markup is swapped in, so the page never reloads and the visitor
+ * stays exactly where they were scrolled to. The submit button is then
+ * redundant and hides itself — see `.no-js-only` in globals.css.
  */
 
 export interface ActiveFilters {
@@ -72,37 +76,81 @@ export default function VehicleFilters({
   hasActiveFilters,
 }: VehicleFiltersProps) {
   const steps = priceSteps(filters.priceRange.min, filters.priceRange.max);
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const formRef = useRef<HTMLFormElement>(null);
 
-  /** Re-submits whenever a control changes, for anyone with JavaScript on. */
+  /**
+   * Realigns the controls with the URL. These selects are uncontrolled, and a
+   * soft navigation never rebuilds the document, so Back, Forward and "Clear
+   * all" would otherwise leave the old choices on display next to freshly
+   * filtered results. Assigning `value` doesn't move focus, so this is safe to
+   * run right after the visitor has picked something — in that case the values
+   * already match and nothing is written.
+   */
+  const { make, fuel_type, transmission, min_price, max_price } = active;
+
+  useEffect(() => {
+    const form = formRef.current;
+    if (!form) return;
+
+    const fromUrl = { make, fuel_type, transmission, min_price, max_price };
+
+    for (const [name, value] of Object.entries(fromUrl)) {
+      const field = form.elements.namedItem(name);
+      if (field instanceof HTMLSelectElement && field.value !== (value ?? "")) {
+        field.value = value ?? "";
+      }
+    }
+  }, [make, fuel_type, transmission, min_price, max_price]);
+
+  /**
+   * Rebuilds `/cars?…` from the form's own state and navigates without a
+   * reload. Untouched controls submit as "" and are dropped, which is what
+   * keeps a URL like `/cars?make=Audi` clean instead of carrying five empty
+   * keys. Paging is deliberately not carried over: a changed filter describes
+   * a different result set, so page 3 of the old one is meaningless.
+   */
+  function applyFilters(form: HTMLFormElement) {
+    const search = new URLSearchParams();
+    for (const [name, value] of new FormData(form)) {
+      if (typeof value === "string" && value) search.set(name, value);
+    }
+
+    const query = search.toString();
+
+    // `scroll: false` is the point of doing this client-side — the filter bar
+    // sits well down the page and yanking the visitor back to the top on every
+    // dropdown change is exactly the reload behaviour we're removing.
+    startTransition(() => {
+      router.push(query ? `/cars?${query}` : "/cars", { scroll: false });
+    });
+  }
+
+  /** Applies as soon as a control changes, for anyone with JavaScript on. */
   function handleChange(event: FormEvent<HTMLFormElement>) {
-    (event.currentTarget as HTMLFormElement).requestSubmit();
+    applyFilters(event.currentTarget);
   }
 
   /**
-   * Keeps URLs clean by omitting untouched controls. Disabled fields aren't
-   * submitted; they're re-enabled immediately so the form stays usable if the
-   * navigation is cancelled or the page is restored from bfcache.
+   * Only reachable with scripting on — without it the browser performs the
+   * native GET and this never runs, which is the whole no-JS fallback.
    */
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    const form = event.currentTarget as HTMLFormElement;
-    const emptied = Array.from(form.elements).filter(
-      (element): element is HTMLSelectElement =>
-        element instanceof HTMLSelectElement && element.value === "",
-    );
-
-    for (const element of emptied) element.disabled = true;
-    setTimeout(() => {
-      for (const element of emptied) element.disabled = false;
-    });
+    event.preventDefault();
+    applyFilters(event.currentTarget);
   }
 
   return (
     <form
+      ref={formRef}
       method="get"
       action="/cars"
       onChange={handleChange}
       onSubmit={handleSubmit}
-      className="glass rounded-2xl p-5 sm:p-6"
+      aria-busy={isPending}
+      className="glass rounded-2xl p-5 transition-opacity sm:p-6"
+      style={{ opacity: isPending ? 0.6 : 1 }}
     >
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <div>
@@ -203,18 +251,27 @@ export default function VehicleFilters({
         </div>
       </div>
 
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        {/* The sole control for anyone without JavaScript; harmless with it. */}
+      <div className="mt-5 flex flex-wrap items-center gap-3 empty:mt-0">
+        {/* The sole control for anyone without JavaScript. With scripting on,
+            changing a dropdown already applies, so it hides itself rather than
+            sitting there implying the choice hasn't taken effect yet. */}
         <button
           type="submit"
-          className="rounded-full bg-amber px-6 py-2.5 text-sm font-semibold text-canvas transition-colors hover:bg-amber-bright"
+          className="no-js-only rounded-full bg-amber px-6 py-2.5 text-sm font-semibold text-on-amber transition-colors hover:bg-amber-bright"
         >
           Apply filters
         </button>
 
+        {/* Announced, not just shown — with the button gone this is the only
+            confirmation that a change was registered. */}
+        <p aria-live="polite" className="text-sm text-muted">
+          {isPending ? "Updating results…" : ""}
+        </p>
+
         {hasActiveFilters && (
           <Link
             href="/cars"
+            scroll={false}
             className="text-sm font-medium text-muted transition-colors hover:text-amber"
           >
             Clear all

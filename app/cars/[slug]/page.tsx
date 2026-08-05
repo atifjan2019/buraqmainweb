@@ -169,8 +169,12 @@ export default async function VehiclePage({ params }: PageProps) {
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-0 h-[40rem] w-[60rem] -translate-x-1/2 opacity-50 blur-3xl"
         style={{
+          // --color-glow, not --color-amber: this wash carries no text, so it
+          // has no contrast requirement and keeps the brand's vivid amber on
+          // both themes. The light palette's darkened amber would settle into
+          // a muddy tan here rather than the warm lift this is meant to be.
           background:
-            "radial-gradient(ellipse, rgba(245,165,36,0.12) 0%, transparent 65%)",
+            "radial-gradient(ellipse, color-mix(in oklab, var(--color-glow) 12%, transparent) 0%, transparent 65%)",
         }}
       />
 
@@ -194,7 +198,7 @@ export default async function VehiclePage({ params }: PageProps) {
                   </span>
                 )}
                 {vehicle.isFeatured && (
-                  <span className="rounded-full bg-amber px-3 py-1 text-xs font-semibold tracking-wide text-canvas">
+                  <span className="rounded-full bg-amber px-3 py-1 text-xs font-semibold tracking-wide text-on-amber">
                     Featured
                   </span>
                 )}

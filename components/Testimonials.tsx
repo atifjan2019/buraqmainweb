@@ -34,7 +34,7 @@ export default function Testimonials() {
                 </div>
 
                 <figcaption className="mt-4 flex items-center gap-3 border-t border-line-soft pt-4">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-linear-to-br from-amber-bright to-amber-dim font-display font-bold text-canvas">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-linear-to-br from-amber-bright to-amber-dim font-display font-bold text-on-amber">
                     {t.name.charAt(0)}
                   </span>
                   <span className="min-w-0">

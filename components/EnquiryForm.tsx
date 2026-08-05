@@ -9,10 +9,18 @@ import {
 } from "@/lib/enquiry-state";
 
 interface EnquiryFormProps {
-  /** The car this enquiry is about, passed to the CRM as context. */
-  registration: string;
+  /**
+   * The car this enquiry is about, passed to the CRM as context. Omitted on
+   * the contact page, where the enquiry isn't about any particular car — the
+   * Server Action treats a blank registration as a general lead and skips the
+   * vehicle lookup entirely.
+   */
+  registration?: string;
   /** Used to pre-fill the message so the customer starts from something. */
-  vehicleHeadline: string;
+  vehicleHeadline?: string;
+  /** Overrides for the general form, which is not asking about a car. */
+  heading?: string;
+  intro?: string;
 }
 
 const fieldClass =
@@ -22,9 +30,21 @@ const fieldClass =
 
 const labelClass = "block text-xs font-semibold tracking-wide text-muted";
 
+/*
+ * Error red is the one colour on this form with no token behind it. The pale
+ * reds that lift an error off the dark canvas sit at roughly 1.4:1 on a white
+ * card, so the light scheme needs a deep red instead. `light-dark()` reads the
+ * `color-scheme` globals.css already sets per theme, which keeps the choice in
+ * CSS — the component still has no idea which theme it is in.
+ */
+const alertTextClass = "text-[color:light-dark(#b91c1c,#fecaca)]";
+const fieldErrorTextClass = "text-[color:light-dark(#b91c1c,#fca5a5)]";
+
 export default function EnquiryForm({
-  registration,
+  registration = "",
   vehicleHeadline,
+  heading = "Enquire about this car",
+  intro = "Send us a message and we'll come back to you with availability, finance options and anything else you need.",
 }: EnquiryFormProps) {
   const [state, formAction, pending] = useActionState<
     EnquiryFormState,
@@ -43,13 +63,8 @@ export default function EnquiryForm({
    */
   return (
     <form action={formAction} className="glass rounded-2xl p-6 sm:p-7">
-      <h3 className="font-display text-xl font-semibold text-ink">
-        Enquire about this car
-      </h3>
-      <p className="mt-2 text-sm leading-relaxed text-muted">
-        Send us a message and we&apos;ll come back to you with availability,
-        finance options and anything else you need.
-      </p>
+      <h3 className="font-display text-xl font-semibold text-ink">{heading}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-muted">{intro}</p>
 
       {/* Context for the sales team — set by the page, not the customer. */}
       <input type="hidden" name="registration" value={registration} />
@@ -57,7 +72,7 @@ export default function EnquiryForm({
       {state.message && (
         <p
           role="alert"
-          className="mt-5 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200"
+          className={`mt-5 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm ${alertTextClass}`}
         >
           {state.message}
         </p>
@@ -136,7 +151,11 @@ export default function EnquiryForm({
             aria-invalid={Boolean(errors.message)}
             aria-describedby={errors.message ? errorId("message") : undefined}
             className={`mt-2 resize-y ${fieldClass}`}
-            placeholder={`I'm interested in the ${vehicleHeadline} — is it still available?`}
+            placeholder={
+              vehicleHeadline
+                ? `I'm interested in the ${vehicleHeadline} — is it still available?`
+                : "Tell us what you're looking for — make, budget, part-exchange, or anything else."
+            }
           />
           <FieldError id={errorId("message")} message={errors.message} />
         </div>
@@ -145,7 +164,7 @@ export default function EnquiryForm({
       <button
         type="submit"
         disabled={pending}
-        className="mt-6 w-full rounded-full bg-amber px-6 py-3.5 font-semibold text-canvas transition-all hover:bg-amber-bright hover:shadow-[0_0_36px_-10px_var(--color-amber)] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
+        className="mt-6 w-full rounded-full bg-amber px-6 py-3.5 font-semibold text-on-amber transition-all hover:bg-amber-bright hover:shadow-(--shadow-glow) disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
       >
         {pending ? "Sending…" : "Send enquiry"}
       </button>
@@ -168,7 +187,7 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
 
   return (
-    <p id={id} role="alert" className="mt-2 text-xs text-red-300">
+    <p id={id} role="alert" className={`mt-2 text-xs ${fieldErrorTextClass}`}>
       {message}
     </p>
   );
