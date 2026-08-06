@@ -163,6 +163,90 @@ export function vehicleTitle(vehicle: Vehicle): string {
   return `${vehicle.make} ${vehicle.model}`;
 }
 
+/* ---------------------------------------------------------------- */
+/* Description                                                       */
+/* ---------------------------------------------------------------- */
+
+/**
+ * Labels the detail page already shows for itself — as a spec tile, in the
+ * headline, or as the price. `Engine` and `Body Style` are deliberately absent:
+ * they have no tile, so those lines are the only place that detail appears.
+ */
+const DUPLICATED_SPEC =
+  /^\s*(make|model|year|mileage|fuel\s*type|fuel|transmission|gearbox|colou?r|price|registration|reg)\s*:/i;
+
+/** A heading that introduces the list and reads as a stray line once it's cut. */
+const SPEC_HEADING = /^\s*vehicle\s+details\s*:?\s*$/i;
+
+/**
+ * Strips the spec list that the imported descriptions repeat verbatim.
+ *
+ * Some of this stock was migrated from the previous site, where the copy was
+ * written as a paragraph followed by `Make: … Model: … Year: …`. Every one of
+ * those labels is already on the detail page, so reprinting them pushes the
+ * genuinely useful part — the equipment list and the condition notes — further
+ * down for no gain. About a fifth of the current descriptions carry the block;
+ * the rest are prose plus a features list and pass through untouched.
+ *
+ * `Condition:` and `Engine:` deliberately survive. They read as spec lines but
+ * appear nowhere else on the page, so dropping them would lose information
+ * rather than repeat it.
+ */
+export function descriptionBody(description: string | null): string {
+  if (!description) return "";
+
+  return description
+    .split("\n")
+    .filter((line) => !DUPLICATED_SPEC.test(line) && !SPEC_HEADING.test(line))
+    .join("\n")
+    // Removing interior lines leaves runs of blanks behind.
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+/**
+ * Enough characters to be worth reading before deciding to open the rest.
+ * Most of these descriptions open with a one-line headline, so taking only the
+ * first paragraph would show the car's name and hide every actual word about
+ * it — paragraphs are taken until this is met instead.
+ */
+const LEAD_TARGET = 320;
+
+/**
+ * Not worth a toggle. Folding away two lines makes the reader click to save
+ * themselves nothing, so anything this short simply stays open.
+ */
+const MIN_WORTH_FOLDING = 200;
+
+/**
+ * Splits the description into an opening the page always shows and a remainder
+ * it can fold away. `rest` is empty when there is nothing worth hiding, in
+ * which case the whole description renders as the lead.
+ */
+export function splitDescription(description: string | null): {
+  lead: string;
+  rest: string;
+} {
+  const body = descriptionBody(description);
+  if (!body) return { lead: "", rest: "" };
+
+  const paragraphs = body.split(/\n{2,}/);
+  const lead: string[] = [];
+  let taken = 0;
+
+  while (paragraphs.length > 0 && taken < LEAD_TARGET) {
+    const next = paragraphs.shift() as string;
+    lead.push(next);
+    taken += next.length;
+  }
+
+  const rest = paragraphs.join("\n\n").trim();
+
+  return rest.length < MIN_WORTH_FOLDING
+    ? { lead: [...lead, rest].join("\n\n").trim(), rest: "" }
+    : { lead: lead.join("\n\n").trim(), rest };
+}
+
 /** e.g. "2021 BMW 3 Series 320d M Sport" — the full headline for a car. */
 export function vehicleHeadline(vehicle: Vehicle): string {
   return `${vehicle.year} ${vehicleTitle(vehicle)}`;

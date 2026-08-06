@@ -13,6 +13,7 @@ import {
 } from "@/components/Icons";
 import Reveal from "@/components/Reveal";
 import StockNotice from "@/components/StockNotice";
+import VehicleDescription from "@/components/VehicleDescription";
 import VehicleGallery from "@/components/VehicleGallery";
 import { CrmError, getVehicle } from "@/lib/crm";
 import { financeDisclaimer, site } from "@/lib/site";
@@ -256,14 +257,7 @@ export default async function VehiclePage({ params }: PageProps) {
 
             {vehicle.description && (
               <Reveal delay={140}>
-                <div className="mt-12">
-                  <h2 className="font-display text-xl font-semibold tracking-tight text-ink">
-                    About this car
-                  </h2>
-                  <p className="mt-4 max-w-2xl whitespace-pre-line text-sm leading-relaxed text-muted">
-                    {vehicle.description}
-                  </p>
-                </div>
+                <VehicleDescription description={vehicle.description} />
               </Reveal>
             )}
 
