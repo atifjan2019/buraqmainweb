@@ -31,12 +31,17 @@ export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
   const reserved = vehicle.status === "reserved";
   const photo = vehicle.featuredImage;
 
+  // Anything the CRM hasn't recorded is dropped rather than rendered as an
+  // empty row — a bare icon with no value beside it reads as a broken card.
   const specs = [
-    { icon: Calendar, label: String(vehicle.year) },
-    { icon: Gauge, label: formatMileage(vehicle.mileage) },
+    { icon: Calendar, label: vehicle.year ? String(vehicle.year) : "" },
+    {
+      icon: Gauge,
+      label: vehicle.mileage ? formatMileage(vehicle.mileage) : "",
+    },
     { icon: Fuel, label: vehicle.fuelType },
     { icon: Gear, label: vehicle.transmission },
-  ];
+  ].filter((spec) => spec.label?.trim());
 
   return (
     <article className="group glass relative flex h-full flex-col overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-1.5 hover:border-amber/30 hover:shadow-(--shadow-card)">
@@ -80,9 +85,13 @@ export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
           )}
         </div>
 
-        <span className="absolute right-4 top-4 rounded-md border border-line bg-canvas/70 px-2 py-1 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-muted backdrop-blur">
-          {vehicle.registration}
-        </span>
+        {/* Without a plate this is an empty bordered chip floating on the
+            photo, which looks like a rendering fault rather than a gap. */}
+        {vehicle.registration?.trim() && (
+          <span className="absolute right-4 top-4 rounded-md border border-line bg-canvas/70 px-2 py-1 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-muted backdrop-blur">
+            {vehicle.registration}
+          </span>
+        )}
 
         <p className="absolute bottom-4 left-5 font-display text-3xl font-bold text-gold">
           {formatPrice(vehicle.price)}
@@ -104,17 +113,20 @@ export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
           ))}
         </dl>
 
+        {/* min-h-11 carries both to the 44px touch minimum — padding alone
+            left them at 40px and 42px. These are the primary actions on a
+            grid most people meet on a phone. */}
         <div className="mt-5 flex items-center gap-2 border-t border-line-soft pt-4">
           <Link
             href={vehicleHref(vehicle)}
-            className="group/btn inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-surface-2 px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-amber hover:text-on-amber"
+            className="group/btn inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-surface-2 px-4 text-sm font-semibold text-ink transition-colors hover:bg-amber hover:text-on-amber"
           >
             View Details
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-0.5" />
           </Link>
           <Link
             href={`/finance?vehicle=${vehicle.slug}`}
-            className="rounded-full border border-line px-4 py-2.5 text-sm font-medium text-muted transition-colors hover:border-amber/40 hover:text-amber"
+            className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm font-medium text-muted transition-colors hover:border-amber/40 hover:text-amber"
           >
             Finance
           </Link>

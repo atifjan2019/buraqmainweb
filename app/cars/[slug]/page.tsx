@@ -56,10 +56,19 @@ function metaDescription(vehicle: Vehicle): string {
   const source = vehicle.description?.replace(/\s+/g, " ").trim();
 
   if (!source) {
+    // Same rule as the page body: an unrecorded field is dropped rather than
+    // interpolated, so a missing colour can't ship "… in , 55,043 miles" to
+    // Google as the snippet for this car.
+    const facts = [
+      vehicle.color,
+      vehicle.mileage ? formatMileage(vehicle.mileage) : "",
+      vehicle.fuelType,
+      vehicle.transmission,
+    ].filter((fact) => fact?.trim());
+
     return (
-      `${vehicleHeadline(vehicle)} in ${vehicle.color}, ` +
-      `${formatMileage(vehicle.mileage)}, ${vehicle.fuelType}, ` +
-      `${vehicle.transmission}. Available now at ${site.name} in Manchester.`
+      `${vehicleHeadline(vehicle)}${facts.length ? ` in ${facts.join(", ")}` : ""}. ` +
+      `Available now at ${site.name} in Manchester.`
     );
   }
 
@@ -131,20 +140,29 @@ export default async function VehiclePage({ params }: PageProps) {
   const motExpiry = formatDate(vehicle.motExpiry);
   const serviceDue = formatDate(vehicle.serviceDue);
 
+  /*
+   * A spec tile with a label and no value tells the visitor nothing and reads
+   * as a fault in the page. The CRM leaves fields blank as a matter of course —
+   * MOT and service dates are unset on the entire forecourt, and a car can
+   * reach the site before someone has recorded its colour — so every tile is
+   * filtered on having something to show rather than each one carrying its own
+   * guard. Year and mileage are checked as numbers: `0` is missing data here,
+   * not a fact about the car, and would otherwise print "0 miles".
+   */
   const specs = [
-    { icon: Calendar, label: "Year", value: String(vehicle.year) },
-    { icon: Gauge, label: "Mileage", value: formatMileage(vehicle.mileage) },
+    { icon: Calendar, label: "Year", value: vehicle.year ? String(vehicle.year) : "" },
+    {
+      icon: Gauge,
+      label: "Mileage",
+      value: vehicle.mileage ? formatMileage(vehicle.mileage) : "",
+    },
     { icon: Fuel, label: "Fuel", value: vehicle.fuelType },
     { icon: Gear, label: "Gearbox", value: vehicle.transmission },
     { icon: Car, label: "Colour", value: vehicle.color },
     { icon: Shield, label: "Registration", value: vehicle.registration },
-    ...(motExpiry
-      ? [{ icon: Shield, label: "MOT until", value: motExpiry }]
-      : []),
-    ...(serviceDue
-      ? [{ icon: Shield, label: "Service due", value: serviceDue }]
-      : []),
-  ];
+    { icon: Shield, label: "MOT until", value: motExpiry },
+    { icon: Shield, label: "Service due", value: serviceDue },
+  ].filter((spec) => spec.value?.trim());
 
   const mainImage = vehicle.images[0] ?? vehicle.featuredImage;
 
@@ -221,9 +239,17 @@ export default async function VehiclePage({ params }: PageProps) {
                 />
               </div>
 
+              {/* Joined rather than interpolated with literal separators: a
+                  car with no colour recorded would otherwise render a stranded
+                  "2020 ·  · 55,043 miles". */}
               <p className="mt-3 text-base text-muted">
-                {vehicle.year} · {vehicle.color} ·{" "}
-                {formatMileage(vehicle.mileage)}
+                {[
+                  vehicle.year ? String(vehicle.year) : "",
+                  vehicle.color,
+                  vehicle.mileage ? formatMileage(vehicle.mileage) : "",
+                ]
+                  .filter((part) => part?.trim())
+                  .join(" · ")}
               </p>
 
               <p className="mt-6 font-display text-4xl font-bold text-gold sm:text-5xl">
