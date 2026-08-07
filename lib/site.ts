@@ -24,12 +24,40 @@ export const company = {
   fcaNumber: "",
 } as const;
 
+/**
+ * The origin this deployment actually answers on.
+ *
+ * Every canonical tag, the sitemap and robots.txt are built from it, so a
+ * hardcoded value is wrong the moment the site moves — and a sitemap
+ * advertising a host you don't serve gets the wrong one indexed.
+ *
+ * Resolution order:
+ *   NEXT_PUBLIC_SITE_URL   set this in the host's env once a real domain is live
+ *   NEXT_PUBLIC_VERCEL_URL supplied automatically, and differs per preview
+ *                          deployment, so previews describe themselves rather
+ *                          than claiming to be production
+ *   the production domain  the intended final home, and the right answer for a
+ *                          plain `next build` with no environment at all
+ *
+ * NEXT_PUBLIC_ because this module is imported by Client Components; a
+ * server-only variable would arrive as undefined in the browser.
+ */
+function siteUrl(): string {
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (explicit) return explicit.replace(/\/+$/, "");
+
+  const vercel = process.env.NEXT_PUBLIC_VERCEL_URL?.trim();
+  if (vercel) return `https://${vercel.replace(/\/+$/, "")}`;
+
+  return "https://burraqmotors.co.uk";
+}
+
 export const site = {
   name: "Burraq Motors",
   tagline: "Premium Japanese Cars in Manchester",
   description:
     "Browse quality hybrid and imported vehicles in Manchester. Finance available on selected cars. Every vehicle HPI checked, warranty available, nationwide delivery.",
-  url: "https://burraqmotors.co.uk",
+  url: siteUrl(),
 } as const;
 
 interface ContactDetails {
