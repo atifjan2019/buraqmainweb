@@ -102,6 +102,86 @@ export interface StockFilters {
   fuelTypes: FuelType[];
   transmissions: Transmission[];
   priceRange: { min: number; max: number };
+  /** Budget rungs for the two price dropdowns — see `priceLadder`. */
+  priceSteps: number[];
+}
+
+/** Linear-interpolated quantile of an already-ascending list. */
+function quantile(ascending: number[], fraction: number): number {
+  const position = (ascending.length - 1) * fraction;
+  const lower = Math.floor(position);
+  const upper = Math.min(ascending.length - 1, lower + 1);
+
+  return (
+    ascending[lower] + (ascending[upper] - ascending[lower]) * (position - lower)
+  );
+}
+
+/** Increments a car is worth quoting in, coarsest last. */
+const LADDER_INCREMENTS = [100, 250, 500, 1000, 2000, 2500, 5000, 10000];
+
+/** Rungs to aim for across the core range, before the tail rung. */
+const LADDER_TARGET_RUNGS = 7;
+
+/**
+ * Round prices for the two budget dropdowns, derived from live stock.
+ *
+ * Spans the tenth to ninetieth percentile rather than the full range, because
+ * min and max are precisely the two numbers a single outlier ruins. A
+ * forecourt's dearest car is routinely several times its median, and one
+ * £74,999 import among sixty £12k hybrids drags a min-to-max ladder so far up
+ * that its lowest rung already excludes four cars in five while its top rungs
+ * return one car each — leaving no way to narrow within the band where nearly
+ * all the stock actually sits. Percentiles put the rungs where the cars are;
+ * the dear ones stay reachable through the coarse tail rung, and through "No
+ * maximum", which is the default.
+ *
+ * Every rung falls strictly inside the real range, so neither dropdown can
+ * offer a budget with no stock behind it — the same guarantee the other three
+ * filters get by only listing values the CRM reports.
+ */
+export function priceLadder(prices: number[]): number[] {
+  const ascending = prices
+    .filter((price) => Number.isFinite(price) && price > 0)
+    .sort((a, b) => a - b);
+
+  // One car, or none, cannot be divided into budgets worth offering.
+  if (ascending.length < 2) return [];
+
+  const cheapest = ascending[0];
+  const dearest = ascending[ascending.length - 1];
+  const coreFrom = quantile(ascending, 0.1);
+  const coreTo = quantile(ascending, 0.9);
+
+  // The coarsest increment that still divides the core finely enough: a
+  // tightly clustered forecourt earns £1,000 rungs and a broad one £5,000,
+  // and neither ends up with forty options in a dropdown.
+  const increment =
+    LADDER_INCREMENTS.find(
+      (candidate) => (coreTo - coreFrom) / candidate <= LADDER_TARGET_RUNGS,
+    ) ?? LADDER_INCREMENTS[LADDER_INCREMENTS.length - 1];
+
+  const rungs: number[] = [];
+  for (
+    let rung = Math.ceil(coreFrom / increment) * increment;
+    rung <= coreTo;
+    rung += increment
+  ) {
+    if (rung > cheapest && rung < dearest) rungs.push(rung);
+  }
+
+  // One coarse rung above the core, so the occasional prestige car stays
+  // findable from the "Price from" side without the whole ladder reaching for
+  // it. Dropped when the core already runs that high.
+  const tailIncrement = increment * 5;
+  const tail =
+    Math.floor(quantile(ascending, 0.95) / tailIncrement) * tailIncrement;
+
+  if (tail < dearest && tail > (rungs[rungs.length - 1] ?? cheapest)) {
+    rungs.push(tail);
+  }
+
+  return rungs;
 }
 
 /* ---------------------------------------------------------------- */

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useTransition, type FormEvent } from "react";
+import { formatPrice } from "@/lib/vehicles";
 import type { StockFilters } from "@/lib/vehicles";
 
 /**
@@ -43,39 +44,14 @@ const selectClass =
 const labelClass =
   "block text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-faint";
 
-/**
- * Six or so round numbers spanning the live price range, so the price filters
- * stay derived from real stock rather than a hardcoded ladder.
- */
-function priceSteps(min: number, max: number): number[] {
-  if (!Number.isFinite(min) || !Number.isFinite(max) || max <= min) return [];
-
-  const stepCount = 5;
-  const raw = (max - min) / stepCount;
-  // Round the increment to something a buyer would actually think in.
-  const granularity = raw > 4000 ? 1000 : 500;
-  const step = Math.max(granularity, Math.round(raw / granularity) * granularity);
-
-  const steps: number[] = [];
-  for (let value = Math.floor(min / step) * step; value < max; value += step) {
-    if (value > min) steps.push(value);
-  }
-
-  return steps;
-}
-
-const money = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-  maximumFractionDigits: 0,
-});
-
 export default function VehicleFilters({
   filters,
   active,
   hasActiveFilters,
 }: VehicleFiltersProps) {
-  const steps = priceSteps(filters.priceRange.min, filters.priceRange.max);
+  // Built server-side from the live spread of prices rather than from the
+  // range's two ends — see `priceLadder` for why the ends are the wrong input.
+  const steps = filters.priceSteps;
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
@@ -224,7 +200,7 @@ export default function VehicleFilters({
             <option value="">No minimum</option>
             {steps.map((value) => (
               <option key={value} value={value}>
-                {money.format(value)}
+                {formatPrice(value)}
               </option>
             ))}
           </select>
@@ -244,7 +220,7 @@ export default function VehicleFilters({
             <option value="">No maximum</option>
             {steps.map((value) => (
               <option key={value} value={value}>
-                {money.format(value)}
+                {formatPrice(value)}
               </option>
             ))}
           </select>

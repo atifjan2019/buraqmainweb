@@ -11,6 +11,7 @@
 
 import "server-only";
 
+import { priceLadder } from "./vehicles";
 import type {
   FuelType,
   StockFilters,
@@ -288,6 +289,45 @@ export async function getVehicle(
 }
 
 /**
+ * A page of stock is capped at 50 by the API, so a forecourt is walked rather
+ * than asked for in one go. The ceiling is a guard against a paginator that
+ * never reports a last page, not an expected depth — 200 cars is already well
+ * beyond this dealership.
+ */
+const MAX_PRICE_PAGES = 4;
+
+/**
+ * Every live price, for the budget ladder.
+ *
+ * The filters endpoint reports only min and max, which is exactly the pair one
+ * outlier ruins, so the ladder is built from the real spread instead. These
+ * reads carry the same tag and revalidation window as every other stock read,
+ * so between revalidations they cost nothing.
+ */
+async function getStockPrices(): Promise<number[]> {
+  const prices: number[] = [];
+  let page = 1;
+  let lastPage = 1;
+
+  do {
+    const payload = await readJson<RawPaginator<RawVehicle>>(
+      "/vehicles",
+      buildVehicleSearch({ perPage: 50, page }),
+    );
+
+    for (const raw of payload.data ?? []) {
+      const price = Number(raw.price);
+      if (Number.isFinite(price) && price > 0) prices.push(price);
+    }
+
+    lastPage = payload.meta?.last_page ?? 1;
+    page += 1;
+  } while (page <= lastPage && page <= MAX_PRICE_PAGES);
+
+  return prices;
+}
+
+/**
  * Dropdown values that currently have stock behind them.
  *
  * @throws {CrmError} if the CRM is unreachable or errors.
@@ -304,6 +344,16 @@ export async function getStockFilters(): Promise<StockFilters> {
 
   const data = payload.data ?? {};
 
+  // The ladder is the one filter built from a second read, so it degrades on
+  // its own: an empty ladder disables the two budget dropdowns and leaves
+  // make, fuel and gearbox working, rather than costing the visitor all five.
+  let priceSteps: number[] = [];
+  try {
+    priceSteps = priceLadder(await getStockPrices());
+  } catch (error) {
+    console.error("[crm] price ladder unavailable", error);
+  }
+
   return {
     makes: data.makes ?? [],
     fuelTypes: (data.fuel_types ?? []) as FuelType[],
@@ -312,6 +362,7 @@ export async function getStockFilters(): Promise<StockFilters> {
       min: data.price_range?.min ?? 0,
       max: data.price_range?.max ?? 0,
     },
+    priceSteps,
   };
 }
 
