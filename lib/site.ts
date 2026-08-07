@@ -32,22 +32,38 @@ export const company = {
  * advertising a host you don't serve gets the wrong one indexed.
  *
  * Resolution order:
- *   NEXT_PUBLIC_SITE_URL   set this in the host's env once a real domain is live
- *   NEXT_PUBLIC_VERCEL_URL supplied automatically, and differs per preview
- *                          deployment, so previews describe themselves rather
- *                          than claiming to be production
- *   the production domain  the intended final home, and the right answer for a
- *                          plain `next build` with no environment at all
+ *   NEXT_PUBLIC_SITE_URL      set in the host's env once a real domain is live
+ *   ..._PROJECT_PRODUCTION_URL  the project's stable production alias
+ *   NEXT_PUBLIC_VERCEL_URL    per-deployment, previews only
+ *   the production domain     the intended final home, and the right answer
+ *                             for a plain `next build` with no environment
+ *
+ * The middle two are not interchangeable, which is easy to get wrong:
+ * VERCEL_URL is unique to a single deployment
+ * (buraqmainweb-568t0csc3-….vercel.app) and changes on every push. Using it in
+ * production would hand search engines a new canonical host each deploy and
+ * index an immutable build URL. PROJECT_PRODUCTION_URL is the alias that
+ * survives deploys, so production takes that and only previews — where
+ * describing the specific build IS correct — fall through to VERCEL_URL.
  *
  * NEXT_PUBLIC_ because this module is imported by Client Components; a
- * server-only variable would arrive as undefined in the browser.
+ * server-only variable would arrive as undefined in the browser. Vercel exposes
+ * the prefixed copies when "Automatically expose System Environment Variables"
+ * is on; if that is ever turned off, set NEXT_PUBLIC_SITE_URL explicitly.
  */
 function siteUrl(): string {
-  const explicit = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  if (explicit) return explicit.replace(/\/+$/, "");
+  const clean = (value: string) => value.trim().replace(/\/+$/, "");
 
-  const vercel = process.env.NEXT_PUBLIC_VERCEL_URL?.trim();
-  if (vercel) return `https://${vercel.replace(/\/+$/, "")}`;
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
+  if (explicit?.trim()) return clean(explicit);
+
+  const production = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL;
+  if (process.env.NEXT_PUBLIC_VERCEL_ENV === "production" && production?.trim()) {
+    return `https://${clean(production)}`;
+  }
+
+  const deployment = process.env.NEXT_PUBLIC_VERCEL_URL;
+  if (deployment?.trim()) return `https://${clean(deployment)}`;
 
   return "https://burraqmotors.co.uk";
 }
