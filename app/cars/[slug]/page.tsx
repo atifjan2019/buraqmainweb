@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
+import EnquiryDialog from "@/components/EnquiryDialog";
 import EnquiryForm from "@/components/EnquiryForm";
-import { ArrowRight } from "@/components/Icons";
+import { ArrowRight, Phone } from "@/components/Icons";
 import Reveal from "@/components/Reveal";
 import StockNotice from "@/components/StockNotice";
 import VehicleDescription from "@/components/VehicleDescription";
 import VehicleGallery from "@/components/VehicleGallery";
 import { CrmError, getVehicle } from "@/lib/crm";
-import { financeDisclaimer, site } from "@/lib/site";
+import { contact, financeDisclaimer, salesContact, site } from "@/lib/site";
 import {
   formatDate,
   formatMileage,
@@ -297,14 +298,87 @@ export default async function VehiclePage({ params }: PageProps) {
           </div>
 
           {/* Enquiry */}
-          <div className="lg:sticky lg:top-28 lg:self-start">
+          <div className="lg:sticky lg:top-24 lg:self-start">
             <Reveal delay={120}>
-              {/* Registration, not slug — it's what the sales team recognises
-                  on an incoming lead. */}
-              <EnquiryForm
-                registration={vehicle.registration}
-                vehicleHeadline={vehicleHeadline(vehicle)}
-              />
+              {/*
+                With scripting, the sidebar is a compact contact card and the
+                form opens in a modal. Without it, the button does nothing, so
+                the form renders inline instead — see the pair of gates below.
+                Enquiring is this page's whole purpose; it does not get to
+                depend on a bundle loading.
+              */}
+              <div className="js-only surface-card p-6 sm:p-8">
+                <div className="flex items-center gap-4">
+                  {/*
+                    Initials, not a stock portrait. See the note on
+                    `salesContact` in lib/site.ts — until a real photograph of
+                    a real member of staff exists, a monogram makes a far
+                    smaller claim than a stranger's face would.
+                  */}
+                  {salesContact.photo ? (
+                    /* eslint-disable-next-line @next/next/no-img-element --
+                       a single small avatar; next/image would add a loader
+                       round-trip for no benefit at this size. */
+                    <img
+                      src={salesContact.photo}
+                      alt=""
+                      width={56}
+                      height={56}
+                      className="h-14 w-14 shrink-0 object-cover"
+                    />
+                  ) : (
+                    <span
+                      aria-hidden
+                      className="title-lg grid h-14 w-14 shrink-0 place-items-center bg-ink text-on-ink"
+                    >
+                      {salesContact.name.charAt(0)}
+                    </span>
+                  )}
+
+                  <span className="min-w-0">
+                    <span className="label-uppercase block truncate text-ink">
+                      {salesContact.name}
+                    </span>
+                    <span className="label-uppercase-sm mt-1 block truncate text-faint">
+                      {salesContact.role}
+                    </span>
+                  </span>
+                </div>
+
+                <p className="mt-5 text-sm font-light leading-relaxed text-muted">
+                  {salesContact.blurb}
+                </p>
+
+                <div className="mt-6 flex flex-col gap-3 border-t border-line-soft pt-6">
+                  {/* Registration, not slug — it's what the sales team
+                      recognises on an incoming lead. */}
+                  <EnquiryDialog
+                    registration={vehicle.registration}
+                    vehicleHeadline={vehicleHeadline(vehicle)}
+                  />
+
+                  {contact.phone && (
+                    <a
+                      href={`tel:${contact.phoneHref}`}
+                      className="btn btn-outline w-full"
+                    >
+                      <Phone className="h-4 w-4" />
+                      {contact.phone}
+                    </a>
+                  )}
+                </div>
+
+                <p className="caption mt-5 text-faint">
+                  {contact.openingHours}
+                </p>
+              </div>
+
+              <div className="no-js-only">
+                <EnquiryForm
+                  registration={vehicle.registration}
+                  vehicleHeadline={vehicleHeadline(vehicle)}
+                />
+              </div>
             </Reveal>
           </div>
         </div>

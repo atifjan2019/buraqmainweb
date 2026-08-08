@@ -114,6 +114,29 @@ export const contact: ContactDetails = {
   trustpilot: "https://uk.trustpilot.com/review/burraqmotors.co.uk",
 };
 
+/**
+ * The named contact shown beside a car on its detail page.
+ *
+ * ⚠ PLACEHOLDER. The name below is invented, and it should be replaced with a
+ * real member of staff before this gets much traffic. A named person on a
+ * vehicle page reads as "this is who you'll be dealing with", and a customer
+ * who rings up asking for someone who doesn't exist is a worse first
+ * impression than no name at all. It also sits oddly next to the deliberate
+ * decision on the About page not to invent staff biographies.
+ *
+ * `photo` is null until a real photograph exists at `public/team/…`. The card
+ * falls back to initials rather than a stock portrait on purpose: a
+ * stranger's face captioned with an invented name is a bigger claim than no
+ * face, and a harder one to walk back.
+ */
+export const salesContact = {
+  name: "Adam Rashid",
+  role: "Sales Specialist",
+  blurb:
+    "Happy to talk this one through, arrange a viewing, or run the finance figures for you — no pressure either way.",
+  photo: null as string | null,
+};
+
 /** Builds a wa.me link, or null when we don't have a verified number. */
 export function whatsappLink(message?: string): string | null {
   if (!contact.whatsapp) return null;

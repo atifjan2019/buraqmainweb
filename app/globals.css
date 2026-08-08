@@ -810,6 +810,51 @@ html[data-theme="dark"] .theme-icon-sun {
   display: none;
 }
 
+/*
+  The mirror of the above: hidden unless scripting is available. Written as
+  `html:not([data-js])` rather than as a default `display:none` that JS
+  removes, because `data-js` is stamped before first paint — so the control
+  is either there from the first frame or never, with no flash either way.
+
+  Used by the enquiry dialog: the trigger button is meaningless without
+  scripting, so without it the form renders inline instead.
+*/
+html:not([data-js]) .js-only {
+  display: none;
+}
+
+/* ==================================================================
+   Native <dialog>
+
+   Used rather than a hand-rolled overlay for the same reason
+   VehicleDescription is built on <details>: the browser gives focus
+   trapping, Escape-to-close, background inertness and the right
+   screen-reader semantics for free, and every one of those is a thing
+   a hand-rolled modal gets subtly wrong.
+
+   The element only needs its UA chrome stripped — the panel inside
+   carries the system's own surface.
+================================================================== */
+dialog {
+  max-width: 100vw;
+  max-height: 100dvh;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  overflow: visible;
+}
+
+/*
+  Dark in both themes. A scrim's job is to drop the page behind it, and on
+  the white surface a light scrim would leave the form floating on
+  near-identical ground with nothing separating them — this system has no
+  shadow to do that job instead.
+*/
+dialog::backdrop {
+  background-color: rgb(0 0 0 / 0.72);
+}
+
 /* ==================================================================
    Scroll reveal — driven by IntersectionObserver in Reveal.tsx.
 
@@ -822,6 +867,24 @@ html[data-theme="dark"] .theme-icon-sun {
    used: this one is engineered rather than cinematic, and a long
    drifting rise reads as decoration.
 ================================================================== */
+/*
+  No `will-change` here, and that is load-bearing rather than an omission.
+
+  Per spec, `will-change: transform` makes the element a containing block for
+  `position: fixed` descendants — even while the transform resolves to `none`.
+  Since almost every section of the site is wrapped in a Reveal, that quietly
+  captured any fixed overlay rendered inside one: the gallery lightbox opened
+  sized and positioned against its own column instead of the viewport, and
+  painted under the header, which looks exactly like "the lightbox doesn't
+  open".
+
+  It bought nothing to offset that. This is a two-property transition on a
+  handful of elements, which compositors already handle; `will-change` is for
+  animations that measurably drop frames without it.
+
+  Native <dialog> is immune to this — the top layer escapes containing blocks
+  entirely — which is one more reason the enquiry modal is built on it.
+*/
 [data-js] [data-reveal] {
   opacity: 0;
   transform: translateY(18px);
@@ -829,7 +892,6 @@ html[data-theme="dark"] .theme-icon-sun {
     opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: var(--reveal-delay, 0ms);
-  will-change: opacity, transform;
 }
 
 [data-js] [data-reveal="shown"] {
