@@ -127,37 +127,56 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-16 border-t border-line-soft pt-8">
-          <p className="caption max-w-3xl leading-relaxed text-faint">
+        {/*
+          The regulatory notice gets a recessed strip with a machined label,
+          rather than sitting as one more grey paragraph among several. It was
+          previously indistinguishable from the copyright line beside it, which
+          is the wrong outcome twice over: visually it read as filler, and this
+          is FCA small print that regulators expect to be easy to find.
+
+          `spec-cell` is the same recessed surface the stat panels use — one
+          step off the canvas, hairline, no shadow.
+        */}
+        <div className="spec-cell mt-16 border border-line-soft p-6 sm:p-8">
+          <h3 className="label-uppercase-sm text-faint">Finance disclaimer</h3>
+          <p className="caption mt-3 max-w-4xl leading-relaxed text-muted">
             {financeDisclaimer} Burraq Motors is a credit broker, not a lender.
           </p>
-          {/* Copyright left, build credit right — they stack on a phone rather
-              than squeezing onto one line. */}
-          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="caption text-faint">
-              © {year} {site.name}. All rights reserved.
-            </p>
+        </div>
 
-            <p className="caption text-faint">
-              {/* The emoji carries its own colour, so this is the one bit of
-                  the footer that doesn't resolve through a token. Labelled
-                  because a bare ❤️ is announced as "red heart" by screen
-                  readers, which reads as noise mid-sentence. */}
-              Developed in{" "}
-              <span role="img" aria-label="love">
-                ❤️
-              </span>{" "}
-              By{" "}
-              <a
-                href="https://webspires.co.uk?utm_source=burraqmotors"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-bold text-ink transition-opacity hover:opacity-70"
-              >
-                Webspires
-              </a>
-            </p>
-          </div>
+        {/* Bottom bar: copyright left, build credit right, stacking on a phone
+            rather than squeezing onto one line. */}
+        <div className="mt-8 flex flex-col gap-4 border-t border-line-soft pt-8 sm:flex-row sm:items-center sm:justify-between">
+          <p className="caption text-faint">
+            © {year} {site.name}. All rights reserved.
+          </p>
+
+          {/*
+            Set in the machined label voice so it reads as chrome rather than
+            as another sentence. That makes the whole line 700, so bolding
+            "Webspires" would no longer distinguish it — the emphasis moves to
+            colour instead, which is how this system separates things anyway:
+            it has no accent hue, only ink against muted.
+          */}
+          <p className="label-uppercase-sm flex items-center gap-2 text-faint">
+            Developed with
+            {/* The emoji carries its own colour, so it is the one thing in the
+                footer that doesn't resolve through a token. Labelled, because
+                a bare ❤️ is announced as "red heart" by screen readers and
+                that reads as noise mid-sentence. */}
+            <span role="img" aria-label="love" className="text-sm">
+              ❤️
+            </span>
+            by
+            <a
+              href="https://webspires.co.uk?utm_source=burraqmotors"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-ink transition-opacity hover:opacity-70"
+            >
+              Webspires
+            </a>
+          </p>
         </div>
       </div>
     </footer>
