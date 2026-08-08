@@ -139,10 +139,15 @@ export default function Footer() {
             </p>
 
             <p className="caption text-faint">
-              {/* The one place a tricolour stop lands on running text. It is
-                  the only red the system defines, so a credit line asking for
-                  red uses it rather than introducing a second one. */}
-              Developed in <span className="text-m-red">Red Love</span> By{" "}
+              {/* The emoji carries its own colour, so this is the one bit of
+                  the footer that doesn't resolve through a token. Labelled
+                  because a bare ❤️ is announced as "red heart" by screen
+                  readers, which reads as noise mid-sentence. */}
+              Developed in{" "}
+              <span role="img" aria-label="love">
+                ❤️
+              </span>{" "}
+              By{" "}
               <a
                 href="https://webspires.co.uk?utm_source=burraqmotors"
                 target="_blank"
