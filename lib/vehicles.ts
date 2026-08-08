@@ -219,8 +219,21 @@ export function formatPrice(value: number): string {
 
 const miles = new Intl.NumberFormat("en-GB");
 
+/** "77,787 miles" — for running text, where the unit has to be carried. */
 export function formatMileage(value: number): string {
   return `${miles.format(value)} miles`;
+}
+
+/**
+ * "77,787" — the same number with the unit dropped.
+ *
+ * For spec cells, where the label underneath already reads MILEAGE and
+ * repeating the unit in the value says the same thing twice. Kept as its own
+ * export rather than a flag on `formatMileage`, so a call site reads as the
+ * thing it wants instead of as a boolean.
+ */
+export function formatMileageValue(value: number): string {
+  return miles.format(value);
 }
 
 /* Dates arrive as plain YYYY-MM-DD, so they're formatted in UTC — reading them

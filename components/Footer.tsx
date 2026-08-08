@@ -131,9 +131,28 @@ export default function Footer() {
           <p className="caption max-w-3xl leading-relaxed text-faint">
             {financeDisclaimer} Burraq Motors is a credit broker, not a lender.
           </p>
-          <p className="caption mt-5 text-faint">
-            © {year} {site.name}. All rights reserved.
-          </p>
+          {/* Copyright left, build credit right — they stack on a phone rather
+              than squeezing onto one line. */}
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="caption text-faint">
+              © {year} {site.name}. All rights reserved.
+            </p>
+
+            <p className="caption text-faint">
+              {/* The one place a tricolour stop lands on running text. It is
+                  the only red the system defines, so a credit line asking for
+                  red uses it rather than introducing a second one. */}
+              Developed in <span className="text-m-red">Red Love</span> By{" "}
+              <a
+                href="https://webspires.co.uk?utm_source=burraqmotors"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-ink transition-opacity hover:opacity-70"
+              >
+                Webspires
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </footer>

@@ -12,6 +12,7 @@ import { financeDisclaimer, site } from "@/lib/site";
 import {
   formatDate,
   formatMileage,
+  formatMileageValue,
   formatPrice,
   vehicleHeadline,
   vehicleTitle,
@@ -145,7 +146,8 @@ export default async function VehiclePage({ params }: PageProps) {
     { label: "Year", value: vehicle.year ? String(vehicle.year) : "" },
     {
       label: "Mileage",
-      value: vehicle.mileage ? formatMileage(vehicle.mileage) : "",
+      // Number only: the MILEAGE label sits directly under it.
+      value: vehicle.mileage ? formatMileageValue(vehicle.mileage) : "",
     },
     { label: "Fuel", value: vehicle.fuelType },
     { label: "Gearbox", value: vehicle.transmission },
