@@ -33,7 +33,7 @@ export default async function FeaturedVehicles() {
              rather than cards scaling down, so photography keeps its crop. */
           <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {vehicles.map((vehicle, i) => (
-              <Reveal key={vehicle.registration} delay={(i % 3) * 90}>
+              <Reveal key={vehicle.slug} delay={(i % 3) * 90}>
                 <VehicleCard vehicle={vehicle} />
               </Reveal>
             ))}

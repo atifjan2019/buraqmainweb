@@ -200,10 +200,17 @@ export default async function VehiclePage({ params }: PageProps) {
                     Featured
                   </span>
                 )}
-                {/* Still the plate: the human-facing identifier, just not the URL. */}
-                <span className="border border-line px-3 py-1.5 label-uppercase-sm font-mono text-muted">
-                  {vehicle.registration}
-                </span>
+                {/* Still the plate: the human-facing identifier, just not the
+                    URL. Guarded, because the CRM does ship cars with no plate
+                    recorded — without this it renders as an empty outlined box
+                    beside the badges, which reads as a broken component rather
+                    than as a missing field. VehicleCard has always had this
+                    guard; the detail page was the one that didn't. */}
+                {vehicle.registration?.trim() && (
+                  <span className="border border-line px-3 py-1.5 label-uppercase-sm font-mono text-muted">
+                    {vehicle.registration}
+                  </span>
+                )}
               </div>
 
               <h1 className="display-md mt-6 text-ink">
