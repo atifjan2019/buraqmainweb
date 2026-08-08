@@ -45,12 +45,15 @@ export default function Footer() {
           {/* Navigation */}
           <div>
             <h3 className="label-uppercase text-ink">Explore</h3>
-            <ul className="mt-6 flex flex-col gap-3">
+            {/* gap-0, not gap-3: each row now carries its own 44px height,
+                and keeping the gap on top would space the column out to twice
+                the height it needs. */}
+            <ul className="mt-4 flex flex-col">
               {nav.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="text-sm text-muted transition-colors hover:text-ink"
+                    className="inline-flex min-h-11 items-center text-sm text-muted transition-colors hover:text-ink"
                   >
                     {item.label}
                   </Link>
@@ -62,12 +65,15 @@ export default function Footer() {
           {/* Legal */}
           <div>
             <h3 className="label-uppercase text-ink">Legal</h3>
-            <ul className="mt-6 flex flex-col gap-3">
+            {/* gap-0, not gap-3: each row now carries its own 44px height,
+                and keeping the gap on top would space the column out to twice
+                the height it needs. */}
+            <ul className="mt-4 flex flex-col">
               {legal.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="text-sm text-muted transition-colors hover:text-ink"
+                    className="inline-flex min-h-11 items-center text-sm text-muted transition-colors hover:text-ink"
                   >
                     {item.label}
                   </Link>
@@ -81,12 +87,12 @@ export default function Footer() {
             <h3 className="label-uppercase text-ink">Get in touch</h3>
 
             {hasContactDetails ? (
-              <ul className="mt-6 flex flex-col gap-3.5 text-sm text-muted">
+              <ul className="mt-4 flex flex-col gap-1 text-sm text-muted">
                 {contact.phone && (
                   <li>
                     <a
                       href={`tel:${contact.phoneHref}`}
-                      className="flex items-center gap-2.5 transition-colors hover:text-ink"
+                      className="flex min-h-11 items-center gap-2.5 transition-colors hover:text-ink"
                     >
                       <Phone className="h-4 w-4 shrink-0 text-faint" />
                       {contact.phone}
@@ -97,7 +103,7 @@ export default function Footer() {
                   <li>
                     <a
                       href={`mailto:${contact.email}`}
-                      className="flex items-center gap-2.5 transition-colors hover:text-ink"
+                      className="flex min-h-11 items-center gap-2.5 transition-colors hover:text-ink"
                     >
                       <Mail className="h-4 w-4 shrink-0 text-faint" />
                       {contact.email}

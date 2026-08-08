@@ -214,7 +214,7 @@ export default async function VehiclePage({ params }: PageProps) {
                 )}
               </div>
 
-              <h1 className="display-md mt-6 text-ink">
+              <h1 className="display-md mt-6 break-words text-ink">
                 {vehicleTitle(vehicle)}
               </h1>
 

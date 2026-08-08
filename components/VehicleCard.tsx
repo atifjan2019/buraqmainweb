@@ -100,7 +100,7 @@ export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
 
       {/* Body */}
       <div className="flex flex-1 flex-col pt-5">
-        <h3 className="title-lg text-ink">{title}</h3>
+        <h3 className="title-lg break-words text-ink">{title}</h3>
 
         {/* One tracked line rather than an icon grid. The doc keeps chrome off
             the card and lets type carry the detail; four labelled icons under

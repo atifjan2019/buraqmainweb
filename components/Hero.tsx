@@ -122,7 +122,13 @@ export default async function Hero() {
                 detail page uses: value on top at display weight, machined
                 label beneath. Hairline gaps rather than gutters, so the row
                 reads as one panel divided rather than three separate tiles. */}
-            <dl className="mt-14 grid max-w-2xl grid-cols-3 gap-px border border-line-soft bg-line-soft">
+            {/* Stacked below `sm`, three-up above. Three columns on a phone
+                left ~66px of text per cell, and "SATISFACTION" at the 10px
+                floor with the system's mandatory 1.5px tracking needs ~90px —
+                so the label overflowed its cell and was silently clipped by
+                the body's overflow-x guard. Tightening the padding doesn't
+                recover 24px; the column count has to give. */}
+            <dl className="mt-14 grid max-w-2xl gap-px border border-line-soft bg-line-soft sm:grid-cols-3">
               {heroStats.map((s) => (
                 <div key={s.label} className="spec-cell px-5 py-6">
                   <dt className="display-sm text-ink">{s.value}</dt>

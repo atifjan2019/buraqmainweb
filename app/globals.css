@@ -529,7 +529,12 @@ body {
     font-family: var(--font-display);
     font-size: clamp(0.8125rem, 0.792rem + 0.093vw, 0.875rem);
     font-weight: 700;
-    line-height: 1;
+    /*
+      1.2, not 1. A single-line label is centred by the 3rem min-height either
+      way, so this is invisible until a long label wraps on a narrow screen —
+      at which point line-height 1 collides the two lines into each other.
+    */
+    line-height: 1.2;
     letter-spacing: 0.09375rem;
     text-transform: uppercase;
     text-align: center;
@@ -590,6 +595,18 @@ body {
   .btn:disabled {
     cursor: not-allowed;
     opacity: 0.45;
+  }
+
+  /*
+    2rem of horizontal padding is a fifth of a 320px screen before the label
+    is even measured. The longest labels on the site ("Tell us what you
+    need", "See what's in stock") clear it at 360px but not with room to
+    spare, so the smallest phones get the padding back.
+  */
+  @media (max-width: 25rem) {
+    .btn {
+      padding: 0 1.25rem;
+    }
   }
 
   /*

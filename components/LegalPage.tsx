@@ -20,6 +20,14 @@ interface LegalPageProps {
  *
  * Inline links are underlined rather than tracked-uppercase. `.link-m` is a
  * navigational control; a link inside a sentence has to stay inside it.
+ *
+ * The tables are `table-fixed` with `break-words` on the cells. Both documents
+ * use two-column label/value tables holding an address and an email, and with
+ * automatic layout a cell sizes to its longest unbreakable token — a 28-char
+ * email is wider than half a 360px screen, so the table pushed past the
+ * viewport. Fixed layout splits the columns evenly and lets the long values
+ * wrap instead. A horizontal scroller would also work, but nobody scrolls a
+ * privacy notice sideways to find the bit they were looking for.
  */
 export default function LegalPage({
   eyebrow,
@@ -50,9 +58,9 @@ export default function LegalPage({
             [&_li]:mt-2 [&_li]:pl-1
             [&_p]:mt-4
             [&_strong]:font-normal [&_strong]:text-ink
-            [&_table]:mt-5 [&_table]:w-full [&_table]:border-collapse [&_table]:text-sm
-            [&_td]:border-t [&_td]:border-line-soft [&_td]:py-3 [&_td]:pr-4 [&_td]:align-top
-            [&_th]:border-b [&_th]:border-line [&_th]:pb-2 [&_th]:pr-4 [&_th]:text-left [&_th]:text-xs [&_th]:font-bold [&_th]:uppercase [&_th]:tracking-[0.09375rem] [&_th]:text-ink
+            [&_table]:mt-5 [&_table]:w-full [&_table]:table-fixed [&_table]:border-collapse [&_table]:text-sm
+            [&_td]:border-t [&_td]:border-line-soft [&_td]:py-3 [&_td]:pr-4 [&_td]:align-top [&_td]:break-words
+            [&_th]:border-b [&_th]:border-line [&_th]:pb-2 [&_th]:pr-4 [&_th]:text-left [&_th]:text-xs [&_th]:font-bold [&_th]:uppercase [&_th]:tracking-[0.09375rem] [&_th]:break-words [&_th]:text-ink
             [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:pl-5"
         >
           {children}
