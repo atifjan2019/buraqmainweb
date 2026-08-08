@@ -1,20 +1,22 @@
 import { trustBadges } from "@/lib/site";
-import { Check } from "./Icons";
 import Reveal from "./Reveal";
 
+/**
+ * The strip directly under the hero. Built as a row of spec cells rather than
+ * as badges: DESIGN-bmw-m.md has no chip or pill shape, and the check-in-a-
+ * circle treatment this carried was the kind of chrome the system deliberately
+ * strips out. Hairline gaps make the four read as one divided panel.
+ */
 export default function TrustBar() {
   return (
-    <section className="relative border-y border-line-soft bg-surface/30">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <ul className="grid grid-cols-2 gap-px lg:grid-cols-4">
+    <section className="bg-canvas">
+      <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
+        <ul className="grid grid-cols-2 gap-px bg-line-soft lg:grid-cols-4">
           {trustBadges.map((badge, i) => (
-            <li key={badge}>
+            <li key={badge} className="spec-cell">
               <Reveal delay={i * 70}>
-                <div className="flex items-center justify-center gap-3 px-3 py-7 text-center">
-                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-amber/25 bg-amber/10">
-                    <Check className="h-4 w-4 text-amber" />
-                  </span>
-                  <span className="text-sm font-medium text-ink sm:text-[0.95rem]">
+                <div className="px-5 py-8">
+                  <span className="label-uppercase block text-ink">
                     {badge}
                   </span>
                 </div>

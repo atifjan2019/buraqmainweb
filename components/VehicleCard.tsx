@@ -6,7 +6,7 @@ import {
   vehicleTitle,
   type Vehicle,
 } from "@/lib/vehicles";
-import { ArrowRight, Calendar, Fuel, Gauge, Gear } from "./Icons";
+import { ArrowRight } from "./Icons";
 import VehiclePlaceholder from "./VehiclePlaceholder";
 
 interface VehicleCardProps {
@@ -19,7 +19,18 @@ interface VehicleCardProps {
 }
 
 /**
- * Stock card.
+ * Stock card, built as DESIGN-bmw-m.md's `model-card`: canvas background with
+ * no card surface at all — a 16:10 photograph on black, then the name, the
+ * specs and a text link beneath it. The photograph is the card.
+ *
+ * That is the reason the translucent panel, the drop shadow and the lift-on-
+ * hover are gone. This system has no shadows and no blur; a card is either a
+ * flat step up from canvas or, as here, nothing but its own photograph. Hover
+ * moves the image rather than the frame.
+ *
+ * The price moved out of the photograph and into the text block. Sitting it
+ * over the image needed a gradient scrim to stay legible, and the doc rules
+ * gradients out — with the price set below, the photo runs clean to its edges.
  *
  * Photography is served straight from the CRM's own URLs — never proxied or
  * re-hosted, so a photo swapped in the CRM appears here immediately rather than
@@ -32,22 +43,19 @@ export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
   const photo = vehicle.featuredImage;
 
   // Anything the CRM hasn't recorded is dropped rather than rendered as an
-  // empty row — a bare icon with no value beside it reads as a broken card.
+  // empty entry — a stranded separator reads as a broken card.
   const specs = [
-    { icon: Calendar, label: vehicle.year ? String(vehicle.year) : "" },
-    {
-      icon: Gauge,
-      label: vehicle.mileage ? formatMileage(vehicle.mileage) : "",
-    },
-    { icon: Fuel, label: vehicle.fuelType },
-    { icon: Gear, label: vehicle.transmission },
-  ].filter((spec) => spec.label?.trim());
+    vehicle.year ? String(vehicle.year) : "",
+    vehicle.mileage ? formatMileage(vehicle.mileage) : "",
+    vehicle.fuelType,
+    vehicle.transmission,
+  ].filter((spec) => spec?.trim());
 
   return (
-    <article className="group glass relative flex h-full flex-col overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-1.5 hover:border-amber/30 hover:shadow-(--shadow-card)">
-      {/* Media — fixed 4:3 box so mixed-shape photos can't make the grid
+    <article className="group flex h-full flex-col">
+      {/* Media — fixed 16:10 box so mixed-shape photos can't make the grid
           ragged, and so nothing reflows as images arrive. */}
-      <div className="relative aspect-4/3 overflow-hidden bg-surface-2">
+      <div className="relative aspect-16/10 overflow-hidden bg-surface-2">
         {photo ? (
           /* eslint-disable-next-line @next/next/no-img-element --
              next/image would proxy these through /_next/image; the CRM already
@@ -56,7 +64,7 @@ export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
             src={photo.thumb}
             alt={photo.alt}
             width={400}
-            height={300}
+            height={250}
             loading={priority ? "eager" : "lazy"}
             fetchPriority={priority ? "high" : "auto"}
             decoding="async"
@@ -66,67 +74,53 @@ export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
           <VehiclePlaceholder make={vehicle.make} model={vehicle.model} />
         )}
 
-        {/* Fade so badges and price stay legible whatever sits behind them */}
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-linear-to-t from-canvas via-canvas/10 to-transparent"
-        />
-
-        <div className="absolute left-4 top-4 flex flex-wrap gap-2">
+        {/* Status chips. Solid fills rather than translucent ones: there is no
+            scrim under them now, so each has to carry its own contrast. */}
+        <div className="absolute left-0 top-0 flex flex-wrap">
           {reserved && (
-            <span className="rounded-full bg-surface-2/90 px-2.5 py-1 text-[0.68rem] font-semibold tracking-wide text-amber ring-1 ring-amber/40 backdrop-blur">
+            <span className="border border-ink bg-canvas px-3 py-1.5 text-[0.7rem] font-bold uppercase tracking-[1.5px] text-ink">
               Reserved
             </span>
           )}
           {vehicle.isFeatured && (
-            <span className="rounded-full bg-amber px-2.5 py-1 text-[0.68rem] font-semibold tracking-wide text-on-amber">
+            <span className="bg-ink px-3 py-1.5 text-[0.7rem] font-bold uppercase tracking-[1.5px] text-on-ink">
               Featured
             </span>
           )}
         </div>
 
-        {/* Without a plate this is an empty bordered chip floating on the
-            photo, which looks like a rendering fault rather than a gap. */}
+        {/* Without a plate this is an empty chip floating on the photo, which
+            looks like a rendering fault rather than a gap. */}
         {vehicle.registration?.trim() && (
-          <span className="absolute right-4 top-4 rounded-md border border-line bg-canvas/70 px-2 py-1 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-muted backdrop-blur">
+          <span className="absolute right-0 top-0 bg-canvas px-2.5 py-1.5 font-mono text-[0.65rem] font-bold uppercase tracking-[1.5px] text-muted">
             {vehicle.registration}
           </span>
         )}
-
-        <p className="absolute bottom-4 left-5 font-display text-3xl font-bold text-gold">
-          {formatPrice(vehicle.price)}
-        </p>
       </div>
 
       {/* Body */}
-      <div className="flex flex-1 flex-col p-5">
-        <h3 className="font-display text-lg font-semibold tracking-tight text-ink">
-          {title}
-        </h3>
+      <div className="flex flex-1 flex-col pt-5">
+        <h3 className="title-lg text-ink">{title}</h3>
 
-        <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2.5">
-          {specs.map(({ icon: Icon, label }) => (
-            <div key={label} className="flex items-center gap-2 text-muted">
-              <Icon className="h-4 w-4 shrink-0 text-amber/70" />
-              <dd className="truncate text-[0.8rem]">{label}</dd>
-            </div>
-          ))}
-        </dl>
+        {/* One tracked line rather than an icon grid. The doc keeps chrome off
+            the card and lets type carry the detail; four labelled icons under
+            every photo is exactly the decoration it backs away from. */}
+        {specs.length > 0 && (
+          <p className="caption mt-3 text-faint">{specs.join(" · ")}</p>
+        )}
 
-        {/* min-h-11 carries both to the 44px touch minimum — padding alone
-            left them at 40px and 42px. These are the primary actions on a
-            grid most people meet on a phone. */}
-        <div className="mt-5 flex items-center gap-2 border-t border-line-soft pt-4">
-          <Link
-            href={vehicleHref(vehicle)}
-            className="group/btn inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-surface-2 px-4 text-sm font-semibold text-ink transition-colors hover:bg-amber hover:text-on-amber"
-          >
-            View Details
-            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-0.5" />
+        <p className="display-sm mt-5 text-ink">{formatPrice(vehicle.price)}</p>
+
+        {/* min-h-11 carries both to the 44px touch minimum. These are the
+            primary actions on a grid most people meet on a phone. */}
+        <div className="mt-auto flex items-center gap-6 border-t border-line-soft pt-5">
+          <Link href={vehicleHref(vehicle)} className="link-m">
+            View details
+            <ArrowRight className="h-3.5 w-3.5" />
           </Link>
           <Link
             href={`/finance?vehicle=${vehicle.slug}`}
-            className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm font-medium text-muted transition-colors hover:border-amber/40 hover:text-amber"
+            className="inline-flex min-h-11 items-center text-sm font-light text-muted transition-colors hover:text-ink"
           >
             Finance
           </Link>

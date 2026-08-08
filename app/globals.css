@@ -1,139 +1,173 @@
 @import "tailwindcss";
 
-/* ------------------------------------------------------------------
-   Midnight Performance — design tokens
-   Dark cinematic canvas, warm amber accent, glass surfaces.
+/* ==================================================================
+   BMW M — design tokens
+   See DESIGN-bmw-m.md. Motorsport-engineering interface: near-pure
+   black canvas, white UPPERCASE display type, photography carrying all
+   the voltage, and the M tricolour used sparingly as a brand signature.
 
    These are the DARK values, and dark is the default: the site renders
-   correctly with no `data-theme` at all, which is what anyone with scripting
-   off gets. `html[data-theme="light"]` further down re-points the same tokens
-   at a light palette, so components never branch on theme — every rule here
-   resolves through the variable and follows automatically.
+   correctly with no `data-theme` at all, which is what anyone with
+   scripting off gets. `html[data-theme="light"]` further down re-points
+   the same tokens at an inverted palette, so components never branch on
+   theme — every rule here resolves through the variable and follows.
+
+   The design doc specifies a black-only marketing surface. The light
+   palette is kept because the site ships a working theme toggle; it is a
+   straight inversion of the same system rather than a second look — same
+   0px radius, same uppercase voice, same tricolour, same weight pair.
 
    Two rules keep that workable:
-     · --color-amber must stay legible as TEXT on its own theme's background,
-       because `text-amber` is used ~90 times. That's why the light value is a
-       deep amber rather than the brand's vivid one.
-     · Anything painted ON an amber fill uses --color-on-amber, never
-       --color-canvas. Canvas inverts between themes; the label on a button
-       has to stay readable in both, so it gets its own token.
------------------------------------------------------------------- */
+     · The accent in this system is WHITE, not a hue. Anything that used
+       to be `amber` is now `ink` (or a hairline), which means it inverts
+       to black on light and stays legible without a second value.
+     · Anything painted ON an ink fill uses --color-on-ink, never
+       --color-canvas. Canvas inverts between themes; the label on a
+       button has to stay readable in both, so it gets its own token.
+================================================================== */
 @theme {
-  /* Surfaces */
-  --color-canvas: #0a0a0b;
-  --color-canvas-deep: #050506;
-  --color-surface: #141417;
-  --color-surface-2: #1c1c21;
-  --color-line: #26262c;
-  --color-line-soft: #1e1e23;
+  /* --- Surfaces ------------------------------------------------- */
+  /* True black. The page floor across every marketing surface. */
+  --color-canvas: #000000;
+  /* "surface-soft" in the doc — barely-different-from-black, used for
+     spec cells and footer-adjacent strips. */
+  --color-canvas-deep: #0d0d0d;
+  /* "surface-card" — cards, secondary buttons, icon-button grounds. */
+  --color-surface: #1a1a1a;
+  /* "surface-elevated" — nested cards inside dark bands. */
+  --color-surface-2: #262626;
+  /* Carbon-fibre-inspired tone for technical-spec surfaces. */
+  --color-carbon: #2b2b2b;
 
-  /* Accent */
-  --color-amber: #f5a524;
-  --color-amber-bright: #ffb840;
-  --color-amber-dim: #b9791a;
-  /* Foreground for amber fills. Near-black here: 9.1:1 on #f5a524. */
-  --color-on-amber: #1a1206;
+  /* --- Hairlines ------------------------------------------------ */
+  /* The 1px divider tone. Every border in the system is one of these
+     two: there are no shadows to separate one surface from another. */
+  --color-line: #3c3c3c;
+  /* "hairline-strong" — same hex as surface-2, so a border reads as a
+     one-step elevation rather than as an ink line. */
+  --color-line-soft: #262626;
 
+  /* --- Text ----------------------------------------------------- */
+  --color-ink: #ffffff;
+  /* Emphasised body / lead paragraph. */
+  --color-lead: #e6e6e6;
+  /* Default running text — slightly cooler than pure white. */
+  --color-muted: #bbbbbb;
+  /* Footer links, breadcrumbs, captions, fine print. */
+  --color-faint: #7e7e7e;
+  /* Foreground for ink fills. Black here: 21:1 on #ffffff. */
+  --color-on-ink: #000000;
+
+  /* --- M tricolour ---------------------------------------------- */
   /*
-    Tint for the ambient glows that sit behind page headers. Deliberately NOT
-    --color-amber, and deliberately the same in both themes: those washes run
-    at 10–20% alpha and carry no text, so they never need the light theme's
-    darkened amber. Mixing the dark one into white gives a muddy tan; the
-    brand's vivid amber gives the warm cream it gives on every other site.
+    Brand-identity only. Per the design doc these are never a CTA
+    colour, never a background fill, and never an action surface — they
+    appear as the 4px stripe divider, as eyebrow rules, and as the
+    active-tab marker. Identical in both themes: the stripe is the
+    trademark, and it does not have a light variant.
   */
-  --color-glow: #f5a524;
+  --color-m-blue-light: #0066b1;
+  --color-m-blue: #1c69d4;
+  --color-m-red: #e22718;
 
-  /* Ghost step numerals — big, faint, and behind their own card. Tokenised
+  /* --- Semantic ------------------------------------------------- */
+  --color-warning: #f4b400;
+  --color-success: #0fa336;
+
+  /* Ghost numerals — big, faint, set behind their own card. Tokenised
      because "faint" is a different colour on each theme, not a different
      alpha: a grey that recedes on black advances on white. */
-  --ghost-numeral: #26262c;
-  --ghost-numeral-hover: #4a3a1f;
+  --ghost-numeral: #262626;
+  --ghost-numeral-hover: #3c3c3c;
 
-  /* Text */
-  --color-ink: #fafafa;
-  --color-muted: #a1a1aa;
-  --color-faint: #6b6b74;
+  /* --- Type ----------------------------------------------------- */
+  /*
+    BMW Type Next Latin is licensed and cannot ship here. The design doc
+    names Inter as the substitute, at the same 700/300 weight pair, with
+    display tracking pulled to -0.5px to match BMW Type's tighter setting
+    at large sizes — that adjustment lives in the .display-* classes.
 
-  /* Depth. Black-based on dark, where a shadow reads as absence of light. */
-  --shadow-card: 0 24px 60px -24px rgb(0 0 0 / 0.7);
-  --shadow-glow: 0 0 44px -8px var(--color-amber);
-  /* Strength of the film grain. Dialled to zero in light mode. */
-  --grain-opacity: 0.14;
-  --grain-blend: overlay;
+    One family for both roles, which is the point: the contrast in this
+    system comes from WEIGHT (700 display against 300 body), not from
+    pairing two typefaces. --font-display is kept as an alias so the
+    `font-display` utility still resolves.
+  */
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-sans);
+
+  /* --- Depth ---------------------------------------------------- */
+  /*
+    The system uses no drop shadows. Depth comes from photography and
+    from the step between canvas and surface. The token is kept so the
+    handful of `shadow-(--shadow-card)` call sites resolve to nothing
+    rather than to a stale amber bloom.
+  */
+  --shadow-card: none;
 
   /*
-    Separates the hero headline from the photograph behind it. Tight on
-    purpose: a wide blur doesn't add legibility past the first few pixels of
-    the glyph edge, it just puts a grey cloud behind the whole word.
+    Separates hero type from the photograph behind it. Tight on purpose:
+    a wide blur doesn't add legibility past the first few pixels of the
+    glyph edge, it just puts a grey cloud behind the whole word.
   */
-  --hero-text-shadow: 0 1px 12px rgb(0 0 0 / 0.55);
+  --hero-text-shadow: 0 1px 14px rgb(0 0 0 / 0.6);
 
-  /* Type */
-  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* --- Spacing -------------------------------------------------- */
+  /* The doc's named steps, on a 4px base. Tailwind's own scale already
+     covers these numerically (py-24 = 96px = section); these exist so
+     the intent is readable at the call site where it matters. */
+  --spacing-section: 6rem; /* 96px — between major editorial bands */
+  --spacing-band: 4rem; /* 64px — inside hero photo bands */
 
-  /* Motion */
+  /* --- Motion --------------------------------------------------- */
   --animate-marquee: marquee 42s linear infinite;
-  --animate-float: float 7s ease-in-out infinite;
 }
 
-/* ------------------------------------------------------------------
-   Daylight — the light palette.
+/* ==================================================================
+   Daylight — the inverted palette.
 
-   Selector is `html[data-theme="light"]` rather than `[data-theme="light"]`
-   so it outranks the `:root` block Tailwind generates from @theme above;
-   those have equal specificity and would otherwise be decided by source
-   order, which is not ours to rely on.
+   Selector is `html[data-theme="light"]` rather than
+   `[data-theme="light"]` so it outranks the `:root` block Tailwind
+   generates from @theme above; those have equal specificity and would
+   otherwise be decided by source order, which is not ours to rely on.
 
-   The attribute is stamped on <html> before first paint by the inline script
-   in app/layout.tsx, so there is no flash of the dark theme on load.
------------------------------------------------------------------- */
+   The attribute is stamped on <html> before first paint by the inline
+   script in app/layout.tsx, so there is no flash of the dark theme.
+================================================================== */
 html[data-theme="light"] {
-  /* Surfaces. "deep" still means further back, which on light means greyer. */
+  /* Surfaces. "deep" still means further back, which on light means
+     greyer rather than blacker. */
   --color-canvas: #ffffff;
-  --color-canvas-deep: #f4f4f5;
-  --color-surface: #fbfbfc;
-  --color-surface-2: #f4f4f5;
-  --color-line: #d4d4d8;
-  --color-line-soft: #e7e7ea;
+  --color-canvas-deep: #f2f2f2;
+  --color-surface: #f2f2f2;
+  --color-surface-2: #e6e6e6;
+  --color-carbon: #dedede;
+
+  --color-line: #c4c4c4;
+  --color-line-soft: #dcdcdc;
+
+  /* Text. All four clear 4.5:1 on white. */
+  --color-ink: #000000;
+  --color-lead: #1a1a1a;
+  --color-muted: #444444;
+  --color-faint: #666666;
+  /* White on black is 21:1 — ink fills invert their label here. */
+  --color-on-ink: #ffffff;
+
+  /* The tricolour does not invert. It is the trademark, not a token. */
+
+  /* Pale enough to read as a watermark on the near-white card, dark
+     enough not to vanish; hover deepens it, which on white means going
+     darker rather than lighter. */
+  --ghost-numeral: #e2e2e2;
+  --ghost-numeral-hover: #cccccc;
 
   /*
-    Deep amber, not the brand's vivid one. #f5a524 sits at 1.9:1 on white,
-    so every `text-amber` label on the site would fail against it; #b45309
-    reads at 5.4:1 and still reads as the same warm accent. The vivid amber
-    only survives where it sits on something dark.
+    Display type is dark here, so a black bloom would smear into the
+    letters instead of separating them. A tight white halo does the same
+    job in reverse, lifting the text off the darker parts of a photo.
   */
-  --color-amber: #b45309;
-  /* Hover wants *more* emphasis, which on a light ground means darker. */
-  --color-amber-bright: #92400e;
-  --color-amber-dim: #d97706;
-  /* White on #b45309 is 5.4:1 — amber fills invert their label here. */
-  --color-on-amber: #ffffff;
-
-  /* Text. All three clear 4.5:1 on white. */
-  --color-ink: #18181b;
-  --color-muted: #52525b;
-  --color-faint: #6b6b75;
-
-  /* A shadow on white reads as depth, not as absence of light — so it is
-     softer, and the amber bloom is dropped to a tight neutral lift. */
-  --shadow-card: 0 18px 40px -20px rgb(24 24 27 / 0.28);
-  --shadow-glow: 0 10px 26px -10px rgb(180 83 9 / 0.45);
-  /* Grain over a light surface reads as dirt rather than film. */
-  --grain-opacity: 0;
-  --grain-blend: normal;
-
-  /*
-    The headline is dark here, so a black shadow would smear into the letters
-    instead of separating them. A tight white halo does the same job in
-    reverse, lifting the text off the darker parts of the photograph.
-  */
-  --hero-text-shadow: 0 1px 10px rgb(255 255 255 / 0.8);
-
-  /* Pale enough to read as a watermark on the near-white card, dark enough
-     not to vanish; hover deepens it, which on white means going darker. */
-  --ghost-numeral: #dcdce0;
-  --ghost-numeral-hover: #c8895a;
+  --hero-text-shadow: 0 1px 12px rgb(255 255 255 / 0.85);
 }
 
 @keyframes marquee {
@@ -145,22 +179,12 @@ html[data-theme="light"] {
   }
 }
 
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-14px);
-  }
-}
-
-/* ------------------------------------------------------------------
+/* ==================================================================
    Base
------------------------------------------------------------------- */
+================================================================== */
 html {
   scroll-behavior: smooth;
-  /* Offset anchor targets so the sticky header never covers a heading. */
+  /* Offset anchor targets so the fixed nav never covers a heading. */
   scroll-padding-top: 6rem;
   background-color: var(--color-canvas);
   /* Drives the UA's own widgets — scrollbars, form controls, spellcheck
@@ -176,126 +200,499 @@ body {
   background-color: var(--color-canvas);
   color: var(--color-ink);
   font-family: var(--font-sans);
+  /* Body is Light (300) at rest. The doc is explicit that bumping this
+     to 400 or 500 makes the page read marketing-bombastic rather than
+     European-engineered — the 700/300 gap is the editorial signature. */
+  font-weight: 300;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
 ::selection {
-  background-color: color-mix(in oklab, var(--color-amber) 30%, transparent);
-  color: var(--color-ink);
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
 }
 
-/* Amber focus ring for keyboard users on every interactive element. */
+/*
+  Focus ring. Square, like everything else — a rounded ring on a system
+  whose entire silhouette is rectangular reads as a foreign control.
+*/
 :where(a, button, input, select, textarea, summary):focus-visible {
-  outline: 2px solid var(--color-amber);
+  outline: 2px solid var(--color-ink);
   outline-offset: 3px;
-  border-radius: 6px;
+  border-radius: 0;
 }
 
-/* Slim dark scrollbar so it doesn't break the cinematic look. */
+/* Slim scrollbar, squared off to match the rest of the chrome. */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-canvas-deep);
+  background: var(--color-canvas);
 }
 ::-webkit-scrollbar-thumb {
   background: var(--color-surface-2);
-  border-radius: 999px;
-  border: 2px solid var(--color-canvas-deep);
+  border: 2px solid var(--color-canvas);
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-line);
 }
 
-/* ------------------------------------------------------------------
-   Utilities
------------------------------------------------------------------- */
+/* ==================================================================
+   Typography scale
 
-/* Fine film grain — lifts flat black into something filmic.
-   Driven by tokens so the light theme can switch it off: over a white surface
-   the same noise reads as a dirty screen rather than as film stock. */
-@utility grain-overlay {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
-  opacity: var(--grain-opacity);
-  mix-blend-mode: var(--grain-blend);
+   Sizes clamp between the doc's mobile and desktop ends (hero 80→48px,
+   section heads 56→32px). Display is UPPERCASE at 700 with -0.5px
+   tracking — the Inter-substitute adjustment the doc calls for, since
+   Inter sets looser than BMW Type Next at large sizes.
+
+   These are classes rather than @utility so the uppercase, weight and
+   tracking travel together. Applying them piecemeal is how the voice
+   drifts.
+================================================================== */
+@layer components {
+  .display-xl,
+  .display-lg,
+  .display-md,
+  .display-sm {
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+  }
+
+  /* Hero h1 — 80px desktop, 48px mobile. */
+  .display-xl {
+    font-size: clamp(3rem, 6.6vw, 5rem);
+    line-height: 1;
+  }
+
+  /* Section heads. */
+  .display-lg {
+    font-size: clamp(2rem, 4.6vw, 3.5rem);
+    line-height: 1.05;
+  }
+
+  /* Sub-section heads, model names. */
+  .display-md {
+    font-size: clamp(1.75rem, 3.4vw, 2.5rem);
+    line-height: 1.1;
+  }
+
+  /* CTA-band heads, spec values, category page titles. */
+  .display-sm {
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+    line-height: 1.15;
+  }
+
+  /* Card titles in 3-up grids. The one title size that stays at 700. */
+  .title-lg {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.3;
+    text-transform: uppercase;
+    letter-spacing: -0.25px;
+  }
+
+  /* Card sub-titles and lead paragraphs — sentence case, regular. */
+  .title-md {
+    font-size: 1.25rem;
+    font-weight: 400;
+    line-height: 1.4;
+  }
+
+  /* Spec callouts, intro paragraphs. */
+  .title-sm {
+    font-size: 1.125rem;
+    font-weight: 400;
+    line-height: 1.4;
+  }
+
+  /*
+    The machined label. 1.5px tracking is non-negotiable per the doc —
+    the spacing is what makes an all-caps label read as stamped rather
+    than as typed.
+  */
+  .label-uppercase {
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  /* Photo captions, image credits, fine print that still needs tracking. */
+  .caption {
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0.5px;
+  }
+
+  /* Top-nav menu items — sentence case, regular, lightly tracked. */
+  .nav-link {
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0.5px;
+  }
 }
 
-/* Gold gradient text for the hero headline. */
-/* Stays bright across its whole run — an over-dark tail makes the last
-   word of a headline unreadable against the near-black canvas. */
-@utility text-gold {
-  background-image: linear-gradient(
-    100deg,
-    #fff3d6 0%,
-    var(--color-amber-bright) 34%,
-    var(--color-amber) 68%,
-    #e0921c 100%
-  );
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-}
+/* ==================================================================
+   The M tricolour stripe
 
-/* The same headline on white: the pale end of that ramp is invisible there,
-   so the whole run moves down into bronze and keeps a legible contrast. */
-html[data-theme="light"] .text-gold {
-  background-image: linear-gradient(
-    100deg,
-    #a3560c 0%,
-    #b45309 34%,
-    #92400e 68%,
-    #78350f 100%
-  );
-}
+   The system's only truly decorative element, and the most distinctive
+   non-typographic one. Hard stops, never a blend: the three bands are a
+   trademark, and a gradient between them is a different mark.
 
-/* Glass card surface used across vehicle + feature cards. */
-@utility glass {
-  background-color: color-mix(in oklab, var(--color-surface) 78%, transparent);
-  backdrop-filter: blur(14px);
-  border: 1px solid var(--color-line-soft);
-}
-
-/* On white, a translucent panel against a white page has nothing to separate
-   it from the background — the border alone reads as flat. A soft shadow does
-   the lifting that the surface contrast did on dark. */
-html[data-theme="light"] .glass {
-  border-color: var(--color-line);
-  box-shadow: 0 1px 2px rgb(24 24 27 / 0.04), 0 8px 24px -16px rgb(24 24 27 / 0.18);
-}
-
-/* Hairline gradient divider. */
-@utility rule-glow {
+   Used as a 4px divider on brand-identity moments, as a 2px active-tab
+   marker, and as the short rule beside an eyebrow label. Never as a
+   button fill, a background, or an action surface.
+================================================================== */
+@utility m-stripe {
   background-image: linear-gradient(
     to right,
-    transparent,
-    var(--color-line),
-    transparent
+    var(--color-m-blue-light) 0 33.333%,
+    var(--color-m-blue) 33.333% 66.666%,
+    var(--color-m-red) 66.666% 100%
   );
 }
 
-/*
-  The brand mark is a flat #f5a524 raster (scripts/build-brand-assets.mjs), so
-  it cannot follow --color-amber the way the wordmark beside it does. These
-  values land it on roughly #b45309 — the light theme's amber — so the emblem
-  and the "MOTORS" lettering next to it stay the same colour as each other.
-*/
-html[data-theme="light"] .brand-mark {
-  filter: brightness(0.65) saturate(1.4);
+/* Vertical run of the same stripe, for left-edge accents on cards. */
+@utility m-stripe-y {
+  background-image: linear-gradient(
+    to bottom,
+    var(--color-m-blue-light) 0 33.333%,
+    var(--color-m-blue) 33.333% 66.666%,
+    var(--color-m-red) 66.666% 100%
+  );
 }
 
-/* ------------------------------------------------------------------
+@layer components {
+  /*
+    Eyebrow: an uppercase tracked label preceded by a short tricolour
+    rule. This is the system's standard way of marking a section, and it
+    replaces the decorative hairline-plus-accent-colour pattern that a
+    hue-led system would use.
+  */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+
+  .eyebrow::before {
+    content: "";
+    display: block;
+    width: 2.25rem;
+    height: 4px;
+    flex: none;
+    background-image: linear-gradient(
+      to right,
+      var(--color-m-blue-light) 0 33.333%,
+      var(--color-m-blue) 33.333% 66.666%,
+      var(--color-m-red) 66.666% 100%
+    );
+  }
+
+  /* Centred sections get the rule on both sides for symmetry. */
+  .eyebrow-center::after {
+    content: "";
+    display: block;
+    width: 2.25rem;
+    height: 4px;
+    flex: none;
+    background-image: linear-gradient(
+      to right,
+      var(--color-m-blue-light) 0 33.333%,
+      var(--color-m-blue) 33.333% 66.666%,
+      var(--color-m-red) 66.666% 100%
+    );
+  }
+}
+
+/* ==================================================================
+   Buttons
+
+   Flat, 0px radius, uppercase, 1.5px tracking, 48px tall. The
+   rectangular silhouette IS the brand — the doc is explicit that
+   rounded corners read as consumer-tech rather than motorsport.
+
+   The only circular shape in the system is the icon button.
+================================================================== */
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    min-height: 48px;
+    padding: 0 2rem;
+    border: 1px solid transparent;
+    border-radius: 0;
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-align: center;
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  /*
+    The signature CTA. Transparent ground with a white outline: over
+    photography a filled button clashes with the image, and the doc
+    makes the outline the default rather than the exception. Hover
+    inverts to a solid fill, which is the one state BMW's own surfaces
+    use to signal a press target.
+  */
+  .btn-outline {
+    background-color: transparent;
+    border-color: var(--color-ink);
+    color: var(--color-ink);
+  }
+
+  .btn-outline:hover {
+    background-color: var(--color-ink);
+    color: var(--color-on-ink);
+  }
+
+  /*
+    Solid. Reserved for the single strongest action in a view — the doc
+    treats white-on-black and black-on-white as the same button seen
+    from either side, which is why the label rides --color-on-ink and
+    follows the theme rather than being pinned to a literal.
+  */
+  .btn-solid {
+    background-color: var(--color-ink);
+    border-color: var(--color-ink);
+    color: var(--color-on-ink);
+  }
+
+  .btn-solid:hover {
+    background-color: transparent;
+    color: var(--color-ink);
+  }
+
+  /* Quiet tertiary: a hairline box that firms up on hover. Used where a
+     third action would otherwise compete with the first two. */
+  .btn-quiet {
+    background-color: transparent;
+    border-color: var(--color-line);
+    color: var(--color-muted);
+  }
+
+  .btn-quiet:hover {
+    border-color: var(--color-ink);
+    color: var(--color-ink);
+  }
+
+  .btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+
+  /*
+    Circular icon button — carousel arrows, lightbox controls, share.
+    48 × 48 exactly, comfortably past the 44px touch minimum. The only
+    non-rectangular shape the system allows.
+  */
+  .btn-icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    flex: none;
+    border: 1px solid var(--color-line);
+    border-radius: 9999px;
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    transition:
+      background-color 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  .btn-icon:hover {
+    border-color: var(--color-ink);
+    background-color: var(--color-surface-2);
+  }
+
+  /*
+    Inline text link — uppercase, tracked, no underline, chevron beside
+    the label. Underlining these would fight the tracking; the arrow is
+    what marks them as navigational.
+  */
+  .link-m {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    transition: opacity 0.25s ease;
+  }
+
+  .link-m:hover {
+    opacity: 0.65;
+  }
+}
+
+/* ==================================================================
+   Surfaces & cells
+================================================================== */
+@layer components {
+  /*
+    Card surface. Replaces the old translucent-blur panel: this system
+    has no backdrop blur and no shadow, so a card is a flat step up from
+    canvas plus a hairline. That step is the entire elevation model.
+  */
+  .surface-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-line-soft);
+    border-radius: 0;
+  }
+
+  /* A card that sits on photography or on canvas with no fill of its
+     own — just the hairline. Used where the photo is the subject. */
+  .surface-outline {
+    background-color: transparent;
+    border: 1px solid var(--color-line);
+    border-radius: 0;
+  }
+
+  /*
+    Technical specification cell. Value on top in display-sm, label
+    below in the machined uppercase. Near-black rather than card grey so
+    a table of these reads as one instrument panel rather than as a row
+    of separate cards.
+  */
+  .spec-cell {
+    background-color: var(--color-canvas-deep);
+    border-radius: 0;
+  }
+
+  /*
+    Form control. 48px tall, square, hairline border that thickens to
+    white on focus — the doc's only documented input state.
+  */
+  .field {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.75rem 1rem;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 0;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.5;
+    transition: border-color 0.2s ease;
+  }
+
+  .field::placeholder {
+    color: var(--color-faint);
+  }
+
+  .field:focus {
+    border-color: var(--color-ink);
+    outline: none;
+  }
+
+  .field[aria-invalid="true"] {
+    border-color: var(--color-m-red);
+  }
+
+  /*
+    Category tab. Text-only, no fill, no radius. Active state lifts the
+    colour to ink and lays the tricolour under the label — which is the
+    doc's one sanctioned use of the stripe as an interface marker.
+  */
+  .category-tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 0;
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    transition: color 0.25s ease;
+  }
+
+  .category-tab:hover {
+    color: var(--color-ink);
+  }
+
+  .category-tab-active {
+    color: var(--color-ink);
+  }
+
+  .category-tab-active::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 2px;
+    background-color: var(--color-ink);
+  }
+}
+
+/* ==================================================================
+   The brand mark.
+
+   The emblem is a flat #f5a524 raster baked by
+   scripts/build-brand-assets.mjs, which predates this system and cannot
+   follow a token. `grayscale(1) brightness(...)` lands it on white for
+   the dark canvas and on black for the light one, so the emblem and the
+   wordmark beside it stay the same colour as each other — which is the
+   whole point of a monochrome system.
+
+   A filter rather than a second raster because it is a single-colour
+   silhouette: the shift is clean and keeps the soft alpha edges the
+   build script went to the trouble of producing.
+================================================================== */
+.brand-mark {
+  filter: grayscale(1) brightness(0) invert(1);
+}
+
+html[data-theme="light"] .brand-mark {
+  filter: grayscale(1) brightness(0);
+}
+
+/* ==================================================================
    Theme toggle.
 
-   Both glyphs are always in the DOM and CSS picks one. Choosing in React
-   instead would mean the server rendering an icon it cannot know is right —
-   the stored preference only exists in the browser — so every visitor on the
-   non-default theme would get a hydration mismatch and a visible icon swap.
+   Both glyphs are always in the DOM and CSS picks one. Choosing in
+   React instead would mean the server rendering an icon it cannot know
+   is right — the stored preference only exists in the browser — so
+   every visitor on the non-default theme would get a hydration mismatch
+   and a visible icon swap.
 
-   The glyph shows the theme being switched TO, which is the convention these
-   controls follow: a sun on the dark site, a moon on the light one.
------------------------------------------------------------------- */
+   The glyph shows the theme being switched TO, which is the convention
+   these controls follow: a sun on the dark site, a moon on the light.
+================================================================== */
 .theme-icon-moon {
   display: none;
 }
@@ -308,30 +705,34 @@ html[data-theme="light"] .theme-icon-moon {
   display: block;
 }
 
-/* ------------------------------------------------------------------
-   Progressive enhancement — controls that exist only as a no-JS fallback.
-
-   Gated behind [data-js] like the reveals below, so the control is hidden
-   before first paint rather than rendered and then pulled, which would flash
-   a button that immediately vanishes. Without scripting it simply stays.
------------------------------------------------------------------- */
+/* ==================================================================
+   Progressive enhancement — controls that exist only as a no-JS
+   fallback. Gated behind [data-js] like the reveals below, so the
+   control is hidden before first paint rather than rendered and then
+   pulled, which would flash a button that immediately vanishes.
+================================================================== */
 [data-js] .no-js-only {
   display: none;
 }
 
-/* ------------------------------------------------------------------
+/* ==================================================================
    Scroll reveal — driven by IntersectionObserver in Reveal.tsx.
 
-   Gated behind [data-js], which an inline script in the document head sets.
-   Without it the starting state never applies, so if scripting is blocked or
-   the bundle fails the page renders fully visible instead of blank.
------------------------------------------------------------------- */
+   Gated behind [data-js], which an inline script in the document head
+   sets. Without it the starting state never applies, so if scripting is
+   blocked or the bundle fails the page renders fully visible instead of
+   blank.
+
+   The travel is shorter and the curve flatter than the previous system
+   used: this one is engineered rather than cinematic, and a long
+   drifting rise reads as decoration.
+================================================================== */
 [data-js] [data-reveal] {
   opacity: 0;
-  transform: translateY(26px);
+  transform: translateY(18px);
   transition:
-    opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: var(--reveal-delay, 0ms);
   will-change: opacity, transform;
 }

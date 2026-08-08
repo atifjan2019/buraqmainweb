@@ -3,12 +3,23 @@ import Reveal from "./Reveal";
 interface SectionHeadingProps {
   eyebrow: string;
   title: string;
-  /** Rendered in gold, appended after the title. */
+  /**
+   * The tail of the headline. It used to be rendered in the accent colour;
+   * this system has no accent colour for type — white IS the primary, and the
+   * doc forbids introducing a brand hue outside the tricolour, which is
+   * identity-only and never lands on running text. So it renders as part of
+   * the same white headline, and stays a separate prop only because every
+   * caller already splits its heading this way.
+   */
   accent?: string;
   body?: string;
   align?: "left" | "center";
 }
 
+/**
+ * Standard section masthead: tricolour-ruled eyebrow, UPPERCASE display-lg
+ * headline, optional Light lead paragraph.
+ */
 export default function SectionHeading({
   eyebrow,
   title,
@@ -19,29 +30,30 @@ export default function SectionHeading({
   const centered = align === "center";
 
   return (
-    <div className={centered ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}>
+    <div className={centered ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
       <Reveal>
         <span
-          className={`inline-flex items-center gap-2.5 text-xs font-semibold tracking-[0.24em] text-amber ${
-            centered ? "justify-center" : ""
-          }`}
+          className={`eyebrow ${centered ? "eyebrow-center justify-center" : ""}`}
         >
-          <span className="h-px w-6 bg-amber/50" />
           {eyebrow}
-          {centered && <span className="h-px w-6 bg-amber/50" />}
         </span>
       </Reveal>
 
       <Reveal delay={80}>
-        <h2 className="mt-5 font-display text-[clamp(1.9rem,4.2vw,3.1rem)] font-bold leading-[1.05] tracking-[-0.025em] text-ink">
-          {title}
-          {accent && <span className="text-gold"> {accent}</span>}
+        <h2 className="display-lg mt-6 text-ink">
+          {accent ? `${title} ${accent}` : title}
         </h2>
       </Reveal>
 
       {body && (
         <Reveal delay={140}>
-          <p className="mt-5 text-base leading-relaxed text-muted">{body}</p>
+          <p
+            className={`mt-6 text-base font-light leading-relaxed text-muted ${
+              centered ? "mx-auto max-w-2xl" : "max-w-2xl"
+            }`}
+          >
+            {body}
+          </p>
         </Reveal>
       )}
     </div>

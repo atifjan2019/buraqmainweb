@@ -7,17 +7,22 @@ import { Close, Menu, Phone, WhatsApp } from "./Icons";
 import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
 
+/**
+ * Top navigation.
+ *
+ * Solid canvas at every scroll position, not transparent-until-scrolled.
+ * DESIGN-bmw-m.md gives `top-nav` a canvas background outright, and the reason
+ * is structural rather than cosmetic: the hero below is full-bleed photography,
+ * and a nav that dissolves into it puts white 14px labels over whatever part of
+ * a car happens to be behind them. A solid bar is what lets the photograph run
+ * edge to edge without the chrome having to fight it.
+ *
+ * That is also why the scroll listener this component used to carry is gone —
+ * it existed only to fade the background in.
+ */
 export default function Header() {
-  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const wa = whatsappLink("Hi Burraq Motors, I'd like to enquire about a car.");
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   // Stop the page scrolling behind the open mobile menu.
   useEffect(() => {
@@ -38,37 +43,36 @@ export default function Header() {
   }, [open]);
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "border-b border-line-soft bg-canvas/80 backdrop-blur-xl"
-          : "border-b border-transparent bg-transparent"
-      }`}
-    >
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8">
-        <Link href="/" className="group" onClick={() => setOpen(false)}>
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-line-soft bg-canvas">
+      {/* 64px per the doc's `top-nav`. The max width is 1440px rather than the
+          usual SaaS 1280 — the system wants photography to breathe. */}
+      <div className="mx-auto flex h-16 max-w-[90rem] items-center justify-between px-5 sm:px-8">
+        <Link href="/" onClick={() => setOpen(false)}>
           <Logo />
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex">
+        {/* Sentence case, not uppercase: the doc reserves the machined
+            all-caps treatment for buttons and labels, and puts nav items in
+            `nav-link` — 14px / 400 / 0.5px. */}
+        <nav className="hidden items-center gap-8 lg:flex">
           {nav.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="relative rounded-lg px-4 py-2 text-sm font-medium text-muted transition-colors hover:text-ink"
+              className="nav-link text-muted transition-colors hover:text-ink"
             >
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 lg:flex">
+        <div className="hidden items-center gap-4 lg:flex">
           {wa && (
             <a
               href={wa}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-full bg-amber px-5 py-2.5 text-sm font-semibold text-on-amber transition-all hover:bg-amber-bright hover:shadow-(--shadow-glow)"
+              className="btn btn-outline h-11 min-h-11 px-6"
             >
               <WhatsApp className="h-4 w-4" />
               WhatsApp
@@ -84,49 +88,54 @@ export default function Header() {
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
-            className="grid h-11 w-11 place-items-center rounded-xl border border-line text-ink"
+            className="grid h-11 w-11 place-items-center border border-line text-ink"
           >
             {open ? <Close className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile drawer */}
+      {/* Mobile sheet — a full-screen black overlay carrying the tricolour at
+          its top edge, which is the collapse the doc specifies by name. */}
       <div
-        className={`fixed inset-0 top-20 z-40 bg-canvas/98 backdrop-blur-xl transition-all duration-300 lg:hidden ${
+        className={`fixed inset-0 top-16 z-40 bg-canvas transition-opacity duration-200 lg:hidden ${
           open
             ? "pointer-events-auto opacity-100"
             : "pointer-events-none opacity-0"
         }`}
       >
-        <div className="flex h-full flex-col gap-2 overflow-y-auto px-5 pt-8 pb-24">
+        <span aria-hidden className="m-stripe block h-1 w-full" />
+
+        <div className="flex h-full flex-col overflow-y-auto px-5 pt-6 pb-28">
           <button
             type="button"
             onClick={() => setOpen(false)}
             aria-label="Close menu"
             /* 44px minimum — this is a touch-only control, so it never gets
                the precision of a cursor. */
-            className="mb-2 ml-auto grid h-11 w-11 place-items-center rounded-xl border border-line text-muted"
+            className="mb-4 ml-auto grid h-11 w-11 place-items-center border border-line text-muted"
           >
             <Close className="h-5 w-5" />
           </button>
 
+          {/* Full-screen menus are the one place the system lets nav labels go
+              display-weight: at this size they are headlines, not chrome. */}
           {nav.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
-              className="border-b border-line-soft py-4 font-display text-2xl font-medium text-ink"
+              className="display-sm border-b border-line-soft py-5 text-ink"
             >
               {item.label}
             </Link>
           ))}
 
-          <div className="mt-8 flex flex-col gap-3">
+          <div className="mt-10 flex flex-col gap-3">
             <Link
               href="/cars"
               onClick={() => setOpen(false)}
-              className="rounded-full bg-amber px-6 py-4 text-center font-semibold text-on-amber"
+              className="btn btn-solid"
             >
               Browse Cars
             </Link>
@@ -135,17 +144,14 @@ export default function Header() {
                 href={wa}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 rounded-full border border-line px-6 py-4 font-semibold text-ink"
+                className="btn btn-outline"
               >
                 <WhatsApp className="h-5 w-5" />
                 WhatsApp Us
               </a>
             )}
             {contact.phone && (
-              <a
-                href={`tel:${contact.phoneHref}`}
-                className="flex items-center justify-center gap-2 rounded-full border border-line px-6 py-4 font-semibold text-ink"
-              >
+              <a href={`tel:${contact.phoneHref}`} className="btn btn-outline">
                 <Phone className="h-5 w-5" />
                 {contact.phone}
               </a>

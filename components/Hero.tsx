@@ -3,7 +3,7 @@ import Link from "next/link";
 import { financeDisclaimer } from "@/lib/site";
 import { getFeaturedVehicles } from "@/lib/crm";
 import { formatPrice, vehicleHref, vehicleTitle } from "@/lib/vehicles";
-import { ArrowRight, Check, Sparkle } from "./Icons";
+import { ArrowRight } from "./Icons";
 import Reveal from "./Reveal";
 
 const heroStats = [
@@ -14,18 +14,35 @@ const heroStats = [
 
 /**
  * Brand photography, not stock — a low-angle shot from the dealership's own
- * library that reads well against the dark canvas. The car it shows may no
+ * library that reads well against the black canvas. The car it shows may no
  * longer be for sale, so nothing here claims it is.
  */
 const HERO_IMAGE = "/cars/112-toyota-prius/03.jpeg";
 
+/**
+ * `hero-photo-band` from DESIGN-bmw-m.md: a full-bleed photograph filling the
+ * frame, an UPPERCASE display-xl h1 sitting left over it, and nothing else. No
+ * card frame — the photo IS the band.
+ *
+ * The ambient glow and the film grain that used to sit here are gone. Both are
+ * named in the doc's Don't list: this system adds no atmospheric backdrops and
+ * no decoration, and depth is supposed to come from the photograph's own
+ * lighting rather than from chrome laid over it.
+ *
+ * The two linear scrims below are not decoration and do stay. White type over a
+ * photograph fails contrast wherever the image happens to be bright, and these
+ * flatten the photo toward canvas so the headline clears 4.5:1 at every crop.
+ * They resolve through --color-canvas, so they darken on the black surface and
+ * lighten on the inverted one without the component knowing which it is in.
+ */
 export default async function Hero() {
   // Same request the featured section makes, so the two share one fetch.
   const [spotlight] = await getFeaturedVehicles(6);
 
   return (
-    <section className="relative isolate flex min-h-[94svh] items-center overflow-hidden pt-28 pb-20">
-      {/* Photography */}
+    <section className="relative isolate flex min-h-[92svh] items-center overflow-hidden pt-16">
+      {/* Photography — full-bleed, edge to edge, never inset into a container.
+          The doc is explicit that it stays that way at every breakpoint. */}
       <div aria-hidden className="absolute inset-0 -z-30">
         <Image
           src={HERO_IMAGE}
@@ -33,105 +50,82 @@ export default async function Hero() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[62%_center] opacity-70 lg:object-[70%_center]"
+          className="object-cover object-[62%_center] lg:object-[70%_center]"
         />
       </div>
 
-      {/* Scrims — keep the headline legible over the photo on every breakpoint */}
+      {/* Legibility scrims — see the note above. */}
       <div
         aria-hidden
-        className="absolute inset-0 -z-20 bg-linear-to-r from-canvas via-canvas/85 to-canvas/25 lg:via-canvas/70 lg:to-transparent"
+        className="absolute inset-0 -z-20 bg-linear-to-r from-canvas via-canvas/85 to-canvas/30 lg:via-canvas/70 lg:to-canvas/10"
       />
       <div
         aria-hidden
-        className="absolute inset-0 -z-20 bg-linear-to-t from-canvas via-transparent to-canvas/85"
-      />
-
-      {/* Ambient amber light. Mixed off --color-glow, which stays the brand's
-          vivid amber on both themes: this wash carries no text, and the light
-          palette's darkened amber would turn it into a muddy tan rather than
-          the warm tint it is meant to be. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute right-[-10%] top-[-15%] -z-10 h-[60rem] w-[60rem] rounded-full opacity-50 blur-3xl"
-        style={{
-          background:
-            "radial-gradient(circle, color-mix(in oklab, var(--color-glow) 20%, transparent) 0%, color-mix(in oklab, var(--color-glow) 6%, transparent) 40%, transparent 70%)",
-        }}
+        className="absolute inset-0 -z-20 bg-linear-to-t from-canvas via-transparent to-canvas/70"
       />
 
-      {/* Film grain — strength and blend come from the utility's own tokens,
-          which zero it out on light, where the same noise reads as a dirty
-          screen rather than as film stock. Repeating them here would pin the
-          grain to its dark values and defeat that. */}
-      <div
-        aria-hidden
-        className="grain-overlay pointer-events-none absolute inset-0 -z-10"
-      />
-
-      <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
-        <div className="max-w-2xl">
+      {/* 64px internal padding, which is the doc's `spacing.xxl` for hero
+          bands — tighter than a section gap, because the photograph is doing
+          the work the whitespace would otherwise do. */}
+      <div className="mx-auto w-full max-w-[90rem] px-5 py-16 sm:px-8">
+        <div className="max-w-3xl">
           <Reveal>
-            <span className="inline-flex items-center gap-2 rounded-full border border-amber/25 bg-canvas/60 px-4 py-1.5 text-xs font-medium tracking-wide text-amber backdrop-blur">
-              <Sparkle className="h-3.5 w-3.5" />
-              Trusted by 200+ Customers
-            </span>
+            <span className="eyebrow">Japanese Imports · Manchester</span>
           </Reveal>
 
           <Reveal delay={80}>
-            {/* The halo separates the headline from the photo behind it, so it
-                inverts with the theme — a black bloom under near-black text
-                would smear it rather than lift it. Kept tight: past a few
+            {/* UPPERCASE display-xl. The doc treats sentence-case display as
+                off-brand outright — the all-caps setting is a brand-voice
+                signal here, not a styling preference.
+
+                The halo separates the headline from the photo behind it, so it
+                inverts with the theme: a black bloom under near-black text
+                would smear it rather than lift it. Kept tight — past a few
                 pixels from the glyph edge a wider blur adds no legibility, it
-                just puts a cloud behind the whole word. See globals.css. */}
-            <h1 className="mt-7 font-display text-[clamp(2.6rem,7.4vw,5.4rem)] font-bold leading-[0.98] tracking-[-0.03em] [text-shadow:var(--hero-text-shadow)]">
-              <span className="block text-ink">Premium</span>
-              <span className="block text-gold">Japanese Cars</span>
-              <span className="block text-ink">in Manchester</span>
+                just puts a cloud behind the whole word. */}
+            <h1 className="display-xl mt-8 text-ink [text-shadow:var(--hero-text-shadow)]">
+              Premium Japanese cars in Manchester
             </h1>
           </Reveal>
 
           <Reveal delay={160}>
-            <p className="mt-7 max-w-lg text-base leading-relaxed text-muted sm:text-lg">
+            {/* Light (300) against the headline's 700. The gap between the two
+                is the editorial signature the whole system rests on. */}
+            <p className="mt-8 max-w-xl text-base font-light leading-relaxed text-lead sm:text-lg">
               Browse quality hybrid and imported vehicles, each one HPI checked
-              and prepared to a standard we&apos;d happily drive ourselves. Finance
-              available on selected cars.
+              and prepared to a standard we&apos;d happily drive ourselves.
+              Finance available on selected cars.
             </p>
           </Reveal>
 
           <Reveal delay={240}>
             <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-              <Link
-                href="/cars"
-                className="group inline-flex items-center justify-center gap-2 rounded-full bg-amber px-8 py-4 font-semibold text-on-amber transition-all hover:bg-amber-bright hover:shadow-(--shadow-glow)"
-              >
+              <Link href="/cars" className="btn btn-solid">
                 Browse Cars
-                <ArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link
-                href="/finance"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-line bg-canvas/50 px-8 py-4 font-semibold text-ink backdrop-blur transition-colors hover:border-amber/40 hover:text-amber"
-              >
+              <Link href="/finance" className="btn btn-outline">
                 Calculate Finance
               </Link>
             </div>
           </Reveal>
 
           <Reveal delay={320}>
-            <p className="mt-5 text-xs text-faint">{financeDisclaimer}</p>
+            <p className="caption mt-6 max-w-lg text-faint">
+              {financeDisclaimer}
+            </p>
           </Reveal>
 
           <Reveal delay={400}>
-            <dl className="mt-12 grid max-w-xl grid-cols-3 gap-px overflow-hidden rounded-2xl border border-line-soft bg-line-soft">
+            {/* Spec cells, the same instrument-panel treatment the vehicle
+                detail page uses: value on top at display weight, machined
+                label beneath. Hairline gaps rather than gutters, so the row
+                reads as one panel divided rather than three separate tiles. */}
+            <dl className="mt-14 grid max-w-2xl grid-cols-3 gap-px border border-line-soft bg-line-soft">
               {heroStats.map((s) => (
-                <div
-                  key={s.label}
-                  className="bg-canvas/80 px-4 py-6 backdrop-blur sm:px-6"
-                >
-                  <dt className="font-display text-2xl font-bold text-amber sm:text-3xl">
-                    {s.value}
-                  </dt>
-                  <dd className="mt-1 text-[0.7rem] leading-tight text-muted sm:text-xs">
+                <div key={s.label} className="spec-cell px-5 py-6">
+                  <dt className="display-sm text-ink">{s.value}</dt>
+                  <dd className="mt-2 text-[0.7rem] font-bold uppercase leading-tight tracking-[1.5px] text-faint">
                     {s.label}
                   </dd>
                 </div>
@@ -141,52 +135,35 @@ export default async function Hero() {
         </div>
       </div>
 
-      {/* Spotlight card — anchors the photo to a real car you can buy */}
+      {/* Spotlight card — anchors the photograph to a real car you can buy. */}
       {spotlight && (
-        <div className="absolute right-8 bottom-16 z-10 hidden xl:block">
+        <div className="absolute right-8 bottom-14 z-10 hidden xl:block">
           <Reveal delay={520}>
             <Link
               href={vehicleHref(spotlight)}
-              className="group glass block w-64 rounded-2xl p-5 transition-all duration-500 hover:-translate-y-1 hover:border-amber/40"
+              className="surface-card group block w-72 p-6 transition-colors hover:border-ink"
             >
-              <span className="text-[0.65rem] font-semibold tracking-[0.2em] text-amber">
-                IN THE SPOTLIGHT
+              <span className="label-uppercase block text-ink">
+                In the spotlight
               </span>
-              <p className="mt-3 font-display text-lg font-semibold leading-tight text-ink">
+              <p className="title-lg mt-4 text-ink">
                 {vehicleTitle(spotlight)}
               </p>
-              <p className="mt-1 text-xs text-muted">
+              <p className="mt-2 text-sm font-light text-muted">
                 {spotlight.year} · {spotlight.fuelType} ·{" "}
                 {spotlight.transmission}
               </p>
-              <p className="mt-4 font-display text-2xl font-bold text-gold">
+              <p className="display-sm mt-5 text-ink">
                 {formatPrice(spotlight.price)}
               </p>
-              <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-muted transition-colors group-hover:text-amber">
+              <span className="link-m mt-2">
                 View details
-                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                <ArrowRight className="h-3.5 w-3.5" />
               </span>
             </Link>
           </Reveal>
         </div>
       )}
-
-      {/* Trust strip pinned to the bottom edge of the hero */}
-      <div className="absolute inset-x-0 bottom-0 hidden lg:block xl:hidden">
-        <ul className="mx-auto flex max-w-7xl flex-wrap gap-x-7 gap-y-2 px-8 pb-6">
-          {["FCA Authorised", "HPI Checked", "Warranty Available"].map(
-            (item) => (
-              <li
-                key={item}
-                className="flex items-center gap-2 text-xs text-muted"
-              >
-                <Check className="h-3.5 w-3.5 text-amber" />
-                {item}
-              </li>
-            ),
-          )}
-        </ul>
-      </div>
     </section>
   );
 }

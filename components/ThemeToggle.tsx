@@ -3,8 +3,8 @@
 import { Moon, Sun } from "./Icons";
 
 /**
- * Switches the site between the dark "Midnight Performance" palette and the
- * light one. Both are defined as token sets in globals.css and selected by
+ * Switches the site between the black BMW M canvas and its inverted light
+ * surface. Both are defined as token sets in globals.css and selected by
  * `data-theme` on <html>, so flipping that attribute repaints the whole site
  * — no component subscribes to the theme and nothing re-renders.
  *
@@ -16,7 +16,11 @@ import { Moon, Sun } from "./Icons";
  * in CSS off the same attribute — see `.theme-icon-*` in globals.css.
  *
  * Rendered inside a `.no-js-only`-free path on purpose: with scripting off the
- * button simply does nothing, and the site stays on its default dark palette.
+ * button simply does nothing, and the site stays on its default black canvas.
+ *
+ * Square, not circular: `.btn-icon` is reserved for the media controls the
+ * design system calls functional (carousel arrows, lightbox), and a round
+ * control in the nav bar would read as a different family of thing.
  */
 export default function ThemeToggle({
   className = "",
@@ -50,7 +54,7 @@ export default function ThemeToggle({
       */
       aria-label="Switch between the dark and light theme"
       title="Switch theme"
-      className={`grid h-11 w-11 shrink-0 place-items-center rounded-full border border-line text-muted transition-colors hover:border-amber/50 hover:text-amber ${className}`}
+      className={`grid h-11 w-11 shrink-0 place-items-center border border-line text-muted transition-colors hover:border-ink hover:text-ink ${className}`}
     >
       <Sun className="theme-icon-sun h-[18px] w-[18px]" />
       <Moon className="theme-icon-moon h-[18px] w-[18px]" />

@@ -1,18 +1,24 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Sora } from "next/font/google";
+import { Inter } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { site } from "@/lib/site";
 import "./globals.css";
 
-/* Sora carries the wide geometric display look; Inter handles body copy. */
-const sora = Sora({
-  variable: "--font-sora",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
-});
+/*
+  One family, two cuts. BMW Type Next Latin is licensed and cannot ship
+  here; DESIGN-bmw-m.md names Inter as the closest open substitute at the
+  same 700/300 pair, with display tracking pulled to -0.5px (applied in
+  the .display-* classes in globals.css).
 
+  Deliberately not two typefaces: the contrast in this system comes from
+  weight — heavy display against Light body — and adding a second family
+  would blur exactly the gap that carries the voice.
+
+  Variable, so 300 and 700 come from one file rather than two static
+  cuts, and the intermediate weights the layout never asks for cost
+  nothing.
+*/
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
@@ -51,12 +57,13 @@ export const metadata: Metadata = {
 };
 
 /*
-  The dark canvas, matching the default the inline script applies. `colorScheme`
-  is deliberately not declared here: globals.css sets it per theme on <html>, and
-  a meta tag pinning it to dark would describe the light theme incorrectly.
+  True black, matching the canvas the inline script applies by default.
+  `colorScheme` is deliberately not declared here: globals.css sets it per theme
+  on <html>, and a meta tag pinning it to dark would describe the light theme
+  incorrectly.
 */
 export const viewport: Viewport = {
-  themeColor: "#0a0a0b",
+  themeColor: "#000000",
 };
 
 export default function RootLayout({
@@ -65,7 +72,7 @@ export default function RootLayout({
   return (
     <html
       lang="en-GB"
-      className={`${sora.variable} ${inter.variable} h-full antialiased`}
+      className={`${inter.variable} h-full antialiased`}
       /*
         The script below stamps `data-js` on this element before React hydrates,
         so the server HTML deliberately lacks an attribute the client DOM has.
