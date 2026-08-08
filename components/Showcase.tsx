@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Check } from "./Icons";
+import { ArrowRight } from "./Icons";
 import Reveal from "./Reveal";
 
 /** Indoor showroom shot — rows of stock, good for the sourcing story. */
@@ -14,88 +14,85 @@ const points = [
 ];
 
 /**
- * Full-bleed band that breaks up the card grids and shows the actual
- * premises rather than another row of tiles.
+ * Full-bleed photo band, and the reason it exists is rhythm: DESIGN-bmw-m.md
+ * forbids two text-only bands in a row, which it says reads as a corporate
+ * site. Photo band → card grid → photo band is the pattern, and this is the
+ * beat between two grids.
+ *
+ * Split rather than overlaid: on a white canvas a scrim heavy enough to carry
+ * black body copy over a photograph washes the car out to nothing, and the doc
+ * would rather have the photograph intact than the copy on top of it. So the
+ * image takes half the band at full strength and the copy takes the other half
+ * on clean canvas. On the black surface the same split still holds.
+ *
+ * The grain overlay and the two atmospheric scrims that used to sit here are
+ * gone — both are on the doc's Don't list.
  */
 export default function Showcase() {
   return (
-    <section className="relative isolate overflow-hidden">
-      <div aria-hidden className="absolute inset-0 -z-20">
-        <Image
-          src={SHOWCASE_IMAGE}
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover object-center opacity-40"
-        />
-      </div>
+    <section className="border-y border-line-soft bg-canvas">
+      <div className="grid lg:grid-cols-2">
+        {/* Photography, edge to edge on its own half. Full-bleed at every
+            breakpoint — the doc never lets it collapse into a margin. */}
+        <div
+          aria-hidden
+          className="relative order-first min-h-[22rem] lg:order-last lg:min-h-[38rem]"
+        >
+          {/* Decorative, and the empty alt is deliberate. This is a vehicle
+              photograph from the CRM library, not a shot of the premises —
+              describing it as the showroom would be a claim the repo can't
+              support. See the same note on the About page. */}
+          <Image
+            src={SHOWCASE_IMAGE}
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            className="object-cover object-center"
+          />
+        </div>
 
-      {/* Scrims: flatten the photo toward canvas — which darkens on dark and
-          lightens on light — then bias contrast toward the copy column */}
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-linear-to-r from-canvas via-canvas/90 to-canvas/55"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-linear-to-b from-canvas via-transparent to-canvas"
-      />
-      {/* Strength and blend are left to the grain tokens instead of being set
-          here: local values outrank the utility, which would keep the noise on
-          in light mode, where it reads as a dirty screen rather than as film. */}
-      <div
-        aria-hidden
-        className="grain-overlay pointer-events-none absolute inset-0 -z-10"
-      />
+        <div className="flex items-center px-5 py-24 sm:px-8 lg:px-16">
+          <div className="max-w-xl">
+            <Reveal>
+              <span className="eyebrow">Our Showroom</span>
+            </Reveal>
 
-      <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 sm:py-32">
-        <div className="max-w-xl">
-          <Reveal>
-            <span className="inline-flex items-center gap-2.5 text-xs font-semibold tracking-[0.24em] text-amber">
-              <span className="h-px w-6 bg-amber/50" />
-              OUR SHOWROOM
-            </span>
-          </Reveal>
+            <Reveal delay={80}>
+              <h2 className="display-lg mt-6 text-ink">
+                Japanese engineering, Manchester prices
+              </h2>
+            </Reveal>
 
-          <Reveal delay={80}>
-            <h2 className="mt-5 font-display text-[clamp(1.9rem,4.2vw,3.1rem)] font-bold leading-[1.05] tracking-[-0.025em] text-ink">
-              Japanese engineering,
-              <span className="text-gold"> Manchester prices</span>
-            </h2>
-          </Reveal>
+            <Reveal delay={140}>
+              <p className="mt-6 max-w-md text-base font-light leading-relaxed text-muted">
+                We specialise in hybrid and imported vehicles — the models that
+                hold their value, sip fuel and keep going. Come and see them in
+                person at our Bury showroom.
+              </p>
+            </Reveal>
 
-          <Reveal delay={140}>
-            <p className="mt-5 max-w-md text-base leading-relaxed text-muted">
-              We specialise in hybrid and imported vehicles — the models that
-              hold their value, sip fuel and keep going. Come and see them in
-              person at our Bury showroom.
-            </p>
-          </Reveal>
-
-          <ul className="mt-9 flex flex-col gap-3.5">
-            {points.map((point, i) => (
-              <li key={point}>
-                <Reveal delay={200 + i * 70}>
-                  <span className="flex items-start gap-3 text-sm text-ink">
-                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full border border-amber/30 bg-amber/10">
-                      <Check className="h-3 w-3 text-amber" />
+            {/* A hairline-ruled list rather than ticks in circles. The system
+                has no chip, badge or icon-in-a-ring shape; a rule between rows
+                is how it separates items. */}
+            <ul className="mt-10 border-t border-line-soft">
+              {points.map((point, i) => (
+                <li key={point} className="border-b border-line-soft">
+                  <Reveal delay={200 + i * 70}>
+                    <span className="block py-4 text-sm font-light text-muted">
+                      {point}
                     </span>
-                    {point}
-                  </span>
-                </Reveal>
-              </li>
-            ))}
-          </ul>
+                  </Reveal>
+                </li>
+              ))}
+            </ul>
 
-          <Reveal delay={480}>
-            <Link
-              href="/cars"
-              className="group mt-10 inline-flex items-center gap-2 rounded-full border border-line bg-canvas/60 px-7 py-3.5 font-semibold text-ink backdrop-blur transition-all hover:border-amber/50 hover:text-amber"
-            >
-              See what&apos;s in stock
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Link>
-          </Reveal>
+            <Reveal delay={480}>
+              <Link href="/cars" className="btn btn-outline mt-10">
+                See what&apos;s in stock
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Reveal>
+          </div>
         </div>
       </div>
     </section>

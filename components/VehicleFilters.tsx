@@ -37,12 +37,15 @@ interface VehicleFiltersProps {
   hasActiveFilters: boolean;
 }
 
-const selectClass =
-  "w-full appearance-none rounded-xl border border-line bg-surface-2 px-4 py-3 text-sm text-ink " +
-  "transition-colors focus:border-amber/50 focus:outline-none focus:ring-2 focus:ring-amber/20";
+/*
+ * `.field` carries the shape (48px, square, hairline that thickens to ink on
+ * focus). `appearance-none` still has to be set here rather than in the class:
+ * it is a select-only concern, and putting it on `.field` would strip the
+ * spinner off number inputs that want it.
+ */
+const selectClass = "field appearance-none";
 
-const labelClass =
-  "block text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-faint";
+const labelClass = "label-uppercase block text-ink";
 
 export default function VehicleFilters({
   filters,
@@ -125,10 +128,10 @@ export default function VehicleFilters({
       onChange={handleChange}
       onSubmit={handleSubmit}
       aria-busy={isPending}
-      className="glass rounded-2xl p-5 transition-opacity sm:p-6"
+      className="surface-card p-6 transition-opacity sm:p-8"
       style={{ opacity: isPending ? 0.6 : 1 }}
     >
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
         <div>
           <label className={labelClass} htmlFor="filter-make">
             Make
@@ -137,7 +140,7 @@ export default function VehicleFilters({
             id="filter-make"
             name="make"
             defaultValue={active.make ?? ""}
-            className={`mt-2 ${selectClass}`}
+            className={`${selectClass} mt-3`}
           >
             <option value="">Any make</option>
             {filters.makes.map((make) => (
@@ -156,7 +159,7 @@ export default function VehicleFilters({
             id="filter-fuel"
             name="fuel_type"
             defaultValue={active.fuel_type ?? ""}
-            className={`mt-2 ${selectClass}`}
+            className={`${selectClass} mt-3`}
           >
             <option value="">Any fuel</option>
             {filters.fuelTypes.map((fuel) => (
@@ -175,7 +178,7 @@ export default function VehicleFilters({
             id="filter-transmission"
             name="transmission"
             defaultValue={active.transmission ?? ""}
-            className={`mt-2 ${selectClass}`}
+            className={`${selectClass} mt-3`}
           >
             <option value="">Any gearbox</option>
             {filters.transmissions.map((transmission) => (
@@ -195,7 +198,7 @@ export default function VehicleFilters({
             name="min_price"
             defaultValue={active.min_price ?? ""}
             disabled={steps.length === 0}
-            className={`mt-2 ${selectClass} disabled:opacity-50`}
+            className={`${selectClass} mt-3 disabled:opacity-50`}
           >
             <option value="">No minimum</option>
             {steps.map((value) => (
@@ -215,7 +218,7 @@ export default function VehicleFilters({
             name="max_price"
             defaultValue={active.max_price ?? ""}
             disabled={steps.length === 0}
-            className={`mt-2 ${selectClass} disabled:opacity-50`}
+            className={`${selectClass} mt-3 disabled:opacity-50`}
           >
             <option value="">No maximum</option>
             {steps.map((value) => (
@@ -227,20 +230,20 @@ export default function VehicleFilters({
         </div>
       </div>
 
-      <div className="mt-5 flex flex-wrap items-center gap-3 empty:mt-0">
+      <div className="mt-6 flex flex-wrap items-center gap-5 empty:mt-0">
         {/* The sole control for anyone without JavaScript. With scripting on,
             changing a dropdown already applies, so it hides itself rather than
             sitting there implying the choice hasn't taken effect yet. */}
         <button
           type="submit"
-          className="no-js-only rounded-full bg-amber px-6 py-2.5 text-sm font-semibold text-on-amber transition-colors hover:bg-amber-bright"
+          className="btn btn-solid no-js-only"
         >
           Apply filters
         </button>
 
         {/* Announced, not just shown — with the button gone this is the only
             confirmation that a change was registered. */}
-        <p aria-live="polite" className="text-sm text-muted">
+        <p aria-live="polite" className="text-sm font-light text-muted">
           {isPending ? "Updating results…" : ""}
         </p>
 
@@ -248,7 +251,7 @@ export default function VehicleFilters({
           <Link
             href="/cars"
             scroll={false}
-            className="text-sm font-medium text-muted transition-colors hover:text-amber"
+            className="link-m"
           >
             Clear all
           </Link>

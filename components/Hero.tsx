@@ -14,8 +14,8 @@ const heroStats = [
 
 /**
  * Brand photography, not stock — a low-angle shot from the dealership's own
- * library that reads well against the black canvas. The car it shows may no
- * longer be for sale, so nothing here claims it is.
+ * library. The car it shows may no longer be for sale, so nothing here claims
+ * it is.
  */
 const HERO_IMAGE = "/cars/112-toyota-prius/03.jpeg";
 
@@ -29,11 +29,12 @@ const HERO_IMAGE = "/cars/112-toyota-prius/03.jpeg";
  * no decoration, and depth is supposed to come from the photograph's own
  * lighting rather than from chrome laid over it.
  *
- * The two linear scrims below are not decoration and do stay. White type over a
- * photograph fails contrast wherever the image happens to be bright, and these
- * flatten the photo toward canvas so the headline clears 4.5:1 at every crop.
- * They resolve through --color-canvas, so they darken on the black surface and
- * lighten on the inverted one without the component knowing which it is in.
+ * The two linear scrims below are not decoration and do stay. Type over a
+ * photograph fails contrast wherever the image runs toward the headline's own
+ * value, and these flatten the photo toward canvas so it clears 4.5:1 at every
+ * crop. They resolve through --color-canvas, so they lighten on the white
+ * surface and darken on the black one without the component knowing which it is
+ * in — the same markup, inverted by the token.
  */
 export default async function Hero() {
   // Same request the featured section makes, so the two share one fetch.

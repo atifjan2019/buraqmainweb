@@ -3,8 +3,8 @@
 import { Moon, Sun } from "./Icons";
 
 /**
- * Switches the site between the black BMW M canvas and its inverted light
- * surface. Both are defined as token sets in globals.css and selected by
+ * Switches the site between the white canvas and the black one the BMW M doc
+ * specifies. Both are defined as token sets in globals.css and selected by
  * `data-theme` on <html>, so flipping that attribute repaints the whole site
  * — no component subscribes to the theme and nothing re-renders.
  *
@@ -16,7 +16,7 @@ import { Moon, Sun } from "./Icons";
  * in CSS off the same attribute — see `.theme-icon-*` in globals.css.
  *
  * Rendered inside a `.no-js-only`-free path on purpose: with scripting off the
- * button simply does nothing, and the site stays on its default black canvas.
+ * button simply does nothing, and the site stays on its default white canvas.
  *
  * Square, not circular: `.btn-icon` is reserved for the media controls the
  * design system calls functional (carousel arrows, lightbox), and a round
@@ -29,7 +29,7 @@ export default function ThemeToggle({
 }) {
   function toggle() {
     const root = document.documentElement;
-    const next = root.dataset.theme === "light" ? "dark" : "light";
+    const next = root.dataset.theme === "dark" ? "light" : "dark";
 
     root.dataset.theme = next;
 

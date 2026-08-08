@@ -23,19 +23,23 @@ interface EnquiryFormProps {
   intro?: string;
 }
 
-const fieldClass =
-  "w-full rounded-xl border border-line bg-surface-2 px-4 py-3 text-sm text-ink " +
-  "placeholder:text-faint transition-colors focus:border-amber/50 focus:outline-none " +
-  "focus:ring-2 focus:ring-amber/20 aria-[invalid=true]:border-red-500/60";
-
-const labelClass = "block text-xs font-semibold tracking-wide text-muted";
+/*
+ * `.field` and `.label-uppercase` carry the whole control now — 48px tall,
+ * square, hairline border that thickens to ink on focus, which is the only
+ * input state DESIGN-bmw-m.md documents. The focus ring is gone with them: the
+ * border IS the focus state here, and a second glowing ring outside it was the
+ * consumer-tech treatment the system backs away from.
+ */
+const labelClass = "label-uppercase block text-ink";
 
 /*
- * Error red is the one colour on this form with no token behind it. The pale
- * reds that lift an error off the dark canvas sit at roughly 1.4:1 on a white
- * card, so the light scheme needs a deep red instead. `light-dark()` reads the
- * `color-scheme` globals.css already sets per theme, which keeps the choice in
- * CSS — the component still has no idea which theme it is in.
+ * Error red is the one colour on this form with no token behind it, and it
+ * deliberately isn't the M red: the tricolour is identity-only, and reusing one
+ * of its stops as a validation state would make the brand mark mean "you typed
+ * something wrong". The deep red reads at 5.9:1 on white; the pale one lifts
+ * off the black canvas where the deep one would disappear. `light-dark()` reads
+ * the `color-scheme` globals.css already sets per theme, which keeps the choice
+ * in CSS — the component still has no idea which theme it is in.
  */
 const alertTextClass = "text-[color:light-dark(#b91c1c,#fecaca)]";
 const fieldErrorTextClass = "text-[color:light-dark(#b91c1c,#fca5a5)]";
@@ -62,9 +66,11 @@ export default function EnquiryForm({
    * form or its errors.
    */
   return (
-    <form action={formAction} className="glass rounded-2xl p-6 sm:p-7">
-      <h3 className="font-display text-xl font-semibold text-ink">{heading}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-muted">{intro}</p>
+    <form action={formAction} className="surface-card p-6 sm:p-8">
+      <h3 className="title-lg text-ink">{heading}</h3>
+      <p className="mt-3 text-sm font-light leading-relaxed text-muted">
+        {intro}
+      </p>
 
       {/* Context for the sales team — set by the page, not the customer. */}
       <input type="hidden" name="registration" value={registration} />
@@ -72,7 +78,7 @@ export default function EnquiryForm({
       {state.message && (
         <p
           role="alert"
-          className={`mt-5 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm ${alertTextClass}`}
+          className={`mt-6 border border-current/40 px-4 py-3 text-sm font-light ${alertTextClass}`}
         >
           {state.message}
         </p>
@@ -93,7 +99,7 @@ export default function EnquiryForm({
             defaultValue={state.values?.name}
             aria-invalid={Boolean(errors.name)}
             aria-describedby={errors.name ? errorId("name") : undefined}
-            className={`mt-2 ${fieldClass}`}
+            className="field mt-3"
             placeholder="Jane Buyer"
           />
           <FieldError id={errorId("name")} message={errors.name} />
@@ -112,7 +118,7 @@ export default function EnquiryForm({
             defaultValue={state.values?.email}
             aria-invalid={Boolean(errors.email)}
             aria-describedby={errors.email ? errorId("email") : undefined}
-            className={`mt-2 ${fieldClass}`}
+            className="field mt-3"
             placeholder="jane@example.com"
           />
           <FieldError id={errorId("email")} message={errors.email} />
@@ -132,7 +138,7 @@ export default function EnquiryForm({
             defaultValue={state.values?.phone}
             aria-invalid={Boolean(errors.phone)}
             aria-describedby={errors.phone ? errorId("phone") : undefined}
-            className={`mt-2 ${fieldClass}`}
+            className="field mt-3"
             placeholder="07700 900123"
           />
           <FieldError id={errorId("phone")} message={errors.phone} />
@@ -140,7 +146,7 @@ export default function EnquiryForm({
 
         <div>
           <label className={labelClass} htmlFor={fieldId("message")}>
-            Message <span className="font-normal text-faint">(optional)</span>
+            Message <span className="text-faint">(optional)</span>
           </label>
           <textarea
             id={fieldId("message")}
@@ -150,7 +156,7 @@ export default function EnquiryForm({
             defaultValue={state.values?.message}
             aria-invalid={Boolean(errors.message)}
             aria-describedby={errors.message ? errorId("message") : undefined}
-            className={`mt-2 resize-y ${fieldClass}`}
+            className="field mt-3 resize-y"
             placeholder={
               vehicleHeadline
                 ? `I'm interested in the ${vehicleHeadline} — is it still available?`
@@ -164,16 +170,16 @@ export default function EnquiryForm({
       <button
         type="submit"
         disabled={pending}
-        className="mt-6 w-full rounded-full bg-amber px-6 py-3.5 font-semibold text-on-amber transition-all hover:bg-amber-bright hover:shadow-(--shadow-glow) disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
+        className="btn btn-solid mt-8 w-full"
       >
         {pending ? "Sending…" : "Send enquiry"}
       </button>
 
-      <p className="mt-4 text-xs leading-relaxed text-faint">
+      <p className="caption mt-5 leading-relaxed text-faint">
         We&apos;ll only use your details to answer this enquiry. Read our{" "}
         <Link
           href="/privacy"
-          className="underline decoration-line underline-offset-2 transition-colors hover:text-muted"
+          className="underline decoration-line underline-offset-2 transition-colors hover:text-ink"
         >
           privacy policy
         </Link>
@@ -187,7 +193,7 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
 
   return (
-    <p id={id} role="alert" className={`mt-2 text-xs ${fieldErrorTextClass}`}>
+    <p id={id} role="alert" className={`caption mt-2 ${fieldErrorTextClass}`}>
       {message}
     </p>
   );

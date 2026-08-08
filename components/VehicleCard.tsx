@@ -55,7 +55,7 @@ export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
     <article className="group flex h-full flex-col">
       {/* Media — fixed 16:10 box so mixed-shape photos can't make the grid
           ragged, and so nothing reflows as images arrive. */}
-      <div className="relative aspect-16/10 overflow-hidden bg-surface-2">
+      <div className="photo-frame relative aspect-16/10 overflow-hidden bg-surface-2">
         {photo ? (
           /* eslint-disable-next-line @next/next/no-img-element --
              next/image would proxy these through /_next/image; the CRM already

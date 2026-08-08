@@ -7,21 +7,8 @@ import StockNotice from "@/components/StockNotice";
  */
 export default function VehicleNotFound() {
   return (
-    <section className="relative pt-32 pb-24 sm:pt-40 sm:pb-32">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 h-[40rem] w-[60rem] -translate-x-1/2 opacity-50 blur-3xl"
-        style={{
-          // --color-glow, not --color-amber: this wash carries no text, so it
-          // has no contrast requirement and keeps the brand's vivid amber on
-          // both themes. The light palette's darkened amber would settle into
-          // a muddy tan here rather than the warm lift this is meant to be.
-          background:
-            "radial-gradient(ellipse, color-mix(in oklab, var(--color-glow) 12%, transparent) 0%, transparent 65%)",
-        }}
-      />
-
-      <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+    <section className="bg-canvas pt-32 pb-24">
+      <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
         <StockNotice
           title="This car is no longer available"
           body="It's been sold or taken off sale. We get new stock in regularly, and we can source specific vehicles to order — tell us what you're after and we'll keep an eye out."

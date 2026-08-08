@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import EnquiryForm from "@/components/EnquiryForm";
-import { Calendar, Mail, Phone, Pin, WhatsApp } from "@/components/Icons";
+import { ArrowRight } from "@/components/Icons";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import { contact, whatsappLink } from "@/lib/site";
@@ -33,22 +33,10 @@ export default function ContactPage() {
 
   return (
     <>
-      <section className="relative overflow-hidden pt-32 pb-14 sm:pt-40 sm:pb-16">
-        {/* Ambient warmth behind the masthead, mixed off --color-glow rather
-            than --color-amber: it carries no text, so it has no contrast
-            requirement and keeps the brand's vivid amber on both themes. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-0 h-[36rem] w-[56rem] -translate-x-1/2 opacity-50 blur-3xl"
-          style={{
-            background:
-              "radial-gradient(ellipse, color-mix(in oklab, var(--color-glow) 12%, transparent) 0%, transparent 65%)",
-          }}
-        />
-
-        <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+      <section className="bg-canvas pt-32 pb-16">
+        <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
           <SectionHeading
-            eyebrow="CONTACT"
+            eyebrow="Contact"
             title="Let's talk about"
             accent="your next car"
             body="Call us, message us on WhatsApp, or send the form below. Whichever you pick, a person reads it and comes back to you."
@@ -56,30 +44,31 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="pb-20 sm:pb-28">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:gap-12">
-            {/* Ways to reach us */}
-            <div className="flex flex-col gap-4">
+      <section className="bg-canvas pb-24">
+        <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
+          <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+            {/*
+              Ways to reach us. Each was an icon-in-a-rounded-square beside a
+              tinted value; both are shapes this system doesn't have. They are
+              now hairline-separated rows with a machined label over the value,
+              which is how the doc presents a fact — and the whole column reads
+              as one panel rather than four floating cards.
+            */}
+            <div className="border-t border-line">
               {contact.phone && (
                 <Reveal>
                   <a
                     href={`tel:${contact.phoneHref}`}
-                    className="glass group flex items-start gap-4 rounded-2xl p-6 transition-colors hover:border-amber/40"
+                    className="group block border-b border-line py-6 transition-colors hover:bg-surface"
                   >
-                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-amber/30 bg-amber/10 text-amber">
-                      <Phone className="h-5 w-5" />
+                    <span className="label-uppercase block text-faint">
+                      Call the showroom
                     </span>
-                    <span className="min-w-0">
-                      <span className="block font-display text-base font-semibold text-ink">
-                        Call the showroom
-                      </span>
-                      <span className="mt-1 block break-words text-sm text-amber">
-                        {contact.phone}
-                      </span>
-                      <span className="mt-2 block text-sm leading-relaxed text-muted">
-                        Quickest way to check whether a car is still available.
-                      </span>
+                    <span className="title-md mt-2 block break-words text-ink">
+                      {contact.phone}
+                    </span>
+                    <span className="mt-2 block text-sm font-light leading-relaxed text-muted">
+                      Quickest way to check whether a car is still available.
                     </span>
                   </a>
                 </Reveal>
@@ -91,22 +80,16 @@ export default function ContactPage() {
                     href={wa}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="glass group flex items-start gap-4 rounded-2xl p-6 transition-colors hover:border-amber/40"
+                    className="group block border-b border-line py-6 transition-colors hover:bg-surface"
                   >
-                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-amber/30 bg-amber/10 text-amber">
-                      <WhatsApp className="h-5 w-5" />
+                    <span className="label-uppercase block text-faint">
+                      WhatsApp us
                     </span>
-                    <span className="min-w-0">
-                      <span className="block font-display text-base font-semibold text-ink">
-                        WhatsApp us
-                      </span>
-                      <span className="mt-1 block break-words text-sm text-amber">
-                        {contact.whatsappDisplay}
-                      </span>
-                      <span className="mt-2 block text-sm leading-relaxed text-muted">
-                        Send photos of your part-exchange and we&apos;ll value
-                        it.
-                      </span>
+                    <span className="title-md mt-2 block break-words text-ink">
+                      {contact.whatsappDisplay}
+                    </span>
+                    <span className="mt-2 block text-sm font-light leading-relaxed text-muted">
+                      Send photos of your part-exchange and we&apos;ll value it.
                     </span>
                   </a>
                 </Reveal>
@@ -116,63 +99,49 @@ export default function ContactPage() {
                 <Reveal delay={160}>
                   <a
                     href={`mailto:${contact.email}`}
-                    className="glass group flex items-start gap-4 rounded-2xl p-6 transition-colors hover:border-amber/40"
+                    className="group block border-b border-line py-6 transition-colors hover:bg-surface"
                   >
-                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-amber/30 bg-amber/10 text-amber">
-                      <Mail className="h-5 w-5" />
+                    <span className="label-uppercase block text-faint">
+                      Email us
                     </span>
-                    <span className="min-w-0">
-                      <span className="block font-display text-base font-semibold text-ink">
-                        Email us
-                      </span>
-                      {/* Long addresses must wrap rather than widen the card
-                          and push the grid past the viewport on a phone. */}
-                      <span className="mt-1 block break-all text-sm text-amber">
-                        {contact.email}
-                      </span>
-                      <span className="mt-2 block text-sm leading-relaxed text-muted">
-                        Best for anything you need in writing.
-                      </span>
+                    {/* Long addresses must wrap rather than widen the column
+                        and push the grid past the viewport on a phone. */}
+                    <span className="title-md mt-2 block break-all text-ink">
+                      {contact.email}
+                    </span>
+                    <span className="mt-2 block text-sm font-light leading-relaxed text-muted">
+                      Best for anything you need in writing.
                     </span>
                   </a>
                 </Reveal>
               )}
 
               <Reveal delay={240}>
-                <div className="glass rounded-2xl p-6">
-                  <div className="flex items-start gap-4">
-                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-amber/30 bg-amber/10 text-amber">
-                      <Pin className="h-5 w-5" />
-                    </span>
-                    <div className="min-w-0">
-                      <h2 className="font-display text-base font-semibold text-ink">
-                        Visit us
-                      </h2>
-                      {contact.addressLines.length > 0 && (
-                        <address className="mt-1 not-italic leading-relaxed text-muted">
-                          {contact.addressLines.map((line) => (
-                            <span key={line} className="block text-sm">
-                              {line}
-                            </span>
-                          ))}
-                        </address>
-                      )}
-                      <p className="mt-3 flex items-start gap-2 text-sm text-muted">
-                        <Calendar className="mt-0.5 h-4 w-4 shrink-0 text-amber/70" />
-                        {contact.openingHours}
-                      </p>
-                      {directions && (
-                        <a
-                          href={directions}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="mt-4 inline-block text-sm font-semibold text-amber underline decoration-amber/40 underline-offset-4 transition-colors hover:text-amber-bright"
-                        >
-                          Get directions
-                        </a>
-                      )}
-                    </div>
-                  </div>
+                <div className="border-b border-line py-6">
+                  <h2 className="label-uppercase text-faint">Visit us</h2>
+                  {contact.addressLines.length > 0 && (
+                    <address className="mt-2 not-italic font-light leading-relaxed text-ink">
+                      {contact.addressLines.map((line) => (
+                        <span key={line} className="block text-sm">
+                          {line}
+                        </span>
+                      ))}
+                    </address>
+                  )}
+                  <p className="mt-3 text-sm font-light text-muted">
+                    {contact.openingHours}
+                  </p>
+                  {directions && (
+                    <a
+                      href={directions}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="link-m mt-2"
+                    >
+                      Get directions
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </a>
+                  )}
                 </div>
               </Reveal>
             </div>

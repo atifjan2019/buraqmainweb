@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { ArrowRight, Check, Phone, WhatsApp } from "@/components/Icons";
+import { ArrowRight, Phone, WhatsApp } from "@/components/Icons";
 import {
   decodeReceipt,
   ENQUIRY_RECEIPT_COOKIE,
@@ -39,36 +39,22 @@ export default async function ThankYouPage() {
   );
 
   return (
-    <section className="relative flex min-h-[80svh] items-center overflow-hidden pt-32 pb-24">
-      {/*
-        Ambient warmth behind the confirmation, mixed off --color-glow rather
-        than --color-amber: it carries no text, so it has no contrast
-        requirement and keeps the brand's vivid amber on both themes. The light
-        palette's darkened amber would turn this into a muddy tan.
-      */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 h-[45rem] w-[60rem] -translate-x-1/2 opacity-60 blur-3xl"
-        style={{
-          background:
-            "radial-gradient(ellipse, color-mix(in oklab, var(--color-glow) 13%, transparent) 0%, transparent 65%)",
-        }}
-      />
+    <section className="flex min-h-[80svh] items-center bg-canvas pt-32 pb-24">
+      <div className="mx-auto w-full max-w-2xl px-5 text-center sm:px-8">
+        {/* The tick-in-a-disc is gone with the rest of the ornament. The
+            tricolour marks the moment instead, which is what the doc reserves
+            it for — a brand-identity beat, not a status icon. */}
+        <span aria-hidden className="m-stripe mx-auto block h-1 w-16" />
 
-      <div className="relative mx-auto w-full max-w-2xl px-5 text-center sm:px-8">
-        <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-amber/15">
-          <Check className="h-8 w-8 text-amber" />
-        </span>
-
-        <h1 className="mt-7 font-display text-[clamp(2rem,5.5vw,3.2rem)] font-bold leading-[1.05] tracking-[-0.03em] text-ink">
+        <h1 className="display-lg mt-8 text-ink">
           {greeting ? `Thank you, ${greeting}` : "Thank you"}
         </h1>
 
-        <p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-muted">
+        <p className="mx-auto mt-6 max-w-lg text-base font-light leading-relaxed text-muted">
           {receipt?.vehicle ? (
             <>
               We&apos;ve received your enquiry about the{" "}
-              <span className="font-semibold text-ink">{receipt.vehicle}</span>.
+              <span className="text-ink">{receipt.vehicle}</span>.
               One of our team will be in touch shortly — usually the same day.
             </>
           ) : (
@@ -80,24 +66,19 @@ export default async function ThankYouPage() {
         </p>
 
         {receipt?.reference && (
-          <div className="mx-auto mt-8 inline-flex flex-col items-center rounded-2xl border border-line-soft bg-surface/60 px-7 py-5 backdrop-blur">
-            <span className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-faint">
-              Your reference
-            </span>
-            <span className="mt-2 font-display text-2xl font-bold tracking-wide text-gold">
+          <div className="spec-cell mx-auto mt-10 inline-flex flex-col items-center border border-line-soft px-10 py-6">
+            <span className="label-uppercase text-faint">Your reference</span>
+            <span className="display-sm mt-3 text-ink">
               {receipt.reference}
             </span>
-            <span className="mt-2 text-xs text-faint">
+            <span className="caption mt-3 text-faint">
               Quote this if you call or message us
             </span>
           </div>
         )}
 
         <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
-          <a
-            href={`tel:${contact.phoneHref}`}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-amber px-7 py-3.5 font-semibold text-on-amber transition-all hover:bg-amber-bright hover:shadow-(--shadow-glow)"
-          >
+          <a href={`tel:${contact.phoneHref}`} className="btn btn-solid">
             <Phone className="h-4.5 w-4.5" />
             {contact.phone}
           </a>
@@ -107,7 +88,7 @@ export default async function ThankYouPage() {
               href={wa}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-line px-7 py-3.5 font-semibold text-ink transition-colors hover:border-amber/40 hover:text-amber"
+              className="btn btn-outline"
             >
               <WhatsApp className="h-5 w-5" />
               WhatsApp us
@@ -115,28 +96,20 @@ export default async function ThankYouPage() {
           )}
         </div>
 
-        <div className="mt-9 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
           {receipt?.slug && (
-            <Link
-              href={`/cars/${receipt.slug}`}
-              className="group inline-flex items-center gap-1.5 font-medium text-muted transition-colors hover:text-amber"
-            >
+            <Link href={`/cars/${receipt.slug}`} className="link-m">
               Back to the car
-              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+              <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           )}
-          <Link
-            href="/cars"
-            className="group inline-flex items-center gap-1.5 font-medium text-muted transition-colors hover:text-amber"
-          >
+          <Link href="/cars" className="link-m">
             Browse more cars
-            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
 
-        <p className="mt-10 text-xs text-faint">
-          {contact.openingHours}
-        </p>
+        <p className="caption mt-12 text-faint">{contact.openingHours}</p>
       </div>
     </section>
   );

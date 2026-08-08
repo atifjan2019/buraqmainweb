@@ -81,23 +81,13 @@ export default async function CarsPage({
   }
 
   return (
-    <section className="relative pt-32 pb-24 sm:pt-40 sm:pb-32">
-      {/* Ambient bloom behind the heading, mixed off --color-glow rather than
-          --color-amber: it carries no text, so it has no contrast requirement
-          and keeps the brand's vivid amber on both themes. The light palette's
-          darkened amber would land as a muddy tan, not a warm lift. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 h-[40rem] w-[60rem] -translate-x-1/2 opacity-50 blur-3xl"
-        style={{
-          background:
-            "radial-gradient(ellipse, color-mix(in oklab, var(--color-glow) 12%, transparent) 0%, transparent 65%)",
-        }}
-      />
-
-      <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+    /* The ambient bloom that used to sit behind this heading is gone: the
+       design system adds no atmospheric backdrops, and the page floor stays
+       plain canvas. */
+    <section className="bg-canvas pt-32 pb-24">
+      <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
         <SectionHeading
-          eyebrow="OUR COLLECTION"
+          eyebrow="Our Collection"
           title="Current"
           accent="Stock"
           body="Every car below is available right now and prepared to a standard we'd happily drive ourselves."
@@ -107,7 +97,7 @@ export default async function CarsPage({
             filter bar just looks broken. */}
         {filters && filters.makes.length > 0 && (
           <Reveal delay={80}>
-            <div className="mt-14">
+            <div className="mt-16">
               <VehicleFilters
                 filters={filters}
                 active={active}
@@ -147,7 +137,9 @@ export default async function CarsPage({
           </div>
         ) : (
           <>
-            <p className="mt-12 text-sm text-muted">
+            {/* The result count is chrome, so it takes the machined label
+                voice rather than reading as another line of body copy. */}
+            <p className="label-uppercase mt-16 border-b border-line-soft pb-4 text-ink">
               {stock.meta.total === 1
                 ? "1 car available"
                 : `${stock.meta.total} cars available`}
@@ -159,7 +151,7 @@ export default async function CarsPage({
               )}
             </p>
 
-            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {stock.vehicles.map((vehicle, index) => (
                 <Reveal key={vehicle.registration} delay={(index % 3) * 90}>
                   {/* The first card is this page's LCP element — it must not
@@ -173,7 +165,7 @@ export default async function CarsPage({
           </>
         )}
 
-        <p className="mt-16 text-center text-xs text-faint">
+        <p className="caption mt-20 text-center text-faint">
           {financeDisclaimer}
         </p>
       </div>

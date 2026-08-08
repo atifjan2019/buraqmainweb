@@ -11,54 +11,36 @@ interface ComingSoonProps {
 /**
  * Placeholder for routes that are designed but not built yet. Keeps the
  * navigation honest — nothing in the header leads to a 404.
+ *
+ * The mood-lighting bloom that used to sit behind the headline is gone: the
+ * doc's Don't list rules out gradient backdrops behind display type, and the
+ * page floor stays plain canvas.
  */
 export default function ComingSoon({ eyebrow, title, body }: ComingSoonProps) {
   const wa = whatsappLink("Hi Burraq Motors, I'd like to enquire about a car.");
 
   return (
-    <section className="relative flex min-h-[80svh] items-center overflow-hidden pt-32 pb-24">
-      {/* Mood lighting behind the headline, mixed off --color-glow rather than
-          --color-amber: it carries no text, so it has no contrast requirement
-          and keeps the brand's vivid amber on both themes. The light palette's
-          darkened amber would land as a muddy tan instead of a warm tint. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 h-[45rem] w-[60rem] -translate-x-1/2 opacity-60 blur-3xl"
-        style={{
-          background:
-            "radial-gradient(ellipse, color-mix(in oklab, var(--color-glow) 13%, transparent) 0%, transparent 65%)",
-        }}
-      />
+    <section className="flex min-h-[80svh] items-center bg-canvas pt-32 pb-24">
+      <div className="mx-auto w-full max-w-3xl px-5 text-center sm:px-8">
+        <span className="eyebrow eyebrow-center justify-center">{eyebrow}</span>
 
-      <div className="relative mx-auto w-full max-w-3xl px-5 text-center sm:px-8">
-        <span className="inline-flex items-center gap-2.5 text-xs font-semibold tracking-[0.24em] text-amber">
-          <span className="h-px w-6 bg-amber/50" />
-          {eyebrow}
-          <span className="h-px w-6 bg-amber/50" />
-        </span>
+        <h1 className="display-lg mt-8 text-ink">{title}</h1>
 
-        <h1 className="mt-6 font-display text-[clamp(2.2rem,6vw,4rem)] font-bold leading-[1.03] tracking-[-0.03em] text-ink">
-          {title}
-        </h1>
-
-        <p className="mx-auto mt-6 max-w-lg text-base leading-relaxed text-muted">
+        <p className="mx-auto mt-6 max-w-lg text-base font-light leading-relaxed text-muted">
           {body}
         </p>
 
         <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link
-            href="/"
-            className="group inline-flex items-center justify-center gap-2 rounded-full bg-amber px-8 py-4 font-semibold text-on-amber transition-all hover:bg-amber-bright hover:shadow-(--shadow-glow)"
-          >
+          <Link href="/" className="btn btn-solid">
             Back to Home
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            <ArrowRight className="h-4 w-4" />
           </Link>
           {wa && (
             <a
               href={wa}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-line px-8 py-4 font-semibold text-ink transition-colors hover:border-amber/40 hover:text-amber"
+              className="btn btn-outline"
             >
               <WhatsApp className="h-5 w-5" />
               WhatsApp Us

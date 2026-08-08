@@ -118,7 +118,7 @@ export default function FinanceCalculator({
   );
 
   return (
-    <div className="glass overflow-hidden rounded-2xl">
+    <div className="surface-card overflow-hidden">
       {/* Our own controls, styled to the site */}
       <form
         className="border-b border-line-soft p-6 sm:p-8"
@@ -129,17 +129,21 @@ export default function FinanceCalculator({
       >
         <label
           htmlFor={`${containerId}-price`}
-          className="block font-display text-lg font-semibold text-ink"
+          className="title-lg block text-ink"
         >
           What&apos;s the vehicle price?
         </label>
-        <p className="mt-2 text-sm text-muted">
-          Enter a price and we&apos;ll show you illustrative Hire Purchase payments.
+        <p className="mt-3 text-sm font-light text-muted">
+          Enter a price and we&apos;ll show you illustrative Hire Purchase
+          payments.
         </p>
 
-        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-          <div className="flex flex-1 items-center rounded-full border border-line bg-canvas/60 focus-within:border-amber/50">
-            <span className="pl-5 font-display text-lg text-muted">£</span>
+        {/* The currency prefix lives outside the input, so the field's own
+            border wraps both — a composed control that still reads as one
+            48px square box like every other field on the site. */}
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <div className="flex min-h-12 flex-1 items-center border border-line bg-canvas focus-within:border-ink">
+            <span className="pl-4 text-lg font-light text-faint">£</span>
             <input
               id={`${containerId}-price`}
               name="cashPrice"
@@ -149,14 +153,11 @@ export default function FinanceCalculator({
               maxLength={7}
               value={price}
               onChange={(e) => setPrice(e.target.value.replace(/[^0-9]/g, ""))}
-              className="w-full bg-transparent px-3 py-4 font-display text-lg text-ink outline-none placeholder:text-faint"
+              className="w-full bg-transparent px-3 py-3 text-lg font-light text-ink outline-none placeholder:text-faint"
               placeholder="10000"
             />
           </div>
-          <button
-            type="submit"
-            className="rounded-full bg-amber px-8 py-4 font-semibold text-on-amber transition-all hover:bg-amber-bright hover:shadow-(--shadow-glow)"
-          >
+          <button type="submit" className="btn btn-solid">
             Calculate
           </button>
         </div>
@@ -170,9 +171,9 @@ export default function FinanceCalculator({
 
         That panel colour is deliberately a literal and not a surface token: the
         plugin's markup is light in both of our themes, so a token — which would
-        flip to near-black on dark — would put its dark text on a dark ground.
-        The value is the light theme's `canvas-deep`, so on light it reads as a
-        recessed panel rather than a patch of foreign grey.
+        flip to near-black on the dark surface — would put its dark text on a
+        dark ground. The value matches the white theme's `canvas-deep`, so there
+        it reads as a recessed panel rather than as a patch of foreign grey.
       */}
       <div className={status === "ready" ? "bg-[#f4f4f5] p-3 sm:p-5" : ""}>
         <div
@@ -184,12 +185,12 @@ export default function FinanceCalculator({
         {status !== "ready" && (
           <div className="px-6 py-10 text-center">
             {status === "idle" ? (
-              <p className="text-sm text-muted">
+              <p className="text-sm font-light text-muted">
                 Loading the finance calculator…
               </p>
             ) : (
               <>
-                <p className="text-sm leading-relaxed text-muted">
+                <p className="mx-auto max-w-md text-sm font-light leading-relaxed text-muted">
                   {status === "unauthorised"
                     ? "Our live quote calculator isn't available on this address yet."
                     : "The finance calculator couldn't load — an ad blocker or privacy extension may be blocking it."}{" "}
@@ -200,7 +201,7 @@ export default function FinanceCalculator({
                   {contact.phone && (
                     <a
                       href={`tel:${contact.phoneHref}`}
-                      className="inline-flex items-center justify-center gap-2 rounded-full bg-amber px-6 py-3 text-sm font-semibold text-on-amber transition-colors hover:bg-amber-bright"
+                      className="btn btn-solid"
                     >
                       <Phone className="h-4 w-4" />
                       {contact.phone}
@@ -211,7 +212,7 @@ export default function FinanceCalculator({
                       href={wa}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 rounded-full border border-line px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-amber/40 hover:text-amber"
+                      className="btn btn-outline"
                     >
                       <WhatsApp className="h-4 w-4" />
                       WhatsApp us
@@ -226,7 +227,7 @@ export default function FinanceCalculator({
 
       {/* Regulatory disclosure — required alongside any finance illustration */}
       <div className="border-t border-line-soft p-6 sm:px-8">
-        <p className="text-xs leading-relaxed text-faint">
+        <p className="caption leading-relaxed text-faint">
           {financeFullDisclaimer}
         </p>
 
@@ -236,7 +237,7 @@ export default function FinanceCalculator({
             {contact.phone && (
               <a
                 href={`tel:${contact.phoneHref}`}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-line px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-amber/40 hover:text-amber"
+                className="btn btn-outline"
               >
                 <Phone className="h-4 w-4" />
                 {contact.phone}
@@ -247,7 +248,7 @@ export default function FinanceCalculator({
                 href={wa}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-line px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-amber/40 hover:text-amber"
+                className="btn btn-outline"
               >
                 <WhatsApp className="h-4 w-4" />
                 Ask about finance

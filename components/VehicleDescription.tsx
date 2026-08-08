@@ -23,14 +23,12 @@ export default function VehicleDescription({
   if (!lead) return null;
 
   return (
-    <div className="mt-12">
-      <h2 className="font-display text-xl font-semibold tracking-tight text-ink">
-        About this car
-      </h2>
+    <div className="mt-16">
+      <h2 className="title-lg text-ink">About this car</h2>
 
       {/* max-w-2xl holds the line length near 75 characters at every width —
           full-bleed body copy on a wide screen is markedly harder to read. */}
-      <p className="mt-4 max-w-2xl whitespace-pre-line text-sm leading-relaxed text-muted">
+      <p className="mt-5 max-w-2xl whitespace-pre-line text-sm font-light leading-relaxed text-muted">
         {lead}
       </p>
 
@@ -39,7 +37,7 @@ export default function VehicleDescription({
           {/* py-3 carries the row to the 44px minimum touch target; the text
               itself is only 20px tall. The margin above is reduced to match,
               so the padding does not also become visible spacing. */}
-          <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 py-3 text-sm font-semibold text-amber transition-colors hover:text-amber-bright [&::-webkit-details-marker]:hidden">
+          <summary className="link-m cursor-pointer list-none [&::-webkit-details-marker]:hidden">
             <span className="group-open:hidden">Read the full description</span>
             <span className="hidden group-open:inline">Show less</span>
             {/* Rotates to point up when open, so the control reads as a toggle
@@ -58,7 +56,7 @@ export default function VehicleDescription({
             </svg>
           </summary>
 
-          <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-muted">
+          <p className="mt-4 whitespace-pre-line text-sm font-light leading-relaxed text-muted">
             {rest}
           </p>
         </details>

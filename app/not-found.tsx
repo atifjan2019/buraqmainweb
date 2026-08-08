@@ -55,24 +55,8 @@ export default async function NotFound() {
 
   return (
     <>
-      <section className="relative isolate overflow-hidden pt-32 pb-16 sm:pt-40 sm:pb-20">
-        {/* Ambient warmth, mixed off --color-glow rather than --color-amber:
-            it carries no text, so it has no contrast requirement and keeps the
-            brand's vivid amber on both themes. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[40rem] w-[60rem] -translate-x-1/2 opacity-50 blur-3xl"
-          style={{
-            background:
-              "radial-gradient(ellipse, color-mix(in oklab, var(--color-glow) 12%, transparent) 0%, transparent 65%)",
-          }}
-        />
-        <div
-          aria-hidden
-          className="grain-overlay pointer-events-none absolute inset-0 -z-10"
-        />
-
-        <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+      <section className="relative isolate overflow-hidden bg-canvas pt-32 pb-20">
+        <div className="relative mx-auto max-w-[90rem] px-5 sm:px-8">
           <div className="relative mx-auto max-w-2xl text-center">
             {/* The numeral is a watermark, not content. It is announced by
                 nothing — the eyebrow and heading already say what happened,
@@ -81,7 +65,7 @@ export default async function NotFound() {
                 make while someone is trying to find a car. */}
             <span
               aria-hidden
-              className="pointer-events-none absolute -top-8 left-1/2 -z-10 -translate-x-1/2 select-none font-display text-[clamp(9rem,34vw,17rem)] font-bold leading-none tracking-tighter text-(--ghost-numeral)"
+              className="pointer-events-none absolute -top-8 left-1/2 -z-10 -translate-x-1/2 select-none text-[clamp(9rem,34vw,17rem)] font-bold leading-none tracking-[-0.5px] text-(--ghost-numeral)"
             >
               404
             </span>
@@ -94,33 +78,24 @@ export default async function NotFound() {
               has broken, every route out must be readable with no JavaScript at
               all. Do not "tidy this up" by wrapping it.
             */}
-            <span className="inline-flex items-center gap-2.5 text-xs font-semibold tracking-[0.24em] text-amber">
-              <span aria-hidden className="h-px w-6 bg-amber/50" />
-              PAGE NOT FOUND
-              <span aria-hidden className="h-px w-6 bg-amber/50" />
+            <span className="eyebrow eyebrow-center justify-center">
+              Page not found
             </span>
 
-            <h1 className="mt-6 font-display text-[clamp(2.1rem,5.6vw,3.6rem)] font-bold leading-[1.05] tracking-[-0.03em] text-ink">
-              That page has gone.{" "}
-              <span className="text-gold">The forecourt hasn&apos;t.</span>
+            <h1 className="display-lg mt-8 text-ink">
+              That page has gone. The forecourt hasn&apos;t.
             </h1>
 
-            <p className="mx-auto mt-6 max-w-lg text-base leading-relaxed text-muted">
+            <p className="mx-auto mt-6 max-w-lg text-base font-light leading-relaxed text-muted">
               The link you followed is broken or the page has moved. Everything
               we have in stock is still a tap away — pick a budget below, or
               tell us what you&apos;re after and we&apos;ll go and find it.
             </p>
 
             <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link
-                href="/cars"
-                className="group inline-flex items-center justify-center gap-2 rounded-full bg-amber px-8 py-4 font-semibold text-on-amber transition-all hover:bg-amber-bright hover:shadow-(--shadow-glow)"
-              >
+              <Link href="/cars" className="btn btn-solid">
                 Browse all cars
-                <ArrowRight
-                  aria-hidden
-                  className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                />
+                <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
 
               {wa ? (
@@ -128,7 +103,7 @@ export default async function NotFound() {
                   href={wa}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-line px-8 py-4 font-semibold text-ink transition-colors hover:border-amber/40 hover:text-amber"
+                  className="btn btn-outline"
                 >
                   <WhatsApp aria-hidden className="h-5 w-5" />
                   WhatsApp us
@@ -137,7 +112,7 @@ export default async function NotFound() {
                 contact.phone && (
                   <a
                     href={`tel:${contact.phoneHref}`}
-                    className="inline-flex items-center justify-center gap-2 rounded-full border border-line px-8 py-4 font-semibold text-ink transition-colors hover:border-amber/40 hover:text-amber"
+                    className="btn btn-outline"
                   >
                     <Phone aria-hidden className="h-5 w-5" />
                     {contact.phone}
@@ -146,17 +121,14 @@ export default async function NotFound() {
               )}
             </div>
 
-            <nav aria-labelledby="budget-rail" className="mt-10">
-              <p id="budget-rail" className="text-sm text-muted">
+            <nav aria-labelledby="budget-rail" className="mt-12">
+              <p id="budget-rail" className="label-uppercase text-faint">
                 Or jump straight to a budget
               </p>
-              <ul className="mt-4 flex flex-wrap justify-center gap-2.5">
+              <ul className="mt-5 flex flex-wrap justify-center gap-3">
                 {BUDGETS.map((budget) => (
                   <li key={budget.href}>
-                    <Link
-                      href={budget.href}
-                      className="inline-flex min-h-11 items-center rounded-full border border-line bg-surface-2 px-5 text-sm font-medium text-ink transition-colors hover:border-amber/40 hover:text-amber"
-                    >
+                    <Link href={budget.href} className="btn btn-quiet px-6">
                       {budget.label}
                     </Link>
                   </li>
@@ -170,15 +142,15 @@ export default async function NotFound() {
       {/* Real stock. Dropped whole if the CRM is unreachable — the notice below
           is the page's only apology, and two of them reads as a double fault. */}
       {cars.length > 0 && (
-        <section className="pb-16 sm:pb-20">
-          <div className="mx-auto max-w-7xl px-5 sm:px-8">
+        <section className="bg-canvas pb-24">
+          <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
             <SectionHeading
-              eyebrow="STILL AVAILABLE"
+              eyebrow="Still Available"
               title="Straight from"
               accent="the forecourt"
             />
 
-            <ul className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {cars.map((car, index) => (
                 <Reveal key={car.slug} as="li" delay={(index % 3) * 90}>
                   <VehicleCard vehicle={car} />
@@ -186,16 +158,10 @@ export default async function NotFound() {
               ))}
             </ul>
 
-            <div className="mt-10 text-center">
-              <Link
-                href="/cars"
-                className="group inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-amber transition-colors hover:text-amber-bright"
-              >
+            <div className="mt-12 flex justify-center">
+              <Link href="/cars" className="btn btn-outline">
                 View all cars
-                <ArrowRight
-                  aria-hidden
-                  className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"
-                />
+                <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
             </div>
           </div>
@@ -204,27 +170,24 @@ export default async function NotFound() {
 
       {/* The answer for someone who followed a dead link chasing one specific
           car: the CRM has no model filter, but the dealership sources to order. */}
-      <section className="pb-24 sm:pb-32">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+      <section className="bg-canvas pb-24">
+        <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
           <StockNotice
             title="Not seeing what you came for?"
             body="We buy to order from Japanese auctions, so the car you were looking at may be one we can source. Tell us the model, the budget and the mileage you want and we'll go and find it."
             action={{ label: "Tell us what you need", href: "/contact" }}
           />
 
-          <p className="mt-10 text-center text-sm text-muted">
+          <p className="label-uppercase mt-12 text-center text-faint">
             Showroom open {contact.openingHours}
           </p>
 
-          <p className="mt-4 text-center text-xs leading-relaxed text-muted">
+          <p className="caption mx-auto mt-5 max-w-2xl text-center leading-relaxed text-faint">
             {financeDisclaimer}
           </p>
 
-          <div className="mt-8 text-center">
-            <Link
-              href="/"
-              className="inline-flex min-h-11 items-center text-sm font-medium text-muted transition-colors hover:text-amber"
-            >
+          <div className="mt-10 flex justify-center">
+            <Link href="/" className="link-m">
               Back to home
             </Link>
           </div>

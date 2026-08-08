@@ -4,28 +4,26 @@
  */
 export default function CarsLoading() {
   return (
-    <section className="relative pt-32 pb-24 sm:pt-40 sm:pb-32">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <div className="mx-auto h-3 w-32 animate-pulse rounded-full bg-surface-2" />
-          <div className="mx-auto mt-6 h-10 w-72 animate-pulse rounded-lg bg-surface-2" />
-          <div className="mx-auto mt-5 h-4 w-full max-w-md animate-pulse rounded-full bg-surface-2" />
+    /* Square blocks, because the cards this stands in for are square. A
+       rounded skeleton resolving into a sharp card is a visible snap. */
+    <section className="bg-canvas pt-32 pb-24">
+      <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="mx-auto h-4 w-40 animate-pulse bg-surface-2" />
+          <div className="mx-auto mt-6 h-12 w-72 animate-pulse bg-surface-2" />
+          <div className="mx-auto mt-6 h-4 w-full max-w-md animate-pulse bg-surface-2" />
         </div>
 
-        <div className="mt-14 h-32 animate-pulse rounded-2xl bg-surface-2/60" />
+        <div className="mt-16 h-40 animate-pulse bg-surface-2" />
 
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }, (_, index) => (
-            <div
-              key={index}
-              className="overflow-hidden rounded-2xl border border-line-soft"
-            >
+            <div key={index}>
               <div className="aspect-16/10 animate-pulse bg-surface-2" />
-              <div className="space-y-3 p-5">
-                <div className="h-5 w-2/3 animate-pulse rounded-full bg-surface-2" />
-                <div className="h-3 w-full animate-pulse rounded-full bg-surface-2" />
-                <div className="h-3 w-4/5 animate-pulse rounded-full bg-surface-2" />
-                <div className="h-10 w-full animate-pulse rounded-full bg-surface-2" />
+              <div className="space-y-3 pt-5">
+                <div className="h-6 w-2/3 animate-pulse bg-surface-2" />
+                <div className="h-3 w-full animate-pulse bg-surface-2" />
+                <div className="h-8 w-1/3 animate-pulse bg-surface-2" />
               </div>
             </div>
           ))}

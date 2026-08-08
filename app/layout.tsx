@@ -57,13 +57,12 @@ export const metadata: Metadata = {
 };
 
 /*
-  True black, matching the canvas the inline script applies by default.
-  `colorScheme` is deliberately not declared here: globals.css sets it per theme
-  on <html>, and a meta tag pinning it to dark would describe the light theme
-  incorrectly.
+  White, matching the canvas the inline script applies by default. `colorScheme`
+  is deliberately not declared here: globals.css sets it per theme on <html>, and
+  a meta tag pinning it to light would describe the dark theme incorrectly.
 */
 export const viewport: Viewport = {
-  themeColor: "#000000",
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -85,19 +84,19 @@ export default function RootLayout({
         {/*
           Arms the scroll-reveal styles and selects the colour theme. Both have
           to happen before first paint: the reveal flag so content isn't shown
-          and then hidden, and the theme so a visitor who chose light doesn't
-          get a black flash on every navigation.
+          and then hidden, and the theme so a visitor who chose the black canvas
+          doesn't get a white flash on every navigation.
 
-          Dark is the default, and an unreadable or absent preference falls back
-          to it — the dark palette is the brand's own look, so the light one is
-          opt-in rather than something the OS setting turns on unasked.
+          White is the default, and an unreadable or absent preference falls
+          back to it — so the black surface is opt-in rather than something the
+          OS setting turns on unasked.
 
           If scripting is unavailable neither runs: content stays visible and
-          the site stays dark, which are both correct resting states.
+          the site stays white, which are both correct resting states.
         */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `document.documentElement.setAttribute('data-js','');try{var t=localStorage.getItem('theme');document.documentElement.dataset.theme=t==='light'?'light':'dark'}catch(e){document.documentElement.dataset.theme='dark'}`,
+            __html: `document.documentElement.setAttribute('data-js','');try{var t=localStorage.getItem('theme');document.documentElement.dataset.theme=t==='dark'?'dark':'light'}catch(e){document.documentElement.dataset.theme='light'}`,
           }}
         />
       </head>

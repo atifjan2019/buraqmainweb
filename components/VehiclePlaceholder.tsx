@@ -1,5 +1,3 @@
-import { Car } from "./Icons";
-
 interface VehiclePlaceholderProps {
   make: string;
   model: string;
@@ -27,29 +25,21 @@ export default function VehiclePlaceholder({
   return (
     <div
       aria-hidden
-      className="flex h-full w-full flex-col items-center justify-center gap-3 bg-surface-2"
-      /* Warm glow from below, mixed off --color-glow rather than
-         --color-amber: it carries no text, so it has no contrast requirement
-         and keeps the brand's vivid amber on both themes. The light palette's
-         darkened amber would stain the tile rather than warm it. */
-      style={{
-        backgroundImage:
-          "radial-gradient(circle at 50% 120%, color-mix(in oklab, var(--color-glow) 14%, transparent), transparent 60%)",
-      }}
+      /* Flat, with no glow behind it. DESIGN-bmw-m.md rules out atmospheric
+         backdrops, and a tile standing in for a photograph is the last place
+         to spend the exception on. */
+      className="flex h-full w-full flex-col items-center justify-center gap-4 bg-surface-2"
     >
-      <Car
-        className={feature ? "h-20 w-20 text-line" : "h-12 w-12 text-line"}
-        strokeWidth={1}
-      />
+      <span aria-hidden className="m-stripe h-1 w-12" />
       <p
-        className={`px-4 text-center font-display font-semibold tracking-tight text-faint ${
+        className={`px-4 text-center font-bold uppercase tracking-[1.5px] text-ink ${
           feature ? "text-base" : "text-xs"
         }`}
       >
         {make} {model}
       </p>
       <p
-        className={`px-4 text-center text-faint/70 ${
+        className={`px-4 text-center font-light text-faint ${
           feature ? "text-xs" : "text-[0.65rem]"
         }`}
       >

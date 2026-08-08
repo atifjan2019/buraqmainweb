@@ -36,34 +36,18 @@ export default function VideoEmbed({ id, title }: VideoEmbedProps) {
       type="button"
       onClick={() => setPlaying(true)}
       aria-label={`Play video: ${title}`}
-      className="group/play relative grid h-full w-full place-items-center bg-surface-2 transition-colors hover:bg-surface"
+      className="group/play relative grid h-full w-full place-items-center gap-4 bg-surface-2 transition-colors hover:bg-surface"
     >
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-60"
-        style={{
-          // --color-glow, not --color-amber: this wash carries no text, so it
-          // has no contrast requirement and keeps the brand's vivid amber on
-          // both themes. The light palette's darkened amber would settle into
-          // a muddy tan over the near-white poster.
-          background:
-            "radial-gradient(circle at 50% 50%, color-mix(in oklab, var(--color-glow) 14%, transparent), transparent 62%)",
-        }}
-      />
-      {/* The ring and the soft lift are what separate this disc from the
-          poster on light, where a translucent canvas fill is near-white on a
-          near-white surface. On dark the poster is already far darker than
-          both, so neither is doing any work there. */}
-      <span className="relative grid h-16 w-16 place-items-center rounded-full border border-amber/60 bg-canvas/70 shadow-(--shadow-card) backdrop-blur transition-all duration-300 group-hover/play:scale-110 group-hover/play:border-amber group-hover/play:shadow-(--shadow-glow)">
-        <svg
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="ml-1 h-6 w-6 text-amber"
-        >
+      {/* A circular icon button, which is the one shape DESIGN-bmw-m.md
+          allows a radius on: functional media controls read as circles, and
+          everything else in the system reads as a rectangle. The radial wash
+          that used to sit behind it is gone with the rest of the ornament. */}
+      <span className="btn-icon transition-colors group-hover/play:border-ink group-hover/play:bg-ink group-hover/play:text-on-ink">
+        <svg viewBox="0 0 24 24" fill="currentColor" className="ml-1 h-5 w-5">
           <path d="M8 5.5v13l11-6.5-11-6.5Z" />
         </svg>
       </span>
-      <span className="relative mt-4 text-xs text-faint">
+      <span className="caption text-faint">
         Loads from Vimeo when you press play
       </span>
     </button>

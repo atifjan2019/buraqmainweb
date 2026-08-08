@@ -11,7 +11,10 @@ export default function TrustBar() {
   return (
     <section className="bg-canvas">
       <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
-        <ul className="grid grid-cols-2 gap-px bg-line-soft lg:grid-cols-4">
+        {/* The outer border matters as much as the gaps: without it the panel
+            has no edge against the canvas, since nothing here casts a shadow
+            to give it one. */}
+        <ul className="grid grid-cols-2 gap-px border border-line-soft bg-line-soft lg:grid-cols-4">
           {trustBadges.map((badge, i) => (
             <li key={badge} className="spec-cell">
               <Reveal delay={i * 70}>

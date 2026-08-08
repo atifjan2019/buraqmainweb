@@ -48,13 +48,17 @@ export default function Pagination({
   };
 
   const { currentPage, lastPage } = meta;
+
+  /* Square, 44px, machined label — the same button silhouette as everything
+     else in the system. The doc's radius rule is binary: 0 by default, and
+     `full` only on circular icon controls, which these are not. */
   const stepClass =
-    "inline-flex h-10 items-center gap-1.5 rounded-full border border-line px-4 text-sm font-medium text-muted transition-colors hover:border-amber/40 hover:text-amber";
+    "inline-flex h-11 items-center gap-2 border border-line px-5 text-xs font-bold uppercase tracking-[1.5px] text-muted transition-colors hover:border-ink hover:text-ink";
 
   return (
     <nav
       aria-label="Stock pages"
-      className="mt-14 flex flex-wrap items-center justify-center gap-2"
+      className="mt-16 flex flex-wrap items-center justify-center gap-2"
     >
       {currentPage > 1 ? (
         <Link href={href(currentPage - 1)} rel="prev" className={stepClass}>
@@ -74,7 +78,7 @@ export default function Pagination({
             <li
               key={`gap-${index}`}
               aria-hidden
-              className="px-1 text-sm text-faint"
+              className="px-1 text-sm font-light text-faint"
             >
               …
             </li>
@@ -86,8 +90,8 @@ export default function Pagination({
                 aria-label={`Page ${page}`}
                 className={
                   page === currentPage
-                    ? "grid h-10 w-10 place-items-center rounded-full bg-amber text-sm font-semibold text-on-amber"
-                    : "grid h-10 w-10 place-items-center rounded-full border border-line text-sm font-medium text-muted transition-colors hover:border-amber/40 hover:text-amber"
+                    ? "grid h-11 w-11 place-items-center bg-ink text-sm font-bold text-on-ink"
+                    : "grid h-11 w-11 place-items-center border border-line text-sm font-light text-muted transition-colors hover:border-ink hover:text-ink"
                 }
               >
                 {page}

@@ -17,57 +17,50 @@ const HERO_IMAGE = "/cars/107-toyota-prius/01.jpeg";
 export default function FinancePage() {
   return (
     <>
-      {/* Header band */}
-      <section className="relative isolate overflow-hidden pt-36 pb-16">
-        <div aria-hidden className="absolute inset-0 -z-30">
-          <Image
-            src={HERO_IMAGE}
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center opacity-35"
-          />
-        </div>
-        <div
-          aria-hidden
-          className="absolute inset-0 -z-20 bg-linear-to-b from-canvas/95 via-canvas/85 to-canvas"
-        />
-        {/* Opacity and blend come from the utility's own tokens — repeating
-            them here pinned the grain on in light mode, where it reads as a
-            dirty screen rather than as film stock. */}
-        <div
-          aria-hidden
-          className="grain-overlay pointer-events-none absolute inset-0 -z-10"
-        />
+      {/*
+        Header band. The photograph takes its own half at full strength rather
+        than sitting washed-out behind the type: a scrim heavy enough to carry
+        black copy over an image erases the car, and the doc would rather have
+        the photograph intact. The film grain that used to overlay it is gone
+        with the rest of the decoration.
+      */}
+      <section className="border-b border-line-soft bg-canvas">
+        <div className="grid lg:grid-cols-2">
+          <div className="relative order-first min-h-[16rem] lg:order-last lg:min-h-[30rem]">
+            <Image
+              src={HERO_IMAGE}
+              alt=""
+              fill
+              priority
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="object-cover object-center"
+            />
+          </div>
 
-        <div className="mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="max-w-2xl">
-            <Reveal>
-              <span className="inline-flex items-center gap-2.5 text-xs font-semibold tracking-[0.24em] text-amber">
-                <span className="h-px w-6 bg-amber/50" />
-                FINANCE
-              </span>
-            </Reveal>
-            <Reveal delay={80}>
-              <h1 className="mt-5 font-display text-[clamp(2.2rem,5.6vw,4rem)] font-bold leading-[1.02] tracking-[-0.03em] text-ink">
-                Car finance,
-                <span className="text-gold"> made simple</span>
-              </h1>
-            </Reveal>
-            <Reveal delay={140}>
-              <p className="mt-6 max-w-lg text-base leading-relaxed text-muted">
-                Put in a vehicle price and see illustrative Hire Purchase
-                payments. Figures are for illustration only, carry no
-                obligation, and are not an offer of finance.
-              </p>
-            </Reveal>
+          <div className="flex items-center px-5 pt-24 pb-16 sm:px-8 lg:px-16 lg:py-24">
+            <div className="max-w-xl">
+              <Reveal>
+                <span className="eyebrow">Finance</span>
+              </Reveal>
+              <Reveal delay={80}>
+                <h1 className="display-lg mt-6 text-ink">
+                  Car finance, made simple
+                </h1>
+              </Reveal>
+              <Reveal delay={140}>
+                <p className="mt-6 max-w-lg text-base font-light leading-relaxed text-muted">
+                  Put in a vehicle price and see illustrative Hire Purchase
+                  payments. Figures are for illustration only, carry no
+                  obligation, and are not an offer of finance.
+                </p>
+              </Reveal>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Calculator */}
-      <section className="relative pb-24">
+      <section className="bg-canvas py-24">
         <div className="mx-auto max-w-4xl px-5 sm:px-8">
           <Reveal>
             <FinanceCalculator initialPrice={12900} />
@@ -76,31 +69,27 @@ export default function FinancePage() {
       </section>
 
       {/* Process */}
-      <section className="relative border-y border-line-soft py-24">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+      <section className="border-y border-line-soft bg-canvas py-24">
+        <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
           <SectionHeading
-            eyebrow="HOW IT WORKS"
+            eyebrow="How It Works"
             title="Four steps to"
             accent="your next car"
           />
-          <ol className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <ol className="mt-16 grid gap-px border border-line-soft bg-line-soft sm:grid-cols-2 lg:grid-cols-4">
             {financeSteps.map((step, i) => (
-              <li key={step.step}>
+              <li key={step.step} className="spec-cell">
                 <Reveal delay={i * 90}>
-                  <div className="group glass h-full rounded-2xl p-6 transition-colors hover:border-amber/30">
-                    {/* Ghost numeral. `line` only works as a ghost on dark,
-                        where it is lighter than the card; on a near-white card
-                        it is lighter still and the digit disappears. A grey
-                        that recedes on black advances on white, so this is a
-                        token pair — and hover has to deepen it on light where
-                        it brightened on dark. */}
-                    <span className="font-display text-5xl font-bold leading-none text-(--ghost-numeral) transition-colors group-hover:text-(--ghost-numeral-hover)">
+                  <div className="group h-full p-8">
+                    {/* Ghost numeral. A grey that recedes on white advances on
+                        black, so this is a token pair rather than one colour
+                        at a low alpha — and hover has to deepen it on white
+                        where it lightens on black. */}
+                    <span className="display-md block leading-none text-(--ghost-numeral) transition-colors group-hover:text-(--ghost-numeral-hover)">
                       {step.step}
                     </span>
-                    <h3 className="mt-5 font-display text-lg font-semibold text-ink">
-                      {step.title}
-                    </h3>
-                    <p className="mt-2.5 text-sm leading-relaxed text-muted">
+                    <h3 className="title-lg mt-6 text-ink">{step.title}</h3>
+                    <p className="mt-3 text-sm font-light leading-relaxed text-muted">
                       {step.body}
                     </p>
                   </div>
@@ -109,7 +98,7 @@ export default function FinancePage() {
             ))}
           </ol>
           <Reveal delay={140}>
-            <p className="mt-12 text-center text-xs text-faint">
+            <p className="caption mt-16 text-center text-faint">
               {financeDisclaimer}
             </p>
           </Reveal>
@@ -117,10 +106,10 @@ export default function FinancePage() {
       </section>
 
       {/* Explainer films */}
-      <section className="relative py-24">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+      <section className="bg-canvas py-24">
+        <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
           <SectionHeading
-            eyebrow="UNDERSTAND YOUR OPTIONS"
+            eyebrow="Understand Your Options"
             title="Finance explained,"
             accent="in plain English"
             body="Short films covering each type of agreement, so you know exactly what you're signing."
@@ -129,11 +118,11 @@ export default function FinancePage() {
           <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {financeVideos.map((video, i) => (
               <Reveal key={video.id} delay={(i % 3) * 90}>
-                <figure className="glass overflow-hidden rounded-2xl transition-colors hover:border-amber/30">
+                <figure className="surface-card overflow-hidden transition-colors hover:border-ink">
                   <div className="aspect-video w-full overflow-hidden bg-surface-2">
                     <VideoEmbed id={video.id} title={video.title} />
                   </div>
-                  <figcaption className="p-5 font-display text-base font-semibold text-ink">
+                  <figcaption className="title-lg border-t border-line-soft p-6 text-ink">
                     {video.title}
                   </figcaption>
                 </figure>

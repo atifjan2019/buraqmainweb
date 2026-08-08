@@ -12,6 +12,14 @@ interface LegalPageProps {
  * Shared shell for the long-form legal documents. Deliberately plain and
  * high-contrast — these pages are read, not admired, and regulators expect
  * them to be easy to find and easy to follow.
+ *
+ * Body copy stays at Light (300) even here. The doc is explicit that legal
+ * text does not get an exemption from the weight pair: `cookie-consent-card`
+ * is specified at body-sm / 300, and bumping the fine print to 400 to "help"
+ * is the change that makes the whole page read as a different system.
+ *
+ * Inline links are underlined rather than tracked-uppercase. `.link-m` is a
+ * navigational control; a link inside a sentence has to stay inside it.
  */
 export default function LegalPage({
   eyebrow,
@@ -22,45 +30,29 @@ export default function LegalPage({
 }: LegalPageProps) {
   return (
     <>
-      <section className="relative overflow-hidden border-b border-line-soft pt-36 pb-14">
-        {/* Ambient warmth behind the masthead, mixed off --color-glow rather
-            than --color-amber: it carries no text, so it has no contrast
-            requirement and keeps the brand's vivid amber on both themes.
-            Mixing against transparent leaves the dark value exactly the
-            rgba(245,165,36,0.10) it has always been. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-0 h-[34rem] w-[54rem] -translate-x-1/2 opacity-50 blur-3xl"
-          style={{
-            background:
-              "radial-gradient(ellipse, color-mix(in oklab, var(--color-glow) 10%, transparent) 0%, transparent 65%)",
-          }}
-        />
-        <div className="relative mx-auto max-w-3xl px-5 sm:px-8">
-          <span className="inline-flex items-center gap-2.5 text-xs font-semibold tracking-[0.24em] text-amber">
-            <span className="h-px w-6 bg-amber/50" />
-            {eyebrow}
-          </span>
-          <h1 className="mt-5 font-display text-[clamp(2rem,5vw,3.4rem)] font-bold leading-[1.04] tracking-[-0.03em] text-ink">
-            {title}
-          </h1>
-          <p className="mt-5 text-base leading-relaxed text-muted">{intro}</p>
-          <p className="mt-6 text-xs text-faint">Last updated: {updated}</p>
+      <section className="border-b border-line-soft bg-canvas pt-32 pb-16">
+        <div className="mx-auto max-w-3xl px-5 sm:px-8">
+          <span className="eyebrow">{eyebrow}</span>
+          <h1 className="display-lg mt-6 text-ink">{title}</h1>
+          <p className="mt-6 text-base font-light leading-relaxed text-muted">
+            {intro}
+          </p>
+          <p className="caption mt-8 text-faint">Last updated: {updated}</p>
         </div>
       </section>
 
-      <section className="py-16 sm:py-20">
+      <section className="bg-canvas py-20">
         <div
-          className="mx-auto max-w-3xl px-5 text-[0.95rem] leading-relaxed text-muted sm:px-8
-            [&_a]:text-amber [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:text-amber-bright
-            [&_h2]:mt-14 [&_h2]:font-display [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-ink
-            [&_h3]:mt-8 [&_h3]:font-display [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-ink
+          className="mx-auto max-w-3xl px-5 text-[0.95rem] font-light leading-relaxed text-muted sm:px-8
+            [&_a]:text-ink [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:opacity-70
+            [&_h2]:mt-14 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:uppercase [&_h2]:tracking-[-0.25px] [&_h2]:text-ink
+            [&_h3]:mt-8 [&_h3]:text-base [&_h3]:font-bold [&_h3]:uppercase [&_h3]:tracking-[1.5px] [&_h3]:text-ink
             [&_li]:mt-2 [&_li]:pl-1
             [&_p]:mt-4
-            [&_strong]:text-ink
+            [&_strong]:font-normal [&_strong]:text-ink
             [&_table]:mt-5 [&_table]:w-full [&_table]:border-collapse [&_table]:text-sm
             [&_td]:border-t [&_td]:border-line-soft [&_td]:py-3 [&_td]:pr-4 [&_td]:align-top
-            [&_th]:border-b [&_th]:border-line [&_th]:pb-2 [&_th]:pr-4 [&_th]:text-left [&_th]:font-semibold [&_th]:text-ink
+            [&_th]:border-b [&_th]:border-line [&_th]:pb-2 [&_th]:pr-4 [&_th]:text-left [&_th]:text-xs [&_th]:font-bold [&_th]:uppercase [&_th]:tracking-[1.5px] [&_th]:text-ink
             [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:pl-5"
         >
           {children}

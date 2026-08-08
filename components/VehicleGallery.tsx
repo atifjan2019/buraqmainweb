@@ -88,7 +88,7 @@ export default function VehicleGallery({
 
   if (count === 0) {
     return (
-      <div className="aspect-4/3 overflow-hidden rounded-2xl border border-line-soft">
+      <div className="photo-frame aspect-4/3 overflow-hidden">
         <VehiclePlaceholder make={make} model={model} size="feature" />
       </div>
     );
@@ -104,7 +104,7 @@ export default function VehicleGallery({
         type="button"
         onClick={() => setLightboxOpen(true)}
         aria-label={`Open larger view of ${current.alt}`}
-        className="group relative block aspect-4/3 w-full cursor-zoom-in overflow-hidden rounded-2xl border border-line-soft bg-surface-2"
+        className="photo-frame group relative block aspect-4/3 w-full cursor-zoom-in overflow-hidden bg-surface-2"
       >
         {/* eslint-disable-next-line @next/next/no-img-element -- see file header */}
         <img
@@ -120,14 +120,16 @@ export default function VehicleGallery({
           decoding="async"
           className="h-full w-full object-cover"
         />
-        <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-canvas/80 px-3 py-1.5 text-xs font-medium text-muted opacity-0 backdrop-blur transition-opacity group-hover:opacity-100">
+        {/* Solid, not translucent: the system has no backdrop blur, so a
+            chip over photography has to carry its own ground. */}
+        <span className="pointer-events-none absolute bottom-3 right-3 bg-canvas px-3 py-2 text-[0.7rem] font-bold uppercase tracking-[1.5px] text-ink opacity-0 transition-opacity group-hover:opacity-100">
           Click to enlarge
         </span>
       </button>
 
       {/* Thumbnail strip */}
       {count > 1 && (
-        <ul className="mt-3 grid grid-cols-5 gap-2 sm:grid-cols-6">
+        <ul className="mt-3 grid grid-cols-5 gap-3 sm:grid-cols-6">
           {images.map((image, index) => (
             <li key={image.thumb}>
               <button
@@ -135,10 +137,13 @@ export default function VehicleGallery({
                 onClick={() => setActive(index)}
                 aria-label={`Show image ${index + 1} of ${count}`}
                 aria-current={index === active ? "true" : undefined}
-                className={`block aspect-4/3 w-full overflow-hidden rounded-lg border transition-all ${
+                /* The active thumbnail is marked by an ink border rather
+                   than by a hue — this system has no accent colour, and the
+                   tricolour is identity-only. */
+                className={`block aspect-4/3 w-full overflow-hidden border transition-all ${
                   index === active
-                    ? "border-amber opacity-100"
-                    : "border-line-soft opacity-60 hover:opacity-100"
+                    ? "border-ink opacity-100"
+                    : "border-line-soft opacity-55 hover:opacity-100"
                 }`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- see file header */}
@@ -166,13 +171,13 @@ export default function VehicleGallery({
           aria-label={`${current.alt} — image ${active + 1} of ${count}`}
           tabIndex={-1}
           onClick={closeLightbox}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-canvas-deep/95 p-4 backdrop-blur-sm focus:outline-none sm:p-8"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-canvas/97 p-4 focus:outline-none sm:p-8"
         >
           <button
             type="button"
             onClick={closeLightbox}
             aria-label="Close image viewer"
-            className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full border border-line bg-canvas/80 text-muted transition-colors hover:text-amber"
+            className="btn-icon absolute right-4 top-4"
           >
             <Close className="h-5 w-5" />
           </button>
@@ -186,7 +191,7 @@ export default function VehicleGallery({
                   previous();
                 }}
                 aria-label="Previous image"
-                className="absolute left-3 grid h-11 w-11 place-items-center rounded-full border border-line bg-canvas/80 text-muted transition-colors hover:text-amber sm:left-6"
+                className="btn-icon absolute left-3 sm:left-6"
               >
                 <ArrowRight className="h-5 w-5 rotate-180" />
               </button>
@@ -197,7 +202,7 @@ export default function VehicleGallery({
                   next();
                 }}
                 aria-label="Next image"
-                className="absolute right-3 grid h-11 w-11 place-items-center rounded-full border border-line bg-canvas/80 text-muted transition-colors hover:text-amber sm:right-6"
+                className="btn-icon absolute right-3 sm:right-6"
               >
                 <ArrowRight className="h-5 w-5" />
               </button>
@@ -216,11 +221,11 @@ export default function VehicleGallery({
             src={current.full}
             alt={current.alt}
             onClick={(event) => event.stopPropagation()}
-            className="h-auto w-auto max-h-[78vh] max-w-[86vw] cursor-default rounded-lg object-contain shadow-(--shadow-card) sm:max-h-[82vh] sm:max-w-[80vw]"
+            className="h-auto w-auto max-h-[78vh] max-w-[86vw] cursor-default object-contain sm:max-h-[82vh] sm:max-w-[80vw]"
           />
 
           {count > 1 && (
-            <p className="absolute bottom-5 rounded-full bg-canvas/80 px-3 py-1.5 text-xs text-muted backdrop-blur">
+            <p className="absolute bottom-5 bg-canvas px-3 py-2 text-[0.7rem] font-bold uppercase tracking-[1.5px] text-muted">
               {active + 1} / {count}
             </p>
           )}
