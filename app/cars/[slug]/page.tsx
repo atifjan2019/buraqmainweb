@@ -189,22 +189,22 @@ export default async function VehiclePage({ params }: PageProps) {
                   shape and no accent hue to tint a status with. */}
               <div className="flex flex-wrap items-center gap-2">
                 {reserved && (
-                  <span className="border border-ink px-3 py-1.5 text-[0.7rem] font-bold uppercase tracking-[1.5px] text-ink">
+                  <span className="border border-ink px-3 py-1.5 label-uppercase-sm text-ink">
                     Reserved
                   </span>
                 )}
                 {vehicle.isFeatured && (
-                  <span className="bg-ink px-3 py-1.5 text-[0.7rem] font-bold uppercase tracking-[1.5px] text-on-ink">
+                  <span className="bg-ink px-3 py-1.5 label-uppercase-sm text-on-ink">
                     Featured
                   </span>
                 )}
                 {/* Still the plate: the human-facing identifier, just not the URL. */}
-                <span className="border border-line px-3 py-1.5 font-mono text-[0.7rem] font-bold uppercase tracking-[1.5px] text-muted">
+                <span className="border border-line px-3 py-1.5 label-uppercase-sm font-mono text-muted">
                   {vehicle.registration}
                 </span>
               </div>
 
-              <h1 className="display-lg mt-6 text-ink">
+              <h1 className="display-md mt-6 text-ink">
                 {vehicleTitle(vehicle)}
               </h1>
 
@@ -256,8 +256,8 @@ export default async function VehiclePage({ params }: PageProps) {
               <dl className="mt-12 grid grid-cols-1 gap-px border border-line-soft bg-line-soft sm:grid-cols-2 lg:grid-cols-4">
                 {specs.map((spec) => (
                   <div key={spec.label} className="spec-cell px-6 py-6">
-                    <dt className="display-sm text-ink">{spec.value}</dt>
-                    <dd className="label-uppercase mt-3 text-faint">
+                    <dt className="title-lg text-ink">{spec.value}</dt>
+                    <dd className="label-uppercase-sm mt-3 text-faint">
                       {spec.label}
                     </dd>
                   </div>

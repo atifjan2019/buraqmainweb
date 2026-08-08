@@ -98,7 +98,7 @@ export default function AboutPage() {
                 <dl className="mt-8 border-t border-line-soft text-sm">
                   {contact.addressLines.length > 0 && (
                     <div className="border-b border-line-soft py-4">
-                      <dt className="label-uppercase text-faint">Address</dt>
+                      <dt className="label-uppercase-sm text-faint">Address</dt>
                       <dd className="mt-2">
                         <address className="not-italic font-light leading-relaxed text-muted">
                           {contact.addressLines.map((line) => (
@@ -111,7 +111,7 @@ export default function AboutPage() {
                     </div>
                   )}
                   <div className="border-b border-line-soft py-4">
-                    <dt className="label-uppercase text-faint">Opening hours</dt>
+                    <dt className="label-uppercase-sm text-faint">Opening hours</dt>
                     <dd className="mt-2 font-light leading-relaxed text-muted">
                       {contact.openingHours}
                     </dd>

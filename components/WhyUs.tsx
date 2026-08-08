@@ -42,7 +42,7 @@ export default function WhyUs() {
             {stats.map((s) => (
               <div key={s.label} className="spec-cell px-6 py-10 text-center">
                 <dt className="display-md text-ink">{s.value}</dt>
-                <dd className="label-uppercase mt-3 text-faint">{s.label}</dd>
+                <dd className="label-uppercase-sm mt-3 text-faint">{s.label}</dd>
               </div>
             ))}
           </dl>

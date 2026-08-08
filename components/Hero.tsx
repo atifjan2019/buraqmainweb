@@ -126,7 +126,7 @@ export default async function Hero() {
               {heroStats.map((s) => (
                 <div key={s.label} className="spec-cell px-5 py-6">
                   <dt className="display-sm text-ink">{s.value}</dt>
-                  <dd className="mt-2 text-[0.7rem] font-bold uppercase leading-tight tracking-[1.5px] text-faint">
+                  <dd className="mt-2 label-uppercase-sm text-faint">
                     {s.label}
                   </dd>
                 </div>

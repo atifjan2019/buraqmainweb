@@ -53,7 +53,7 @@ export default function Pagination({
      else in the system. The doc's radius rule is binary: 0 by default, and
      `full` only on circular icon controls, which these are not. */
   const stepClass =
-    "inline-flex h-11 items-center gap-2 border border-line px-5 text-xs font-bold uppercase tracking-[1.5px] text-muted transition-colors hover:border-ink hover:text-ink";
+    "inline-flex h-11 items-center gap-2 border border-line px-5 label-uppercase-sm text-muted transition-colors hover:border-ink hover:text-ink";
 
   return (
     <nav

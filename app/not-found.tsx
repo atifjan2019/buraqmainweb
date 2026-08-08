@@ -65,7 +65,7 @@ export default async function NotFound() {
                 make while someone is trying to find a car. */}
             <span
               aria-hidden
-              className="pointer-events-none absolute -top-8 left-1/2 -z-10 -translate-x-1/2 select-none text-[clamp(9rem,34vw,17rem)] font-bold leading-none tracking-[-0.5px] text-(--ghost-numeral)"
+              className="pointer-events-none absolute -top-8 left-1/2 -z-10 -translate-x-1/2 select-none text-[clamp(9rem,34vw,17rem)] font-bold leading-none tracking-[-0.03125rem] text-(--ghost-numeral)"
             >
               404
             </span>

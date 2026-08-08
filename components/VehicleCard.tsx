@@ -78,12 +78,12 @@ export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
             scrim under them now, so each has to carry its own contrast. */}
         <div className="absolute left-0 top-0 flex flex-wrap">
           {reserved && (
-            <span className="border border-ink bg-canvas px-3 py-1.5 text-[0.7rem] font-bold uppercase tracking-[1.5px] text-ink">
+            <span className="border border-ink bg-canvas px-3 py-1.5 label-uppercase-sm text-ink">
               Reserved
             </span>
           )}
           {vehicle.isFeatured && (
-            <span className="bg-ink px-3 py-1.5 text-[0.7rem] font-bold uppercase tracking-[1.5px] text-on-ink">
+            <span className="bg-ink px-3 py-1.5 label-uppercase-sm text-on-ink">
               Featured
             </span>
           )}
@@ -92,7 +92,7 @@ export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
         {/* Without a plate this is an empty chip floating on the photo, which
             looks like a rendering fault rather than a gap. */}
         {vehicle.registration?.trim() && (
-          <span className="absolute right-0 top-0 bg-canvas px-2.5 py-1.5 font-mono text-[0.65rem] font-bold uppercase tracking-[1.5px] text-muted">
+          <span className="absolute right-0 top-0 bg-canvas px-2.5 py-1.5 label-uppercase-sm font-mono text-muted">
             {vehicle.registration}
           </span>
         )}

@@ -56,8 +56,8 @@ export default function ThemeToggle({
       title="Switch theme"
       className={`grid h-11 w-11 shrink-0 place-items-center border border-line text-muted transition-colors hover:border-ink hover:text-ink ${className}`}
     >
-      <Sun className="theme-icon-sun h-[18px] w-[18px]" />
-      <Moon className="theme-icon-moon h-[18px] w-[18px]" />
+      <Sun className="theme-icon-sun h-[1.125rem] w-[1.125rem]" />
+      <Moon className="theme-icon-moon h-[1.125rem] w-[1.125rem]" />
     </button>
   );
 }

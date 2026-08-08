@@ -33,10 +33,10 @@ export default function Logo({ className = "" }: { className?: string }) {
       <span aria-hidden className="m-stripe-y h-9 w-1 shrink-0" />
 
       <span className="flex flex-col leading-none">
-        <span className="font-display text-base font-bold uppercase tracking-[-0.25px] text-ink">
+        <span className="font-display text-base font-bold uppercase tracking-[-0.015625rem] text-ink">
           Burraq
         </span>
-        <span className="mt-1 text-[0.62rem] font-bold uppercase tracking-[1.5px] text-muted">
+        <span className="mt-1 label-uppercase-sm text-muted">
           Motors
         </span>
       </span>

@@ -67,7 +67,7 @@ export default async function ThankYouPage() {
 
         {receipt?.reference && (
           <div className="spec-cell mx-auto mt-10 inline-flex flex-col items-center border border-line-soft px-10 py-6">
-            <span className="label-uppercase text-faint">Your reference</span>
+            <span className="label-uppercase-sm text-faint">Your reference</span>
             <span className="display-sm mt-3 text-ink">
               {receipt.reference}
             </span>

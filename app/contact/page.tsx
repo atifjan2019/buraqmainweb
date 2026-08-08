@@ -61,7 +61,7 @@ export default function ContactPage() {
                     href={`tel:${contact.phoneHref}`}
                     className="group block border-b border-line py-6 transition-colors hover:bg-surface"
                   >
-                    <span className="label-uppercase block text-faint">
+                    <span className="label-uppercase-sm block text-faint">
                       Call the showroom
                     </span>
                     <span className="title-md mt-2 block break-words text-ink">
@@ -82,7 +82,7 @@ export default function ContactPage() {
                     rel="noopener noreferrer"
                     className="group block border-b border-line py-6 transition-colors hover:bg-surface"
                   >
-                    <span className="label-uppercase block text-faint">
+                    <span className="label-uppercase-sm block text-faint">
                       WhatsApp us
                     </span>
                     <span className="title-md mt-2 block break-words text-ink">
@@ -101,7 +101,7 @@ export default function ContactPage() {
                     href={`mailto:${contact.email}`}
                     className="group block border-b border-line py-6 transition-colors hover:bg-surface"
                   >
-                    <span className="label-uppercase block text-faint">
+                    <span className="label-uppercase-sm block text-faint">
                       Email us
                     </span>
                     {/* Long addresses must wrap rather than widen the column
@@ -118,7 +118,7 @@ export default function ContactPage() {
 
               <Reveal delay={240}>
                 <div className="border-b border-line py-6">
-                  <h2 className="label-uppercase text-faint">Visit us</h2>
+                  <h2 className="label-uppercase-sm text-faint">Visit us</h2>
                   {contact.addressLines.length > 0 && (
                     <address className="mt-2 not-italic font-light leading-relaxed text-ink">
                       {contact.addressLines.map((line) => (

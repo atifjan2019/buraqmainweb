@@ -32,15 +32,15 @@ export default function VehiclePlaceholder({
     >
       <span aria-hidden className="m-stripe h-1 w-12" />
       <p
-        className={`px-4 text-center font-bold uppercase tracking-[1.5px] text-ink ${
-          feature ? "text-base" : "text-xs"
+        className={`px-4 text-center text-ink ${
+          feature ? "label-uppercase" : "label-uppercase-sm"
         }`}
       >
         {make} {model}
       </p>
       <p
-        className={`px-4 text-center font-light text-faint ${
-          feature ? "text-xs" : "text-[0.65rem]"
+        className={`caption px-4 text-center font-light text-faint ${
+          feature ? "" : "opacity-80"
         }`}
       >
         Photographs coming soon

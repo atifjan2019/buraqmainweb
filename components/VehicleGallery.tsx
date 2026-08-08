@@ -122,7 +122,7 @@ export default function VehicleGallery({
         />
         {/* Solid, not translucent: the system has no backdrop blur, so a
             chip over photography has to carry its own ground. */}
-        <span className="pointer-events-none absolute bottom-3 right-3 bg-canvas px-3 py-2 text-[0.7rem] font-bold uppercase tracking-[1.5px] text-ink opacity-0 transition-opacity group-hover:opacity-100">
+        <span className="pointer-events-none absolute bottom-3 right-3 bg-canvas px-3 py-2 label-uppercase-sm text-ink opacity-0 transition-opacity group-hover:opacity-100">
           Click to enlarge
         </span>
       </button>
@@ -225,7 +225,7 @@ export default function VehicleGallery({
           />
 
           {count > 1 && (
-            <p className="absolute bottom-5 bg-canvas px-3 py-2 text-[0.7rem] font-bold uppercase tracking-[1.5px] text-muted">
+            <p className="absolute bottom-5 bg-canvas px-3 py-2 label-uppercase-sm text-muted">
               {active + 1} / {count}
             </p>
           )}
