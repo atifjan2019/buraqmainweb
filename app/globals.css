@@ -835,24 +835,39 @@ html:not([data-js]) .js-only {
    The element only needs its UA chrome stripped — the panel inside
    carries the system's own surface.
 ================================================================== */
-dialog {
-  max-width: 100vw;
-  max-height: 100dvh;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  overflow: visible;
-}
+@layer base {
+  dialog {
+    margin: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    /*
+      Lifts the UA's own cap — a modal dialog defaults to
+      max-width/max-height: calc(100% - 6px - 2em) — so the element's own
+      classes decide how big it is.
 
-/*
-  Dark in both themes. A scrim's job is to drop the page behind it, and on
-  the white surface a light scrim would leave the form floating on
-  near-identical ground with nothing separating them — this system has no
-  shadow to do that job instead.
-*/
-dialog::backdrop {
-  background-color: rgb(0 0 0 / 0.72);
+      This block MUST stay inside @layer base. Unlayered CSS outranks every
+      @layer rule regardless of source order, so the same declarations written
+      at the top level silently beat the responsive Tailwind utilities on the
+      element and pin the dialog to one size at every breakpoint.
+    */
+    max-width: none;
+    max-height: none;
+    /* The panel inside owns its own scrolling, so nothing should spill —
+       and `visible` keeps a focus ring's 3px offset from being clipped. */
+    overflow: visible;
+  }
+
+  /*
+    Dark in both themes. A scrim's job is to drop the page behind it, and on
+    the white surface a light scrim would leave the form floating on
+    near-identical ground with nothing separating them — this system has no
+    shadow to do that job instead.
+  */
+  dialog::backdrop {
+    background-color: rgb(0 0 0 / 0.72);
+  }
 }
 
 /* ==================================================================

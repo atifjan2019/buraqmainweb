@@ -80,11 +80,26 @@ export default function EnquiryDialog({
           if (event.target === dialogRef.current) dialogRef.current?.close();
         }}
         aria-label="Enquire about this car"
+        /*
+          A full-height sheet on a phone, a centred panel from `sm` up.
+
+          A centred box is the wrong shape on a small screen: it leaves
+          slivers of dimmed page down each side and squeezes a six-field form
+          into what's left of an already short viewport, so the visitor
+          scrolls a tiny window inside a tiny window. Filling the screen gives
+          the form the whole height and removes the nested scroll.
+
+          `dvh` rather than `vh` throughout — on mobile the URL bar collapses
+          as you scroll, and `vh` measures the *largest* viewport, so a
+          100vh sheet is taller than the screen and pushes its own submit
+          button underneath the browser chrome.
+        */
+        className="h-[100dvh] w-screen bg-canvas sm:h-auto sm:max-h-[calc(100dvh-3rem)] sm:w-[min(34rem,calc(100vw-3rem))] sm:bg-transparent"
       >
-        <div className="flex max-h-[90dvh] w-[min(34rem,92vw)] flex-col">
-          {/* Outside the scroll container, so it stays reachable on a phone
-              where the form is taller than the viewport. */}
-          <div className="flex shrink-0 justify-end pb-3">
+        <div className="flex h-full flex-col sm:h-auto sm:max-h-[inherit]">
+          {/* Outside the scroll container, so it stays reachable when the form
+              is taller than the viewport. */}
+          <div className="flex shrink-0 justify-end p-4 sm:p-0 sm:pb-3">
             <button
               type="button"
               onClick={() => dialogRef.current?.close()}
@@ -95,7 +110,10 @@ export default function EnquiryDialog({
             </button>
           </div>
 
-          <div className="min-h-0 flex-1 overflow-y-auto">
+          {/* The bottom inset keeps the submit button clear of the home
+              indicator on a notched phone, where the sheet runs to the very
+              edge of the screen. */}
+          <div className="min-h-0 flex-1 overflow-y-auto pb-[env(safe-area-inset-bottom)] sm:pb-0">
             <EnquiryForm
               registration={registration}
               vehicleHeadline={vehicleHeadline}
