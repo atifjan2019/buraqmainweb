@@ -11,6 +11,14 @@
 
 import "server-only";
 
+import { toPost, toPostSummary } from "./posts";
+import type {
+  Post,
+  PostPage,
+  PostSummary,
+  RawPost,
+  RawPostSummary,
+} from "./posts";
 import { toReviewsPayload } from "./reviews";
 import type { RawReviewsResponse, ReviewsPayload } from "./reviews";
 import { priceLadder } from "./vehicles";
@@ -52,6 +60,17 @@ const REVIEWS_REVALIDATE_SECONDS = 900;
  * without dropping the other.
  */
 export const REVIEWS_CACHE_TAG = "crm-reviews";
+
+/**
+ * A blog changes at the pace of someone sitting down to write, which is far
+ * slower than stock turns over. Five minutes still makes a freshly published
+ * article visible while the author is still looking at the tab, and leaves the
+ * CRM's 120/min read budget effectively untouched.
+ */
+const POSTS_REVALIDATE_SECONDS = 300;
+
+/** Cache tag for post reads, separate from stock and reviews. */
+export const POSTS_CACHE_TAG = "crm-posts";
 
 /** Thrown when the CRM answers with a non-2xx status, or can't be reached. */
 export class CrmError extends Error {
@@ -563,6 +582,106 @@ export async function getReviews(limit = 6): Promise<ReviewsPayload | null> {
   } catch (error) {
     console.error("[crm] reviews unavailable", error);
     return null;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Blog posts (no API key required)                                  */
+/* ---------------------------------------------------------------- */
+
+const POSTS_CACHE: ReadCache = {
+  revalidate: POSTS_REVALIDATE_SECONDS,
+  tags: [POSTS_CACHE_TAG],
+};
+
+/** Matches the CRM endpoint's own default. Three rows of three. */
+export const DEFAULT_POSTS_PER_PAGE = 9;
+
+export interface PostQuery {
+  page?: number;
+  /** Clamped to the API's supported 1–50. */
+  perPage?: number;
+}
+
+/**
+ * A page of published articles, newest first.
+ *
+ * There is no status parameter, here or upstream: the endpoint returns
+ * published posts and nothing else, so there is no string this site could send
+ * that would reach a draft or a post scheduled for a future date.
+ *
+ * @throws {CrmError} if the CRM is unreachable or errors.
+ */
+export async function getPosts(query: PostQuery = {}): Promise<PostPage> {
+  const search = new URLSearchParams({
+    per_page: String(clamp(query.perPage ?? DEFAULT_POSTS_PER_PAGE, 1, 50)),
+    page: String(Math.max(1, query.page ?? 1)),
+  });
+
+  const payload = await readJson<RawPaginator<RawPostSummary>>(
+    "/posts",
+    search,
+    POSTS_CACHE,
+  );
+
+  const posts = (payload.data ?? [])
+    .map(toPostSummary)
+    .filter((post): post is PostSummary => post !== null);
+
+  const meta = payload.meta ?? {};
+
+  return {
+    posts,
+    meta: {
+      currentPage: meta.current_page ?? 1,
+      lastPage: meta.last_page ?? 1,
+      perPage: meta.per_page ?? posts.length,
+      total: meta.total ?? posts.length,
+    },
+  };
+}
+
+/**
+ * One article by slug.
+ *
+ * Returns null for 404 — which is what a draft, a scheduled post, a deleted
+ * one and a slug that never existed all look like from here. The API makes
+ * them deliberately indistinguishable, and so does this: the page turns any of
+ * them into a real 404, never into an empty shell. Other errors still throw,
+ * so "the CRM is down" stays distinguishable from "there is no such article".
+ *
+ * `encodeURIComponent` is what keeps a crafted path segment (`../`, an embedded
+ * `?`) from escaping into a different upstream endpoint — the `getVehicle` rule.
+ */
+export async function getPost(slug: string): Promise<Post | null> {
+  try {
+    const payload = await readJson<{ data: RawPost }>(
+      `/posts/${encodeURIComponent(slug)}`,
+      undefined,
+      POSTS_CACHE,
+    );
+    return toPost(payload.data);
+  } catch (error) {
+    if (error instanceof CrmError && error.status === 404) return null;
+    throw error;
+  }
+}
+
+/**
+ * The newest few articles, for the homepage band.
+ *
+ * Degrades to an empty list rather than throwing — the same contract
+ * `getFeaturedVehicles` has, and the input `RecentPosts` needs to return null
+ * and disappear. A CRM outage, or a CRM too old to have the endpoint at all
+ * (404), costs the homepage one section rather than the whole page.
+ */
+export async function getRecentPosts(limit = 3): Promise<PostSummary[]> {
+  try {
+    const { posts } = await getPosts({ perPage: limit });
+    return posts;
+  } catch (error) {
+    console.error("[crm] recent posts unavailable", error);
+    return [];
   }
 }
 

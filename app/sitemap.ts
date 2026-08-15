@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
-import { getVehicles } from "@/lib/crm";
+import { getPosts, getVehicles } from "@/lib/crm";
+import { postHref } from "@/lib/posts";
 import { site } from "@/lib/site";
 import { vehicleHref } from "@/lib/vehicles";
 
@@ -11,9 +12,16 @@ import { vehicleHref } from "@/lib/vehicles";
  * the listing. Those URLs turn over as cars sell, which is exactly what a
  * sitemap is for.
  *
+ * Articles are included for the same reason: a blog post is a page people find
+ * by searching for the question it answers, and it is a URL that appears
+ * without a deploy. Drafts and scheduled posts cannot appear here, because the
+ * endpoint that feeds this cannot return them.
+ *
  * A CRM outage must not take the sitemap down with it: the static routes are
  * the part search engines rely on most, so a failed stock read degrades to
- * those rather than throwing and returning a 500 to the crawler.
+ * those rather than throwing and returning a 500 to the crawler. The two CRM
+ * reads get a try/catch each, so a blog failure cannot cost the sitemap its car
+ * URLs and vice versa.
  */
 
 const STATIC_ROUTES: Array<{
@@ -23,6 +31,7 @@ const STATIC_ROUTES: Array<{
 }> = [
   { path: "/", changeFrequency: "daily", priority: 1 },
   { path: "/cars", changeFrequency: "daily", priority: 0.9 },
+  { path: "/blog", changeFrequency: "weekly", priority: 0.7 },
   { path: "/finance", changeFrequency: "monthly", priority: 0.7 },
   { path: "/about", changeFrequency: "monthly", priority: 0.6 },
   { path: "/contact", changeFrequency: "monthly", priority: 0.6 },
@@ -60,5 +69,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("[sitemap] stock unavailable, listing static routes only", error);
   }
 
-  return [...staticEntries, ...vehicleEntries];
+  let postEntries: MetadataRoute.Sitemap = [];
+
+  try {
+    // 50 is the API's cap and comfortably more than a dealership blog holds.
+    const { posts } = await getPosts({ perPage: 50 });
+
+    postEntries = posts.map((post) => ({
+      url: `${site.url}${postHref(post)}`,
+      // An article's own last edit, not the time this file was rendered:
+      // `lastModified` is the one field here a crawler can actually act on, and
+      // stamping every post with "now" on every revalidation makes it noise.
+      // Falls back to the render time only when the date is unusable.
+      lastModified: postDate(post.updatedAt ?? post.publishedAt) ?? lastModified,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    }));
+  } catch (error) {
+    console.error("[sitemap] journal unavailable, omitting article URLs", error);
+  }
+
+  return [...staticEntries, ...vehicleEntries, ...postEntries];
+}
+
+/** A `YYYY-MM-DD` from the CRM as a Date, or null when it can't be read. */
+function postDate(iso: string | null): Date | null {
+  if (!iso) return null;
+  const parsed = new Date(iso);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
 }

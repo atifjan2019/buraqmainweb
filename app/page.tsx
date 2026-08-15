@@ -5,6 +5,7 @@ import FinanceSection from "@/components/FinanceSection";
 import Hero from "@/components/Hero";
 import LiveStock from "@/components/LiveStock";
 import Marquee from "@/components/Marquee";
+import RecentPosts from "@/components/RecentPosts";
 import SearchByMaker from "@/components/SearchByMaker";
 import Showcase from "@/components/Showcase";
 import Testimonials from "@/components/Testimonials";
@@ -25,6 +26,9 @@ export default function Home() {
       <Marquee />
       <WhyUs />
       <Testimonials />
+      {/* Editorial reassurance: after the social proof, before the ask. Renders
+          nothing at all when the CRM has no published articles. */}
+      <RecentPosts />
       <CtaBanner />
     </>
   );

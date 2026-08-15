@@ -144,10 +144,18 @@ export function whatsappLink(message?: string): string | null {
   return `https://wa.me/${contact.whatsapp}${text}`;
 }
 
+/**
+ * The primary navigation, rendered by both `Header` and `Footer` — which is
+ * why the blog link is added here rather than typed into the header alone. It
+ * sits after Finance and before About: the journal is something a visitor
+ * reads while deciding, so it belongs with the shopping links rather than with
+ * the company ones.
+ */
 export const nav = [
   { label: "Home", href: "/" },
   { label: "Our Cars", href: "/cars" },
   { label: "Finance", href: "/finance" },
+  { label: "Journal", href: "/blog" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ] as const;
