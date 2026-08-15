@@ -387,6 +387,44 @@ export async function getVehicles(
 }
 
 /**
+ * The API caps a page at 50, so anything that needs the whole forecourt has to
+ * walk it. The ceiling is a guard against a paginator that never reports a last
+ * page, not an expected depth — 1,000 cars is far beyond this dealership.
+ */
+const MAX_STOCK_PAGES = 20;
+
+/**
+ * Every published car, paginator followed to its last page.
+ *
+ * Asking for a single page of 50 was right while the forecourt was smaller than
+ * that, and silently truncated the caller the moment it wasn't — the sitemap
+ * quietly dropped every car past the fiftieth. A failed page throws rather than
+ * returning a short list, because a caller cannot tell "all of them" from "the
+ * first two pages" otherwise.
+ *
+ * @throws {CrmError} if the CRM is unreachable or errors.
+ */
+export async function getAllVehicles(): Promise<Vehicle[]> {
+  const vehicles: Vehicle[] = [];
+  let page = 1;
+  let lastPage = 1;
+
+  do {
+    const payload = await readJson<RawPaginator<RawVehicle>>(
+      "/vehicles",
+      buildVehicleSearch({ perPage: 50, page }),
+    );
+
+    for (const raw of payload.data ?? []) vehicles.push(toVehicle(raw));
+
+    lastPage = payload.meta?.last_page ?? 1;
+    page += 1;
+  } while (page <= lastPage && page <= MAX_STOCK_PAGES);
+
+  return vehicles;
+}
+
+/**
  * Cars flagged as featured in the CRM, for the homepage.
  *
  * Degrades to an empty list rather than throwing: a CRM outage should cost the

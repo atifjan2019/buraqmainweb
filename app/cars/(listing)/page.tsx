@@ -9,6 +9,7 @@ import VehicleFilters, {
 } from "@/components/VehicleFilters";
 import { DEFAULT_PER_PAGE, getStockFilters, getVehicles } from "@/lib/crm";
 import { financeDisclaimer } from "@/lib/site";
+import { stockEmptyState } from "@/lib/vehicles";
 
 export const metadata: Metadata = {
   title: "Our Cars",
@@ -82,6 +83,10 @@ export default async function CarsPage({
     if (value) linkParams[key] = value;
   }
 
+  /** The same URL page one carries, filters and all. */
+  const firstPageQuery = new URLSearchParams(linkParams).toString();
+  const firstPageHref = firstPageQuery ? `/cars?${firstPageQuery}` : "/cars";
+
   return (
     /* The ambient bloom that used to sit behind this heading is gone: the
        design system adds no atmospheric backdrops, and the page floor stays
@@ -120,21 +125,7 @@ export default async function CarsPage({
         ) : stock.vehicles.length === 0 ? (
           <div className="mt-16">
             <StockNotice
-              title={
-                hasActiveFilters
-                  ? "Nothing matches that combination"
-                  : "New stock is on its way"
-              }
-              body={
-                hasActiveFilters
-                  ? "Try widening your search, or clear the filters to see everything we have in right now."
-                  : "Our next vehicles are being prepared and checked. Get in touch and we'll let you know the moment they land."
-              }
-              action={
-                hasActiveFilters
-                  ? { label: "Clear filters", href: "/cars" }
-                  : undefined
-              }
+              {...stockEmptyState(stock.meta, hasActiveFilters, firstPageHref)}
             />
           </div>
         ) : (

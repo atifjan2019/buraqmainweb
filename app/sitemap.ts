@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getPosts, getVehicles } from "@/lib/crm";
+import { getAllVehicles, getPosts } from "@/lib/crm";
 import { postHref } from "@/lib/posts";
 import { site } from "@/lib/site";
 import { vehicleHref } from "@/lib/vehicles";
@@ -55,9 +55,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let vehicleEntries: MetadataRoute.Sitemap = [];
 
   try {
-    // The API caps per_page at 50; one page is comfortably more than the
-    // forecourt holds, and over-fetching a sitemap helps nobody.
-    const { vehicles } = await getVehicles({ perPage: 50 });
+    // The API caps per_page at 50, and the forecourt has outgrown that, so the
+    // paginator is walked — one page would drop every car past the fiftieth
+    // from the sitemap without any sign that it had.
+    const vehicles = await getAllVehicles();
 
     vehicleEntries = vehicles.map((vehicle) => ({
       url: `${site.url}${vehicleHref(vehicle)}`,

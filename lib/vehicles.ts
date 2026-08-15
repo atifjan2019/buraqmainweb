@@ -312,6 +312,60 @@ export function vehicleHref(vehicle: Vehicle): string {
 }
 
 /* ---------------------------------------------------------------- */
+/* Empty states                                                      */
+/* ---------------------------------------------------------------- */
+
+/** The copy a dead-end stock list shows, and the way back out of it. */
+export interface StockEmptyState {
+  title: string;
+  body: string;
+  action?: { label: string; href: string };
+}
+
+/**
+ * Which dead end an empty list actually is.
+ *
+ * Three different things produce no cards, and they need three different
+ * sentences. The one that used to be wrong is the first: `?page=99` on a
+ * forecourt that has cars came back empty and was read as "no stock", so a
+ * visitor who over-clicked was told new stock was on its way while thirteen
+ * cars sat one page behind them. The paginator still reports the real total on
+ * an out-of-range page, which is what separates the cases.
+ *
+ * `firstPageHref` carries the current filters, so recovering from a bad page
+ * number does not silently drop the search as well.
+ */
+export function stockEmptyState(
+  meta: PageMeta,
+  hasActiveFilters: boolean,
+  firstPageHref: string,
+): StockEmptyState {
+  if (meta.total > 0) {
+    return {
+      title: "That page doesn't exist",
+      body:
+        meta.total === 1
+          ? "There's one car in this search, and it's on the first page."
+          : `There are ${meta.total} cars in this search, but not that many pages of them.`,
+      action: { label: "Back to the first page", href: firstPageHref },
+    };
+  }
+
+  if (hasActiveFilters) {
+    return {
+      title: "Nothing matches that combination",
+      body: "Try widening your search, or clear the filters to see everything we have in right now.",
+      action: { label: "Clear filters", href: "/cars" },
+    };
+  }
+
+  return {
+    title: "New stock is on its way",
+    body: "Our next vehicles are being prepared and checked. Get in touch and we'll let you know the moment they land.",
+  };
+}
+
+/* ---------------------------------------------------------------- */
 /* Formatting helpers                                               */
 /* ---------------------------------------------------------------- */
 
