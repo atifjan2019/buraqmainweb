@@ -76,7 +76,7 @@ export default async function SearchByMaker() {
                            transition-colors duration-200 hover:bg-ink
                            focus-visible:bg-ink focus-visible:outline-none sm:p-7"
               >
-                <span className="display-xs text-ink transition-colors group-hover:text-on-ink group-focus-visible:text-on-ink">
+                <span className="display-sm text-ink transition-colors group-hover:text-on-ink group-focus-visible:text-on-ink">
                   {make}
                 </span>
 
