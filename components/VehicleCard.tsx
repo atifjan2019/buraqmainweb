@@ -83,10 +83,10 @@ export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
             is only a fact. That ordering is what stops a third chip shouting
             over the first two.
 
-            The stack is width-capped: the plate badge is pinned to the top-right
-            of this same photograph, and an uncapped row would slide underneath
-            it as soon as a third chip appears on a narrow card. */}
-        <div className="absolute left-0 top-0 flex max-w-[calc(100%-6rem)] flex-wrap">
+            The row runs the full width of the photograph. It used to be capped
+            to leave room for a plate badge pinned top-right; that badge is gone,
+            so the cap went with it. */}
+        <div className="absolute left-0 top-0 flex flex-wrap">
           {reserved && (
             <span className="border border-ink bg-canvas px-3 py-1.5 label-uppercase-sm text-ink">
               Reserved
@@ -107,13 +107,11 @@ export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
           )}
         </div>
 
-        {/* Without a plate this is an empty chip floating on the photo, which
-            looks like a rendering fault rather than a gap. */}
-        {vehicle.registration?.trim() && (
-          <span className="absolute right-0 top-0 bg-canvas px-2.5 py-1.5 label-uppercase-sm font-mono text-muted">
-            {vehicle.registration}
-          </span>
-        )}
+        {/* The plate badge lived here. It is off the card deliberately: the
+            registration is an administrative identifier, not something a buyer
+            shops by, and on an import forecourt many cars carry a temporary or
+            not-yet-issued plate. It still appears on the vehicle's own page,
+            where it belongs — in the spec table with the rest of the detail. */}
       </div>
 
       {/* Body */}
