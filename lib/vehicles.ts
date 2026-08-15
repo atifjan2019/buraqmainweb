@@ -53,6 +53,30 @@ export interface BranchOption extends VehicleBranch {
   count: number;
 }
 
+/**
+ * A marque in live stock, with the brand logo the CRM holds for it.
+ *
+ * `name` is the exact `vehicles.make` string and the ONLY value that may be put
+ * in a `?make=` link — `displayName` is a prettier spelling for print and must
+ * never be used as a filter value. Both logo URLs are null until the dealership
+ * uploads artwork, which is the ordinary state, not an error.
+ *
+ * The logos are absolute URLs on the CRM's own storage, served directly and
+ * never proxied — the same contract `VehicleImage` carries, so a logo replaced
+ * in the CRM changes here on the next revalidation rather than being pinned to
+ * a stale cached copy.
+ */
+export interface MakerOption {
+  name: string;
+  slug: string;
+  displayName: string;
+  /** Mark for light grounds. Null until uploaded. */
+  logoUrl: string | null;
+  /** Mark for dark grounds. Null falls back to `logoUrl` — see SearchByMaker. */
+  logoDarkUrl: string | null;
+  count: number;
+}
+
 export interface Vehicle {
   /**
    * Canonical SEO slug, owned by the CRM — e.g.
@@ -117,6 +141,16 @@ export interface VehiclePage {
  */
 export interface StockFilters {
   makes: string[];
+  /**
+   * The same marques as `makes`, with logos and live counts. Empty when the CRM
+   * predates the makers feature; `makes` is the fallback and stays authoritative
+   * for the filter dropdowns, which take strings and have nowhere to put a logo.
+   *
+   * Not index-parallel with `makes` — the two arrays are ordered differently
+   * (the CRM sorts these by the dealership's own display order first), so they
+   * are joined by `name`, never by position.
+   */
+  makers: MakerOption[];
   /** Only branches that are active AND have stock behind them. */
   branches: BranchOption[];
   fuelTypes: FuelType[];

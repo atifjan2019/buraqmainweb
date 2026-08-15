@@ -360,6 +360,19 @@ export async function getStockFilters(): Promise<StockFilters> {
   const payload = await readJson<{
     data: {
       makes?: string[];
+      /**
+       * The marques again, carrying the logos the CRM's Makers page holds.
+       * Optional on the wire on purpose: `makes` is the frozen compatibility
+       * surface, and a CRM that predates the makers feature simply omits this.
+       */
+      makers?: {
+        name?: string;
+        slug?: string;
+        display_name?: string;
+        logo_url?: string | null;
+        logo_dark_url?: string | null;
+        count?: number;
+      }[];
       branches?: {
         name?: string;
         slug?: string;
@@ -386,6 +399,21 @@ export async function getStockFilters(): Promise<StockFilters> {
 
   return {
     makes: data.makes ?? [],
+    // Same defensive shape as `branches` below: every field is untrusted, and a
+    // marque with no name can neither be printed nor linked to, so it is dropped
+    // rather than rendered as a dead tile. `|| null` rather than `?? null` on the
+    // logos, so an empty-string URL becomes null instead of an `<img src="">`
+    // that re-requests the current page.
+    makers: (data.makers ?? [])
+      .map((maker) => ({
+        name: maker.name?.trim() ?? "",
+        slug: maker.slug?.trim() ?? "",
+        displayName: maker.display_name?.trim() || maker.name?.trim() || "",
+        logoUrl: maker.logo_url?.trim() || null,
+        logoDarkUrl: maker.logo_dark_url?.trim() || null,
+        count: Number.isFinite(maker.count) ? Number(maker.count) : 0,
+      }))
+      .filter((maker) => maker.name),
     // A branch with no name or no slug can neither be printed nor linked to,
     // so it is dropped rather than offered as a dead option.
     branches: (data.branches ?? [])
