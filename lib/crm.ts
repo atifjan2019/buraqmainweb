@@ -18,6 +18,8 @@ import type {
   Transmission,
   Vehicle,
   VehicleBranch,
+  VehicleDocument,
+  VehicleDocumentFormat,
   VehicleImage,
   VehiclePage,
   VehicleStatus,
@@ -60,6 +62,16 @@ interface RawImage {
   alt?: string | null;
 }
 
+/** One published document as the API sends it. Every field is untrusted. */
+interface RawDocument {
+  kind?: string | null;
+  label?: string | null;
+  format?: string | null;
+  thumb?: string | null;
+  url?: string | null;
+  byte_size?: number | null;
+}
+
 /** A vehicle exactly as the API sends it, before camel-casing. */
 interface RawVehicle {
   slug: string;
@@ -79,6 +91,12 @@ interface RawVehicle {
   service_due: string | null;
   featured_image?: RawImage | null;
   images?: RawImage[] | null;
+  /**
+   * Public paperwork. Sent by the detail endpoint only — the listing endpoint
+   * omits the key entirely, which is why this is optional rather than an array
+   * the site can assume is there.
+   */
+  documents?: RawDocument[] | null;
   branch?: {
     name?: string | null;
     slug?: string | null;
@@ -120,6 +138,44 @@ function toBranch(raw: RawVehicle["branch"]): VehicleBranch | null {
   };
 }
 
+/**
+ * Rejects a document that can neither be opened nor titled, so a half-populated
+ * row is dropped rather than rendered as an unlabelled dead link on the one
+ * section of the page whose whole purpose is being credible.
+ *
+ * `format` is narrowed to "pdf" only on an exact match and defaults to "image"
+ * for everything else, including a value this build has never heard of. A CRM
+ * that grows a third format must degrade to a picture — which either renders or
+ * shows nothing — rather than to a download affordance claiming to be a PDF.
+ *
+ * An image with no thumbnail falls back to the full document. That pulls a
+ * 2400px JPEG into a ~400px box, which is wasteful, but a legible sheet at the
+ * wrong size beats no evidence at all. It should never happen: the CRM writes a
+ * thumbnail for every image it stores.
+ */
+function toDocument(raw: RawDocument | null | undefined): VehicleDocument | null {
+  const url = raw?.url?.trim();
+  const label = raw?.label?.trim();
+
+  if (!url || !label) return null;
+
+  const format: VehicleDocumentFormat = raw?.format === "pdf" ? "pdf" : "image";
+  const size = Number(raw?.byte_size);
+
+  return {
+    kind: raw?.kind?.trim() ?? "",
+    label,
+    format,
+    // A PDF's thumbnail is null by contract and must not fall back to `url` —
+    // that would put the PDF's own bytes in an <img>, which is the broken grey
+    // box the PDF affordance exists to avoid.
+    thumb: format === "pdf" ? null : raw?.thumb?.trim() || url,
+    url,
+    // A zero simply suppresses the size caption; it never prints "0 KB".
+    byteSize: Number.isFinite(size) && size > 0 ? size : 0,
+  };
+}
+
 interface RawPaginator<T> {
   data: T[];
   meta?: {
@@ -146,9 +202,17 @@ function toVehicle(raw: RawVehicle): Vehicle {
   // gallery keeps a car with photos visible even if that field is ever absent.
   const featuredImage = toImage(raw.featured_image, fallbackAlt) ?? images[0] ?? null;
 
+  // Kept in the CRM's order — original sheet, then translation. The site never
+  // re-sorts: the dealership decides which document leads, and a second
+  // ordering rule here would drift from the one the CRM enforces.
+  const documents = (raw.documents ?? [])
+    .map(toDocument)
+    .filter((document): document is VehicleDocument => document !== null);
+
   return {
     featuredImage,
     images,
+    documents,
     slug: raw.slug,
     registration: raw.registration,
     make: raw.make,

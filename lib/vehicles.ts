@@ -38,6 +38,51 @@ export interface VehicleImage {
 }
 
 /**
+ * How a stored document can be shown.
+ *
+ * `image` — a re-encoded JPEG, so a thumbnail exists and the sheet can be
+ * pictured. `pdf` — stored exactly as the dealership supplied it, and it can
+ * never carry a thumbnail: rasterising a PDF needs Ghostscript or Imagick's PDF
+ * delegate, neither of which exists on the CRM's host. A null `thumb` on a PDF
+ * is therefore a permanent fact about the format, not a job that failed.
+ *
+ * A closed two-value union on purpose. It is the only thing the UI branches on,
+ * and a closed vocabulary is what stops that branch drifting as the CRM's
+ * document list grows.
+ */
+export type VehicleDocumentFormat = "image" | "pdf";
+
+/**
+ * One piece of paperwork the dealership has published for a car — today the
+ * Japanese auction sheet and its English translation.
+ *
+ * Only documents the CRM has explicitly marked public ever reach this site; the
+ * API's relation filters on that flag, so a private de-registration paper
+ * cannot arrive here by omission.
+ *
+ * Both URLs point at the CRM's own serving routes and are used directly, never
+ * proxied or re-hosted — the same contract `VehicleImage` carries, so replacing
+ * a sheet in the CRM changes it here on the next revalidation.
+ */
+export interface VehicleDocument {
+  /**
+   * The CRM's machine key, e.g. "auction_sheet_original". An open string, not a
+   * union: the CRM's list of kinds grows by a line in a PHP array with no site
+   * deploy, so an unrecognised kind must render generically rather than vanish.
+   */
+  kind: string;
+  /** The CRM's own label, printed verbatim. Renaming a kind is a CRM-only change. */
+  label: string;
+  format: VehicleDocumentFormat;
+  /** Null for every PDF — see `VehicleDocumentFormat`. */
+  thumb: string | null;
+  /** Full-size document. Images open inline; PDFs download. */
+  url: string;
+  /** Bytes actually served, so the size can be printed beside the link. 0 = unknown. */
+  byteSize: number;
+}
+
+/**
  * The showroom a car is at. Public showroom identity only — the CRM also holds
  * the branch's address, phone and opening hours, and the API deliberately does
  * not send them here because nothing on this site renders them.
@@ -120,6 +165,15 @@ export interface Vehicle {
   featuredImage: VehicleImage | null;
   /** Full gallery in CRM order, featured first. Empty until photographed. */
   images: VehicleImage[];
+  /**
+   * Published paperwork in the CRM's own order — original sheet first, then the
+   * translation. Always an array: the listing endpoint omits the key entirely
+   * (no card renders paperwork, so loading it would cost a query per page for
+   * nothing), and only the detail endpoint sends it. Consumers must therefore
+   * treat an absent key as `[]` rather than as an error, which is what
+   * `toDocument` in lib/crm.ts guarantees.
+   */
+  documents: VehicleDocument[];
 }
 
 /** The subset of Laravel's paginator `meta` block the UI actually uses. */
@@ -288,6 +342,30 @@ export function formatMileage(value: number): string {
  */
 export function formatMileageValue(value: number): string {
   return miles.format(value);
+}
+
+/**
+ * "471 KB", "1.1 MB" — the weight of a document, for the caption beside a link
+ * that downloads it.
+ *
+ * Binary units, matching what the visitor's own operating system will report
+ * once the file is saved: a sheet listed here as 1.1 MB and shown as 1.2 MB in
+ * their downloads folder reads as a discrepancy on a page whose entire job is
+ * being trustworthy about this car.
+ *
+ * Returns null rather than "0 KB" for a missing or nonsensical size, so the
+ * caller drops the segment instead of printing a number it does not have.
+ */
+export function formatFileSize(bytes: number): string | null {
+  if (!Number.isFinite(bytes) || bytes <= 0) return null;
+  if (bytes < 1024) return `${Math.round(bytes)} B`;
+
+  const kilobytes = bytes / 1024;
+  if (kilobytes < 1024) return `${Math.round(kilobytes)} KB`;
+
+  // One decimal from a megabyte up: "1.1 MB" is a size, "1.148 MB" is a
+  // measurement, and nobody choosing whether to tap a link wants the latter.
+  return `${(kilobytes / 1024).toFixed(1)} MB`;
 }
 
 /* Dates arrive as plain YYYY-MM-DD, so they're formatted in UTC — reading them

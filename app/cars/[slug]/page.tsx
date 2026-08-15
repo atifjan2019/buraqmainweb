@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
+import AuctionSheets from "@/components/AuctionSheets";
 import EnquiryDialog from "@/components/EnquiryDialog";
 import EnquiryForm from "@/components/EnquiryForm";
 import { ArrowRight, Phone } from "@/components/Icons";
@@ -277,6 +278,27 @@ export default async function VehiclePage({ params }: PageProps) {
                 ))}
               </dl>
             </Reveal>
+
+            {/*
+              The Japanese auction sheets, when the dealership has published
+              them. Directly under the spec panel and above the sales copy:
+              this is evidence, and it belongs with the facts.
+
+              Delay 110 keeps the stagger ascending down the column — 80 for
+              the spec grid, then this, then 140 for the description. The
+              reveal delay is per element, so a value out of sequence would let
+              the copy beneath fade in ahead of the evidence above it whenever
+              both enter the viewport together.
+
+              Gated here as well as inside the component: most of the forecourt
+              has no published paperwork, and an empty `Reveal` would leave a
+              stray wrapper on every one of those cars.
+            */}
+            {vehicle.documents.length > 0 && (
+              <Reveal delay={110}>
+                <AuctionSheets documents={vehicle.documents} />
+              </Reveal>
+            )}
 
             {vehicle.description && (
               <Reveal delay={140}>

@@ -176,6 +176,21 @@ export function Car(props: IconProps) {
   );
 }
 
+/**
+ * A sheet of paper with a turned corner and ruled lines — used where a document
+ * exists but cannot be pictured, so the placeholder reads as a document rather
+ * than as a photograph that failed to load.
+ */
+export function Document(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" />
+      <path d="M14 3v5h5" />
+      <path d="M9 13h6M9 17h4" />
+    </svg>
+  );
+}
+
 export function Sparkle(props: IconProps) {
   return (
     <svg {...base} {...props}>
