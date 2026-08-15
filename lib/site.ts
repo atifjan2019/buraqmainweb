@@ -229,7 +229,17 @@ export const whyUs = [
   },
 ] as const;
 
-/** Customer reviews carried across from the current site. */
+/**
+ * Customer reviews carried across from the current site.
+ *
+ * NOT dead code, and not the primary source any more. Since the CRM began
+ * caching real Google and Trustpilot reviews, `components/Testimonials.tsx`
+ * renders those — and falls back to THIS set whenever the CRM is unreachable
+ * or has no visible reviews to publish (see `pickTestimonials` in
+ * `lib/reviews.ts`). An empty testimonials band on the homepage is worse than
+ * six true-but-static quotes, so this array is the floor under that section
+ * and must not be deleted or emptied.
+ */
 export const testimonials = [
   {
     quote:

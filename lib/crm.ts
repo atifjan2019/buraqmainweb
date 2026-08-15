@@ -11,6 +11,8 @@
 
 import "server-only";
 
+import { toReviewsPayload } from "./reviews";
+import type { RawReviewsResponse, ReviewsPayload } from "./reviews";
 import { priceLadder } from "./vehicles";
 import type {
   FuelType,
@@ -37,6 +39,19 @@ const READ_REVALIDATE_SECONDS = 120;
 
 /** Cache tag for every stock read, so it can all be dropped in one call. */
 export const VEHICLES_CACHE_TAG = "crm-vehicles";
+
+/**
+ * Reviews change at the pace of customers, and the CRM refreshes its own cache
+ * hourly, so re-asking more often than a quarter of an hour cannot produce
+ * newer data — it only spends the CRM's 120/min read budget.
+ */
+const REVIEWS_REVALIDATE_SECONDS = 900;
+
+/**
+ * Cache tag for review reads, separate from stock so one can be dropped
+ * without dropping the other.
+ */
+export const REVIEWS_CACHE_TAG = "crm-reviews";
 
 /** Thrown when the CRM answers with a non-2xx status, or can't be reached. */
 export class CrmError extends Error {
@@ -236,9 +251,26 @@ function toVehicle(raw: RawVehicle): Vehicle {
 /* Reads (no API key required)                                       */
 /* ---------------------------------------------------------------- */
 
+/**
+ * How one read is cached. `cacheComponents` is not enabled in `next.config.ts`,
+ * so `next: { revalidate, tags }` on the fetch itself is the current model —
+ * confirmed against
+ * `node_modules/next/dist/docs/01-app/02-guides/caching-without-cache-components.md`.
+ */
+interface ReadCache {
+  revalidate: number;
+  tags: string[];
+}
+
+const STOCK_CACHE: ReadCache = {
+  revalidate: READ_REVALIDATE_SECONDS,
+  tags: [VEHICLES_CACHE_TAG],
+};
+
 async function readJson<T>(
   path: string,
   search?: URLSearchParams,
+  cache: ReadCache = STOCK_CACHE,
 ): Promise<T> {
   const query = search?.toString();
   const url = `${BASE_URL}${path}${query ? `?${query}` : ""}`;
@@ -248,8 +280,8 @@ async function readJson<T>(
     response = await fetch(url, {
       headers: { Accept: "application/json" },
       next: {
-        revalidate: READ_REVALIDATE_SECONDS,
-        tags: [VEHICLES_CACHE_TAG],
+        revalidate: cache.revalidate,
+        tags: cache.tags,
       },
     });
   } catch (cause) {
@@ -496,6 +528,42 @@ export async function getStockFilters(): Promise<StockFilters> {
     },
     priceSteps,
   };
+}
+
+/* ---------------------------------------------------------------- */
+/* Reviews (no API key required)                                     */
+/* ---------------------------------------------------------------- */
+
+/**
+ * Google and Trustpilot reviews, as cached and moderated by the CRM.
+ *
+ * The dealership's provider credentials live in the CRM and never leave it:
+ * the CRM calls Google and Trustpilot server-side, caches what comes back, and
+ * publishes only the reviews staff have left visible. This site reads that
+ * cache exactly as it reads stock, and has no idea a credential exists.
+ *
+ * Degrades to `null` rather than throwing — the same contract
+ * `getFeaturedVehicles` already has, and the input `pickTestimonials` needs to
+ * fall back to the hardcoded quotes. A CRM outage, a CRM too old to have the
+ * endpoint (404), or a malformed body all land here and all cost the homepage
+ * nothing but the live data.
+ */
+export async function getReviews(limit = 6): Promise<ReviewsPayload | null> {
+  const search = new URLSearchParams({
+    per_page: String(clamp(limit, 1, 50)),
+  });
+
+  try {
+    const payload = await readJson<RawReviewsResponse>("/reviews", search, {
+      revalidate: REVIEWS_REVALIDATE_SECONDS,
+      tags: [REVIEWS_CACHE_TAG],
+    });
+
+    return toReviewsPayload(payload);
+  } catch (error) {
+    console.error("[crm] reviews unavailable", error);
+    return null;
+  }
 }
 
 /* ---------------------------------------------------------------- */
