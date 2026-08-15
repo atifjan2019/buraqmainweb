@@ -37,6 +37,22 @@ export interface VehicleImage {
   alt: string;
 }
 
+/**
+ * The showroom a car is at. Public showroom identity only — the CRM also holds
+ * the branch's address, phone and opening hours, and the API deliberately does
+ * not send them here because nothing on this site renders them.
+ */
+export interface VehicleBranch {
+  name: string;
+  slug: string;
+  city: string;
+}
+
+/** A branch offered as a filter, with the number of cars behind it. */
+export interface BranchOption extends VehicleBranch {
+  count: number;
+}
+
 export interface Vehicle {
   /**
    * Canonical SEO slug, owned by the CRM — e.g.
@@ -66,6 +82,8 @@ export interface Vehicle {
   description: string | null;
   status: VehicleStatus;
   isFeatured: boolean;
+  /** Null when the dealership hasn't allocated the car to a showroom yet. */
+  branch: VehicleBranch | null;
   /** ISO date (YYYY-MM-DD), or null when the CRM has nothing recorded. */
   motExpiry: string | null;
   serviceDue: string | null;
@@ -99,6 +117,8 @@ export interface VehiclePage {
  */
 export interface StockFilters {
   makes: string[];
+  /** Only branches that are active AND have stock behind them. */
+  branches: BranchOption[];
   fuelTypes: FuelType[];
   transmissions: Transmission[];
   priceRange: { min: number; max: number };

@@ -153,6 +153,9 @@ export default async function VehiclePage({ params }: PageProps) {
     { label: "Fuel", value: vehicle.fuelType },
     { label: "Gearbox", value: vehicle.transmission },
     { label: "Colour", value: vehicle.color },
+    // Which showroom to walk into. Unallocated cars simply lose the tile via
+    // the filter below, exactly as an unrecorded colour does.
+    { label: "Showroom", value: vehicle.branch?.name ?? "" },
     { label: "Registration", value: vehicle.registration },
     { label: "MOT until", value: motExpiry },
     { label: "Service due", value: serviceDue },

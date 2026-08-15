@@ -17,6 +17,7 @@ import type {
   StockFilters,
   Transmission,
   Vehicle,
+  VehicleBranch,
   VehicleImage,
   VehiclePage,
   VehicleStatus,
@@ -78,6 +79,11 @@ interface RawVehicle {
   service_due: string | null;
   featured_image?: RawImage | null;
   images?: RawImage[] | null;
+  branch?: {
+    name?: string | null;
+    slug?: string | null;
+    city?: string | null;
+  } | null;
 }
 
 /**
@@ -97,6 +103,20 @@ function toImage(
     display: raw.display,
     full: raw.full,
     alt: raw.alt?.trim() || fallbackAlt,
+  };
+}
+
+/**
+ * Rejects a branch missing its name or slug, so a half-populated record renders
+ * no badge rather than an empty chip or a link to `/cars?branch=undefined`.
+ */
+function toBranch(raw: RawVehicle["branch"]): VehicleBranch | null {
+  if (!raw?.name?.trim() || !raw.slug?.trim()) return null;
+
+  return {
+    name: raw.name.trim(),
+    slug: raw.slug.trim(),
+    city: raw.city?.trim() ?? "",
   };
 }
 
@@ -142,6 +162,7 @@ function toVehicle(raw: RawVehicle): Vehicle {
     description: raw.description,
     status: raw.status as VehicleStatus,
     isFeatured: raw.is_featured,
+    branch: toBranch(raw.branch),
     motExpiry: raw.mot_expiry,
     serviceDue: raw.service_due,
   };
@@ -183,6 +204,8 @@ async function readJson<T>(
 
 export interface VehicleQuery {
   make?: string;
+  /** Branch slug, as emitted by the API. */
+  branch?: string;
   fuelType?: string;
   transmission?: string;
   featured?: boolean;
@@ -199,6 +222,7 @@ function buildVehicleSearch(query: VehicleQuery): URLSearchParams {
   const search = new URLSearchParams();
 
   if (query.make) search.set("make", query.make);
+  if (query.branch) search.set("branch", query.branch);
   if (query.fuelType) search.set("fuel_type", query.fuelType);
   if (query.transmission) search.set("transmission", query.transmission);
   if (query.featured) search.set("featured", "true");
@@ -336,6 +360,12 @@ export async function getStockFilters(): Promise<StockFilters> {
   const payload = await readJson<{
     data: {
       makes?: string[];
+      branches?: {
+        name?: string;
+        slug?: string;
+        city?: string;
+        count?: number;
+      }[];
       fuel_types?: string[];
       transmissions?: string[];
       price_range?: { min?: number; max?: number };
@@ -356,6 +386,16 @@ export async function getStockFilters(): Promise<StockFilters> {
 
   return {
     makes: data.makes ?? [],
+    // A branch with no name or no slug can neither be printed nor linked to,
+    // so it is dropped rather than offered as a dead option.
+    branches: (data.branches ?? [])
+      .map((branch) => ({
+        name: branch.name?.trim() ?? "",
+        slug: branch.slug?.trim() ?? "",
+        city: branch.city?.trim() ?? "",
+        count: Number.isFinite(branch.count) ? Number(branch.count) : 0,
+      }))
+      .filter((branch) => branch.name && branch.slug),
     fuelTypes: (data.fuel_types ?? []) as FuelType[],
     transmissions: (data.transmissions ?? []) as Transmission[],
     priceRange: {

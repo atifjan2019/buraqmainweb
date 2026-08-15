@@ -38,6 +38,7 @@ export default async function CarsPage({
   const params = await searchParams;
 
   const active: ActiveFilters = {
+    branch: single(params.branch),
     make: single(params.make),
     fuel_type: single(params.fuel_type),
     transmission: single(params.transmission),
@@ -53,6 +54,7 @@ export default async function CarsPage({
   const [filtersResult, stockResult] = await Promise.allSettled([
     getStockFilters(),
     getVehicles({
+      branch: active.branch,
       make: active.make,
       fuelType: active.fuel_type,
       transmission: active.transmission,

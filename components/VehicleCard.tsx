@@ -75,8 +75,18 @@ export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
         )}
 
         {/* Status chips. Solid fills rather than translucent ones: there is no
-            scrim under them now, so each has to carry its own contrast. */}
-        <div className="absolute left-0 top-0 flex flex-wrap">
+            scrim under them now, so each has to carry its own contrast.
+
+            Three steps of loudness, all from the same type and box: Featured is
+            solid ink because it is a claim, Reserved is ink-outlined because it
+            is a caution, and the showroom is a hairline in muted text because it
+            is only a fact. That ordering is what stops a third chip shouting
+            over the first two.
+
+            The stack is width-capped: the plate badge is pinned to the top-right
+            of this same photograph, and an uncapped row would slide underneath
+            it as soon as a third chip appears on a narrow card. */}
+        <div className="absolute left-0 top-0 flex max-w-[calc(100%-6rem)] flex-wrap">
           {reserved && (
             <span className="border border-ink bg-canvas px-3 py-1.5 label-uppercase-sm text-ink">
               Reserved
@@ -85,6 +95,14 @@ export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
           {vehicle.isFeatured && (
             <span className="bg-ink px-3 py-1.5 label-uppercase-sm text-on-ink">
               Featured
+            </span>
+          )}
+
+          {/* Which showroom the car is at. Rendered only when the CRM has
+              allocated one — an empty chip reads as a rendering fault. */}
+          {vehicle.branch && (
+            <span className="border border-line bg-canvas px-3 py-1.5 label-uppercase-sm text-muted">
+              {vehicle.branch.name}
             </span>
           )}
         </div>

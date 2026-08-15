@@ -1,3 +1,4 @@
+import BranchPicker from "@/components/BranchPicker";
 import CtaBanner from "@/components/CtaBanner";
 import FeaturedVehicles from "@/components/FeaturedVehicles";
 import FinanceSection from "@/components/FinanceSection";
@@ -18,6 +19,7 @@ export default function Home() {
       <FeaturedVehicles />
       <LiveStock />
       <SearchByMaker />
+      <BranchPicker />
       <Showcase />
       <FinanceSection />
       <Marquee />

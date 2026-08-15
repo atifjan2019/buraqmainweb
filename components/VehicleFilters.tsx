@@ -23,6 +23,8 @@ import type { StockFilters } from "@/lib/vehicles";
  */
 
 export interface ActiveFilters {
+  /** Branch slug, matching the CRM's public key — see `BranchOption`. */
+  branch?: string;
   make?: string;
   fuel_type?: string;
   transmission?: string;
@@ -67,13 +69,20 @@ export default function VehicleFilters({
    * run right after the visitor has picked something — in that case the values
    * already match and nothing is written.
    */
-  const { make, fuel_type, transmission, min_price, max_price } = active;
+  const { branch, make, fuel_type, transmission, min_price, max_price } = active;
 
   useEffect(() => {
     const form = formRef.current;
     if (!form) return;
 
-    const fromUrl = { make, fuel_type, transmission, min_price, max_price };
+    const fromUrl = {
+      branch,
+      make,
+      fuel_type,
+      transmission,
+      min_price,
+      max_price,
+    };
 
     for (const [name, value] of Object.entries(fromUrl)) {
       const field = form.elements.namedItem(name);
@@ -81,7 +90,7 @@ export default function VehicleFilters({
         field.value = value ?? "";
       }
     }
-  }, [make, fuel_type, transmission, min_price, max_price]);
+  }, [branch, make, fuel_type, transmission, min_price, max_price]);
 
   /**
    * Rebuilds `/cars?…` from the form's own state and navigates without a
@@ -131,7 +140,35 @@ export default function VehicleFilters({
       className="surface-card p-6 transition-opacity sm:p-8"
       style={{ opacity: isPending ? 0.6 : 1 }}
     >
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+      {/* Rows of three rather than five across: the showroom control makes six,
+          and five was already tight at lg. With the showroom hidden the five
+          remaining controls fall as 3 + 2, which reads just as cleanly — so
+          neither case needs a conditional class. */}
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {/* First, because which showroom is the coarsest cut a visitor makes —
+            and only when there is a genuine choice. A single-showroom
+            dealership must not be asked to pick between one option. */}
+        {filters.branches.length > 1 && (
+          <div>
+            <label className={labelClass} htmlFor="filter-branch">
+              Showroom
+            </label>
+            <select
+              id="filter-branch"
+              name="branch"
+              defaultValue={active.branch ?? ""}
+              className={`${selectClass} mt-3`}
+            >
+              <option value="">Any showroom</option>
+              {filters.branches.map((branchOption) => (
+                <option key={branchOption.slug} value={branchOption.slug}>
+                  {branchOption.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <div>
           <label className={labelClass} htmlFor="filter-make">
             Make
