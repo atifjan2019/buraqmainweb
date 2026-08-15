@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getVehicles } from "@/lib/crm";
 import { selectLiveStock } from "@/lib/live-stock";
 import { ArrowRight } from "./Icons";
+import LiveStockRail from "./LiveStockRail";
 import Reveal from "./Reveal";
 import VehicleCard from "./VehicleCard";
 
@@ -40,9 +41,10 @@ export default async function LiveStock() {
 
   return (
     <section className="bg-canvas-deep py-24">
-      {/* The heading block keeps the page's left gutter, but the rail below
-          runs full-bleed so cards bleed off the right edge — the visual cue
-          that there is more stock than fits. */}
+      {/* Everything sits inside the site's standard container. The rail used to
+          run full-bleed so cards bled off the screen edge; that broke the
+          page's left margin, which every other band holds to. The partially
+          visible next card does the "there is more" job on its own. */}
       <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
         <Reveal>
           <div className="flex flex-wrap items-end justify-between gap-6">
@@ -66,33 +68,24 @@ export default async function LiveStock() {
             </Link>
           </div>
         </Reveal>
-      </div>
 
-      {/*
-        Full-bleed rail. `scroll-px` + the matching leading spacer keep the
-        first card aligned to the page gutter while still letting the track
-        scroll edge to edge. `snap-x` makes a flick land on a card rather than
-        halfway across one; touch devices get momentum for free.
-
-        Each card is fixed-width rather than fluid — a rail whose cards resize
-        with the viewport stops reading as a shelf.
-      */}
-      <div
-        className="mt-14 flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4
-                   [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        <span aria-hidden className="shrink-0 pl-1 sm:pl-4" />
-
-        {vehicles.map((vehicle, i) => (
-          <div
-            key={vehicle.slug}
-            className="w-[78vw] shrink-0 snap-start sm:w-[22rem]"
-          >
-            <VehicleCard vehicle={vehicle} priority={i === 0} />
-          </div>
-        ))}
-
-        <span aria-hidden className="shrink-0 pr-5 sm:pr-8" />
+        {/*
+          Cards are a fraction of the container rather than a fixed rem width,
+          so the rail always lands on a whole number of cards at every
+          breakpoint and never leaves a stranded sliver. The fourth card is
+          deliberately part-visible at desktop — that overflow is what tells
+          you the shelf continues.
+        */}
+        <LiveStockRail>
+          {vehicles.map((vehicle, i) => (
+            <div
+              key={vehicle.slug}
+              className="w-[80%] shrink-0 snap-start sm:w-[45%] lg:w-[31%] xl:w-[23.5%]"
+            >
+              <VehicleCard vehicle={vehicle} priority={i === 0} />
+            </div>
+          ))}
+        </LiveStockRail>
       </div>
     </section>
   );
