@@ -8,6 +8,7 @@ import {
   type ReviewSummarySource,
   type SiteReview,
 } from "@/lib/reviews";
+import CardRail from "./CardRail";
 import { Star } from "./Icons";
 import Reveal from "./Reveal";
 import SectionHeading from "./SectionHeading";
@@ -39,14 +40,30 @@ export default async function Testimonials() {
           }
         />
 
-        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {source.kind === "live"
-            ? source.reviews.map((review, i) => (
-                <Reveal key={`${review.source}-${i}`} delay={(i % 3) * 90}>
-                  <ReviewCard review={review} summary={source.summary} />
-                </Reveal>
-              ))
-            : source.testimonials.map((t, i) => (
+        {source.kind === "live" && <ReviewTally summary={source.summary} />}
+
+        {/*
+          Real reviews go in a rail, static quotes stay in a grid.
+
+          The difference is a claim about completeness. A grid of six is a
+          closed set — "here are our reviews". A rail that runs off the edge
+          says there are more, which is true of a 57-review profile the Places
+          API will only hand five of, and false of the six quotes in site.ts.
+        */}
+        {source.kind === "live" ? (
+          <CardRail noun="reviews">
+            {source.reviews.map((review, i) => (
+              <div
+                key={`${review.source}-${i}`}
+                className="w-[85%] shrink-0 snap-start sm:w-[48%] lg:w-[32%]"
+              >
+                <ReviewCard review={review} summary={source.summary} />
+              </div>
+            ))}
+          </CardRail>
+        ) : (
+          <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {source.testimonials.map((t, i) => (
                 <Reveal key={t.name} delay={(i % 3) * 90}>
                   <figure className="surface-card flex h-full flex-col p-8 transition-colors hover:border-ink">
                     {/* Stars in ink, not in a hue. The doc forbids introducing a
@@ -77,12 +94,73 @@ export default async function Testimonials() {
                     </figcaption>
                   </figure>
                 </Reveal>
-              ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {source.kind === "live" && <ProfileLinks summary={source.summary} />}
       </div>
     </section>
+  );
+}
+
+/**
+ * The headline figure, and the reason this feature was worth building.
+ *
+ * Google's Places API hands over five review texts but reports the profile's
+ * true total: this dealership has 57 averaging 5.0. Printing "5 reviews" from
+ * the five we can cache would understate them by an order of magnitude — the
+ * least persuasive true thing the page could say. So the big number is the
+ * provider's own, and the small print says how many are quoted below it.
+ *
+ * `totalReported` is null for a provider that publishes no aggregate, in which
+ * case the cached count is the only honest figure and is shown instead.
+ */
+function ReviewTally({ summary }: { summary: ReviewSummary }) {
+  const scored = summary.sources.filter((s) => (s.totalReported ?? s.count) > 0);
+  if (scored.length === 0) return null;
+
+  return (
+    <Reveal delay={100}>
+      <div className="mt-12 flex flex-wrap items-stretch justify-center gap-px border border-line bg-line">
+        {scored.map((entry) => {
+          const total = entry.totalReported ?? entry.count;
+          const rating = entry.ratingReported ?? entry.averageRating;
+
+          return (
+            <div
+              key={entry.key}
+              className="flex min-w-[15rem] flex-1 flex-col items-center gap-2 bg-canvas px-8 py-7"
+            >
+              <span className="display-sm text-ink">{rating.toFixed(1)}</span>
+
+              <span
+                className="flex gap-1 text-ink"
+                aria-label={`Rated ${rating.toFixed(1)} out of 5`}
+              >
+                {Array.from({ length: 5 }).map((_, n) => (
+                  <Star key={n} className="h-3.5 w-3.5" />
+                ))}
+              </span>
+
+              <span className="caption text-faint">
+                {total} {total === 1 ? "review" : "reviews"} on {entry.label}
+              </span>
+
+              {/* Only when the two differ, and only as fine print: the gap
+                  between what exists and what we can quote is Google's cap,
+                  not a claim worth making loudly. */}
+              {entry.totalReported !== null &&
+                entry.totalReported > entry.count && (
+                  <span className="caption text-faint/70">
+                    {entry.count} shown below
+                  </span>
+                )}
+            </div>
+          );
+        })}
+      </div>
+    </Reveal>
   );
 }
 

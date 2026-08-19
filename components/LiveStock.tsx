@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getVehicles } from "@/lib/crm";
 import { selectLiveStock } from "@/lib/live-stock";
 import { ArrowRight } from "./Icons";
-import LiveStockRail from "./LiveStockRail";
+import CardRail from "./CardRail";
 import Reveal from "./Reveal";
 import VehicleCard from "./VehicleCard";
 
@@ -76,7 +76,7 @@ export default async function LiveStock() {
           deliberately part-visible at desktop — that overflow is what tells
           you the shelf continues.
         */}
-        <LiveStockRail>
+        <CardRail noun="vehicles">
           {vehicles.map((vehicle, i) => (
             <div
               key={vehicle.slug}
@@ -85,7 +85,7 @@ export default async function LiveStock() {
               <VehicleCard vehicle={vehicle} priority={i === 0} />
             </div>
           ))}
-        </LiveStockRail>
+        </CardRail>
       </div>
     </section>
   );

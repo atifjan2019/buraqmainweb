@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight } from "./Icons";
 
-interface LiveStockRailProps {
+interface CardRailProps {
   /**
    * The cards. These arrive as already-rendered Server Component output —
    * passing them through `children` keeps VehicleCard off this component's
@@ -11,10 +11,16 @@ interface LiveStockRailProps {
    * mechanics ship to the browser.
    */
   children: React.ReactNode;
+  /**
+   * Plural noun for the arrows' accessible names — "vehicles", "reviews". A
+   * screen-reader user hearing "Next" twice on one page cannot tell which rail
+   * they are in.
+   */
+  noun: string;
 }
 
 /**
- * The Live Stock slider.
+ * A horizontal card rail with paging arrows.
  *
  * Built on native overflow scrolling rather than a transform-based carousel:
  * the track is a real scroll container, so trackpad swipes, touch flicks,
@@ -25,7 +31,7 @@ interface LiveStockRailProps {
  * Paging moves by whole cards rather than a fixed pixel amount, measured off
  * the first card so it stays correct across the responsive width changes.
  */
-export default function LiveStockRail({ children }: LiveStockRailProps) {
+export default function CardRail({ children, noun }: CardRailProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
@@ -91,10 +97,16 @@ export default function LiveStockRail({ children }: LiveStockRailProps) {
       <div className="mt-8 flex justify-end gap-3">
         <RailButton
           direction="left"
+          noun={noun}
           disabled={atStart}
           onClick={() => page(-1)}
         />
-        <RailButton direction="right" disabled={atEnd} onClick={() => page(1)} />
+        <RailButton
+          direction="right"
+          noun={noun}
+          disabled={atEnd}
+          onClick={() => page(1)}
+        />
       </div>
     </div>
   );
@@ -102,10 +114,12 @@ export default function LiveStockRail({ children }: LiveStockRailProps) {
 
 function RailButton({
   direction,
+  noun,
   disabled,
   onClick,
 }: {
   direction: "left" | "right";
+  noun: string;
   disabled: boolean;
   onClick: () => void;
 }) {
@@ -114,7 +128,7 @@ function RailButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      aria-label={direction === "left" ? "Previous vehicles" : "Next vehicles"}
+      aria-label={`${direction === "left" ? "Previous" : "Next"} ${noun}`}
       /* Square, ink-outlined, flat — the same vocabulary as .btn-outline.
          Disabled fades rather than disappears, so the control row does not
          reflow when you reach either end. */

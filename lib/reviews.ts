@@ -44,6 +44,8 @@ interface RawReview {
 interface RawSummarySource {
   label?: string | null;
   count?: unknown;
+  total_reported?: unknown;
+  rating_reported?: unknown;
   average_rating?: unknown;
   profile_url?: string | null;
   max_per_fetch?: unknown;
@@ -98,8 +100,17 @@ export interface ReviewSummarySource {
   /** Provider key — the object key in the payload. */
   key: string;
   label: string;
+  /** How many this site holds and can quote. */
   count: number;
   averageRating: number;
+  /**
+   * How many the provider says the profile ACTUALLY has, which is not what it
+   * hands over: Google reports 57 and returns 5. Null when the provider
+   * publishes no aggregate, in which case `count` is the only honest figure.
+   */
+  totalReported: number | null;
+  /** The provider's average across that full set, not just the cached sample. */
+  ratingReported: number | null;
   /** Where "read all our reviews" points. Null means no such link is rendered. */
   profileUrl: string | null;
   /** How many the provider returns per fetch, when it is capped. Google: 5. */
@@ -254,12 +265,21 @@ function toSummary(raw: RawSummary | null | undefined): ReviewSummary {
     if (!key.trim() || total === 0) continue;
 
     const cap = Number(entry?.max_per_fetch);
+    const reported = Number(entry?.total_reported);
+    const reportedRating = Number(entry?.rating_reported);
 
     sources.push({
       key: key.trim(),
       label: text(entry?.label) ?? key.trim(),
       count: total,
       averageRating: average(entry?.average_rating),
+      // Only trust a reported total that is at least what we hold — a provider
+      // claiming fewer reviews than it just handed over is a payload to ignore,
+      // not to print.
+      totalReported:
+        Number.isFinite(reported) && reported >= total ? Math.floor(reported) : null,
+      ratingReported:
+        Number.isFinite(reportedRating) && reportedRating > 0 ? reportedRating : null,
       profileUrl: toHttpUrl(entry?.profile_url),
       maxPerFetch: Number.isFinite(cap) && cap > 0 ? Math.floor(cap) : null,
       // Defaults to complete: only an explicit `false` makes the heading hedge,
