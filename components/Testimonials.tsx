@@ -115,6 +115,11 @@ export default async function Testimonials() {
  *
  * `totalReported` is null for a provider that publishes no aggregate, in which
  * case the cached count is the only honest figure and is shown instead.
+ *
+ * The tile deliberately does NOT footnote how many of that total are quoted
+ * below it. The cards are plainly a selection — the section's own lead line
+ * says so — and spelling out "5 shown below" under a 57-review score drew the
+ * eye to the smaller number, which is the opposite of what the tile is for.
  */
 function ReviewTally({ summary }: { summary: ReviewSummary }) {
   const scored = summary.sources.filter((s) => (s.totalReported ?? s.count) > 0);
@@ -147,15 +152,6 @@ function ReviewTally({ summary }: { summary: ReviewSummary }) {
                 {total} {total === 1 ? "review" : "reviews"} on {entry.label}
               </span>
 
-              {/* Only when the two differ, and only as fine print: the gap
-                  between what exists and what we can quote is Google's cap,
-                  not a claim worth making loudly. */}
-              {entry.totalReported !== null &&
-                entry.totalReported > entry.count && (
-                  <span className="caption text-faint/70">
-                    {entry.count} shown below
-                  </span>
-                )}
             </div>
           );
         })}

@@ -44,6 +44,9 @@ interface RawReview {
 interface RawSummarySource {
   label?: string | null;
   count?: unknown;
+  /** How many of `count` were typed into the CRM by hand. Absent on a CRM
+      that predates manual entry, which normalises to 0 — see `toSummary`. */
+  manual_count?: unknown;
   total_reported?: unknown;
   rating_reported?: unknown;
   average_rating?: unknown;
@@ -115,6 +118,22 @@ export interface ReviewSummarySource {
   profileUrl: string | null;
   /** How many the provider returns per fetch, when it is capped. Google: 5. */
   maxPerFetch: number | null;
+  /**
+   * How many of `count` were entered in the CRM by hand rather than fetched
+   * from the platform's API. The dealership collects praise on Facebook, on
+   * WhatsApp and across the desk, and Google hands over five of fifty-seven,
+   * so the rest are typed in. 0 when the CRM did not say.
+   */
+  manualCount: number;
+  /**
+   * True when NOTHING from this source was fetched — every row was typed in.
+   *
+   * The heading must not claim such a source was "pulled live": the review is
+   * genuinely from that platform, but we read it there with our eyes rather
+   * than through an API, and saying otherwise would overstate it. A CRM that
+   * sends no `manual_count` yields false, which keeps the old wording.
+   */
+  isManualOnly: boolean;
   /**
    * False when the CRM's cache is structurally a sample rather than a mirror —
    * Google's Places API returns at most five reviews and cannot paginate. The
@@ -264,6 +283,7 @@ function toSummary(raw: RawSummary | null | undefined): ReviewSummary {
     // second half of the same guarantee.
     if (!key.trim() || total === 0) continue;
 
+    const manualCount = count(entry?.manual_count);
     const cap = Number(entry?.max_per_fetch);
     const reported = Number(entry?.total_reported);
     const reportedRating = Number(entry?.rating_reported);
@@ -280,6 +300,11 @@ function toSummary(raw: RawSummary | null | undefined): ReviewSummary {
         Number.isFinite(reported) && reported >= total ? Math.floor(reported) : null,
       ratingReported:
         Number.isFinite(reportedRating) && reportedRating > 0 ? reportedRating : null,
+      manualCount,
+      // `>=` rather than `===`: a payload claiming more hand-entered rows than
+      // it holds in total is still a source nothing was fetched for, and the
+      // heading's claim is the thing being decided here.
+      isManualOnly: manualCount >= total,
       profileUrl: toHttpUrl(entry?.profile_url),
       maxPerFetch: Number.isFinite(cap) && cap > 0 ? Math.floor(cap) : null,
       // Defaults to complete: only an explicit `false` makes the heading hedge,
@@ -369,6 +394,13 @@ export function sourceLabel(review: SiteReview, summary: ReviewSummary): string 
   return declared?.label ?? review.sourceLabel;
 }
 
+/** "Google", "Google and Trustpilot", "Google, Trustpilot and Facebook". */
+function listNames(names: string[]): string {
+  return names.length <= 1
+    ? (names[0] ?? "")
+    : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+}
+
 /**
  * The lead paragraph under the heading, in live mode.
  *
@@ -376,16 +408,35 @@ export function sourceLabel(review: SiteReview, summary: ReviewSummary): string 
  * Trustpilot", and says "A selection of" whenever any of them is structurally
  * incomplete — Google's Places API returns at most five reviews and cannot page
  * through the rest, so claiming to show what drivers say would overstate it.
+ *
+ * The two halves of the sentence are the two ways a review reaches this page,
+ * and they are worded apart because only one of them was verified by machine.
+ * "Pulled live from" is a claim about an API call, so it is made only for a
+ * source something was actually fetched from. A source whose every row was
+ * typed into the CRM by hand gets "shared with us on", which is the precise
+ * truth: the customer did leave it on Facebook, and we did not read it through
+ * an API. Nothing here fetches, parses or scrapes a third-party page, and the
+ * heading must not imply otherwise.
+ *
+ * With no manual-only source the output is byte-identical to what it was
+ * before hand entry existed — a guarantee, not an aspiration, and the reason
+ * the pre-existing heading assertions in `reviews.test.ts` stand unedited.
  */
 export function liveHeadingBody(summary: ReviewSummary): string {
-  const names = summary.sources.map((entry) => entry.label);
+  const fetched = summary.sources.filter((entry) => !entry.isManualOnly);
+  const shared = summary.sources.filter((entry) => entry.isManualOnly);
+
+  const live = listNames(fetched.map((entry) => entry.label));
+  const byHand = listNames(shared.map((entry) => entry.label));
 
   const providers =
-    names.length === 0
-      ? ""
-      : names.length === 1
-        ? ` — pulled live from ${names[0]}`
-        : ` — pulled live from ${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+    live && byHand
+      ? ` — pulled live from ${live}, and shared with us on ${byHand}`
+      : live
+        ? ` — pulled live from ${live}`
+        : byHand
+          ? ` — shared with us on ${byHand}`
+          : "";
 
   const hedged = summary.sources.some((entry) => !entry.isComplete);
 

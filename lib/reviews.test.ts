@@ -217,3 +217,126 @@ test("a date-only reviewed_at formats in UTC and never rolls back a day", () => 
   assert.equal(reviewDate({ ...payload.reviews[0], reviewedAt: null }), null);
   assert.equal(reviewDate({ ...payload.reviews[0], reviewedAt: "not a date" }), null);
 });
+
+test("a manual-only source is flagged, and prints no reported total", () => {
+  const payload = toReviewsPayload({
+    data: [
+      {
+        source: "facebook",
+        source_label: "Facebook",
+        author_name: "Priya K.",
+        rating: 5,
+        body: "Recommended us to two of her neighbours.",
+        reviewed_at: "2026-08-02",
+      },
+    ],
+    summary: {
+      total: 10,
+      average_rating: 4.9,
+      sources: {
+        // Every row typed in by hand: no run, so no provider aggregate.
+        facebook: { label: "Facebook", count: 3, manual_count: 3, average_rating: 5 },
+        // Mixed: Google handed over five of fifty-seven, two more were typed in.
+        google: {
+          label: "Google",
+          count: 7,
+          manual_count: 2,
+          average_rating: 4.9,
+          total_reported: 57,
+          rating_reported: 5,
+          max_per_fetch: 5,
+          is_complete: false,
+        },
+        // A CRM that predates hand entry sends no manual_count at all.
+        trustpilot: { label: "Trustpilot", count: 4, average_rating: 4.8 },
+      },
+    },
+  });
+
+  const [facebook, google, trustpilot] = payload.summary.sources;
+
+  assert.equal(facebook.manualCount, 3);
+  assert.equal(facebook.isManualOnly, true);
+  // No provider ever reported on this source, so the cached count is the whole
+  // truth and the tally's "N shown below" line must not render.
+  assert.equal(facebook.totalReported, null);
+  assert.equal(facebook.ratingReported, null);
+  assert.equal(
+    facebook.totalReported !== null && facebook.totalReported > facebook.count,
+    false,
+  );
+  // The tally block itself still renders — its guard is the count.
+  assert.equal((facebook.totalReported ?? facebook.count) > 0, true);
+
+  assert.equal(google.manualCount, 2);
+  assert.equal(google.isManualOnly, false);
+  assert.equal(google.totalReported, 57);
+  // The one source where the fine print is true: 57 exist, 7 are quotable.
+  assert.equal(google.totalReported! > google.count, true);
+
+  // Absent manual_count must not make an older CRM's source look hand-entered.
+  assert.equal(trustpilot.manualCount, 0);
+  assert.equal(trustpilot.isManualOnly, false);
+});
+
+test("a source claiming fewer reviews than it handed over loses its total", () => {
+  const payload = toReviewsPayload({
+    summary: {
+      sources: {
+        google: { label: "Google", count: 9, manual_count: 4, total_reported: 5 },
+      },
+    },
+  });
+
+  // 4 of the 9 were typed in, so the profile's own 5 is now behind our count.
+  // Printing it would say "5 reviews on Google" above nine of them.
+  assert.equal(payload.summary.sources[0].totalReported, null);
+  assert.equal(payload.summary.sources[0].isManualOnly, false);
+});
+
+test("the heading only claims 'pulled live' for a source something was fetched from", () => {
+  // With no manual-only source the wording is byte-identical to before hand
+  // entry existed — the three assertions above this one are the proof.
+  const raw = samplePayload();
+  raw.summary!.sources!.facebook = {
+    label: "Facebook",
+    count: 3,
+    manual_count: 3,
+    average_rating: 5,
+  };
+  raw.summary!.sources!.whatsapp = {
+    label: "WhatsApp",
+    count: 1,
+    manual_count: 1,
+    average_rating: 5,
+  };
+
+  assert.equal(
+    liveHeadingBody(toReviewsPayload(raw).summary),
+    "A selection of what drivers say after buying from us — pulled live from Google and Trustpilot, and shared with us on Facebook and WhatsApp.",
+  );
+
+  // Nothing fetched at all: no "pulled live" clause anywhere in the sentence.
+  const manualOnly = samplePayload();
+  delete manualOnly.summary!.sources!.google;
+  delete manualOnly.summary!.sources!.trustpilot;
+  manualOnly.summary!.sources!.facebook = {
+    label: "Facebook",
+    count: 3,
+    manual_count: 3,
+    average_rating: 5,
+  };
+
+  const sentence = liveHeadingBody(toReviewsPayload(manualOnly).summary);
+  assert.equal(
+    sentence,
+    "What drivers say after buying from us — shared with us on Facebook.",
+  );
+  assert.equal(sentence.includes("pulled live"), false);
+
+  // A source with no visible reviews is dropped before the heading sees it.
+  assert.equal(
+    liveHeadingBody(toReviewsPayload({ summary: { sources: {} } }).summary),
+    "What drivers say after buying from us.",
+  );
+});
