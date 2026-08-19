@@ -257,15 +257,21 @@ test("a manual-only source is flagged, and prints no reported total", () => {
 
   assert.equal(facebook.manualCount, 3);
   assert.equal(facebook.isManualOnly, true);
-  // No provider ever reported on this source, so the cached count is the whole
-  // truth and the tally's "N shown below" line must not render.
+  // Nothing ever fetched this source, so no provider ever published an
+  // aggregate for it and the cached count is the whole truth.
   assert.equal(facebook.totalReported, null);
   assert.equal(facebook.ratingReported, null);
-  assert.equal(
-    facebook.totalReported !== null && facebook.totalReported > facebook.count,
-    false,
-  );
-  // The tally block itself still renders — its guard is the count.
+
+  // What the tally tile prints, computed here exactly as ReviewTally computes
+  // it: `totalReported ?? count`. Null falls through to 3, so the tile reads
+  // "3 reviews on Facebook" — a number we hold every one of. The failure this
+  // pins is the tile claiming a headline total nobody reported, which is the
+  // one way a hand-entered source could overstate itself.
+  assert.equal(facebook.totalReported ?? facebook.count, 3);
+  assert.equal(facebook.ratingReported ?? facebook.averageRating, 5);
+
+  // The tile still renders at all — its guard is that same figure being above
+  // zero, so a manual-only source gets its own block rather than vanishing.
   assert.equal((facebook.totalReported ?? facebook.count) > 0, true);
 
   assert.equal(google.manualCount, 2);
