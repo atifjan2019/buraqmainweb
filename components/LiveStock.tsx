@@ -76,15 +76,31 @@ export default async function LiveStock() {
           deliberately part-visible at desktop — that overflow is what tells
           you the shelf continues.
         */}
-        <CardRail noun="vehicles">
-          {vehicles.map((vehicle, i) => (
-            <div
-              key={vehicle.slug}
-              className="w-[80%] shrink-0 snap-start sm:w-[45%] lg:w-[31%] xl:w-[23.5%]"
-            >
-              <VehicleCard vehicle={vehicle} priority={i === 0} />
-            </div>
-          ))}
+        <CardRail noun="vehicles" autoScroll>
+          {/*
+            The stock is rendered TWICE, and that is what makes the loop work:
+            the rail drifts left, and once the first copy has passed it jumps
+            back by exactly one copy's width. The jump lands on an identical
+            frame, so there is no seam to see — no clone, no transform, no
+            measurement of individual cards.
+
+            The second copy is aria-hidden and its links are taken out of the
+            tab order. It is the same twelve cars again, and a screen reader
+            announcing every car twice — or a keyboard user tabbing through
+            twenty-four links to leave the section — would be paying for a
+            visual trick they get nothing from.
+          */}
+          {[0, 1].flatMap((copy) =>
+            vehicles.map((vehicle, i) => (
+              <div
+                key={`${copy}-${vehicle.slug}`}
+                className="w-[80%] shrink-0 snap-start sm:w-[45%] lg:w-[31%] xl:w-[23.5%]"
+                {...(copy === 1 ? { "aria-hidden": true, inert: true } : {})}
+              >
+                <VehicleCard vehicle={vehicle} priority={copy === 0 && i === 0} />
+              </div>
+            )),
+          )}
         </CardRail>
       </div>
     </section>
