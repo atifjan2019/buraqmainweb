@@ -773,24 +773,34 @@ body {
 /* ==================================================================
    The brand mark.
 
-   The emblem is a flat #f5a524 raster baked by
-   scripts/build-brand-assets.mjs, which predates this system and cannot
-   follow a token. `grayscale(1) brightness(0)` crushes it to solid black
-   for the white canvas, and the added `invert(1)` flips it to white on
-   the dark one, so the emblem and the wordmark beside it stay the same
-   colour as each other — which is the whole point of a monochrome
-   system.
+   The dealership's BMM roundel, shipped as two rasters — one per theme.
 
-   A filter rather than two more rasters because it is a single-colour
-   silhouette: the shift is clean and keeps the soft alpha edges the
-   build script went to the trouble of producing.
+   What was here before filtered a single-colour horse silhouette to solid
+   black or solid white, which is clean and cheap when the mark has no
+   colour of its own. This lockup does: just over half its visible pixels
+   are near-black (the horse and "MANCHESTER") and most of the rest is the
+   brand red. On the dark canvas that black half disappears and leaves red
+   type wrapped around a horse-shaped hole, and there is no single filter
+   that rescues it without also mangling the red.
+
+   So the dark file inverts only its near-neutral pixels and leaves
+   anything chromatic alone, which holds the trademark red identical
+   across both themes. See components/Logo.tsx.
+
+   Both files sit in the markup and CSS chooses; the theme is stamped on
+   <html> before first paint, so a scripted swap would flash the wrong
+   mark for a frame on every load.
 ================================================================== */
-.brand-mark {
-  filter: grayscale(1) brightness(0);
+.brand-logo--dark {
+  display: none;
 }
 
-html[data-theme="dark"] .brand-mark {
-  filter: grayscale(1) brightness(0) invert(1);
+html[data-theme="dark"] .brand-logo--light {
+  display: none;
+}
+
+html[data-theme="dark"] .brand-logo--dark {
+  display: block;
 }
 
 /* ==================================================================

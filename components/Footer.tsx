@@ -35,8 +35,11 @@ export default function Footer() {
         <div className="grid gap-12 lg:grid-cols-[1.6fr_1fr_1fr_1.2fr]">
           {/* Brand */}
           <div>
+            {/* Larger than the header's. The footer has vertical room, and at
+                this size the roundel's own "BurraqMotors Manchester" is
+                readable rather than implied. */}
             <Link href="/" className="inline-block">
-              <Logo />
+              <Logo markClassName="h-20" />
             </Link>
 
             <p className="mt-6 max-w-sm text-sm leading-relaxed text-muted">
