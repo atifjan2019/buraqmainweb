@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { company, contact, whatsappLink } from "@/lib/site";
 import { ArrowRight, WhatsApp } from "@/components/Icons";
+import AuctionGradePicker from "@/components/AuctionGradePicker";
 import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
@@ -19,19 +20,6 @@ export const metadata: Metadata = {
  * reasons: a page duplicated from another site does not rank, and the point of
  * publishing it is to be the dealer who explains this properly.
  */
-
-const OVERALL_GRADES: Array<[string, string]> = [
-  ["S", "Effectively new. Delivery mileage, nothing to note. Rare at auction."],
-  ["6", "Excellent. Very low mileage and no meaningful faults."],
-  ["5", "Very good. Light use, well looked after."],
-  ["4.5", "Good to very good. Small cosmetic marks only."],
-  ["4", "Good used condition with minor flaws. Where most sound imports sit."],
-  ["3.5", "Fair. Visible wear, or repairs that have been done properly."],
-  ["3", "Poor. Significant wear or damage, priced to match."],
-  ["2", "Very poor. Heavy wear, corrosion or damage."],
-  ["1", "Needs restoration, or has been modified heavily."],
-  ["R / RA", "Repaired accident or structural repair history. Always read the sheet in full."],
-];
 
 const LETTER_GRADES: Array<[string, string, string]> = [
   ["A", "Pristine", "Like new"],
@@ -164,31 +152,13 @@ export default function AuctionSheetsPage() {
           <Reveal>
             <h2 className="display-sm text-ink">The overall grade</h2>
             <p className="mt-4 max-w-2xl text-base font-light leading-relaxed text-muted">
-              The single number in the top-right corner. It is a summary, not
-              the whole story — always read it alongside the damage diagram,
-              because a 4 with one deep scratch and a 4 with marks on every
-              panel are very different cars.
+              The single number in the top-right corner. Pick one below to see
+              what it means for condition and for buying risk.
             </p>
           </Reveal>
 
           <Reveal delay={100}>
-            <dl className="mt-10 max-w-3xl border border-line">
-              {OVERALL_GRADES.map(([grade, meaning], i) => (
-                <div
-                  key={grade}
-                  className={`flex gap-6 bg-canvas px-6 py-4 sm:px-8 ${
-                    i > 0 ? "border-t border-line-soft" : ""
-                  }`}
-                >
-                  <dt className="w-24 shrink-0 font-mono text-sm font-bold text-ink">
-                    {grade}
-                  </dt>
-                  <dd className="text-sm font-light leading-relaxed text-muted">
-                    {meaning}
-                  </dd>
-                </div>
-              ))}
-            </dl>
+            <AuctionGradePicker />
           </Reveal>
         </div>
       </section>
