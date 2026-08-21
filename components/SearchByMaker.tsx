@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { getStockFilters } from "@/lib/crm";
-import type { MakerOption } from "@/lib/vehicles";
+import { getStockFilters, getVehicles } from "@/lib/crm";
+import { vehicleHref, type MakerOption, type Vehicle } from "@/lib/vehicles";
+import MakerTile, { type MakerModel } from "./MakerTile";
 import Reveal from "./Reveal";
 import SectionHeading from "./SectionHeading";
 
@@ -29,8 +30,14 @@ import SectionHeading from "./SectionHeading";
  */
 export default async function SearchByMaker() {
   let makers: MakerOption[];
+  let stock: Vehicle[] = [];
   try {
     const filters = await getStockFilters();
+
+    // The stock itself, so each marque can show what is actually behind it.
+    // One extra cached read, shared with nothing — the homepage already pays
+    // for this call in LiveStock and Next dedupes it within a render.
+    stock = (await getVehicles({ perPage: 50 })).vehicles;
 
     // `makers` carries the logos and the counts in the one request. `makes` is
     // the fallback for a CRM that predates the Makers page: same marques, same
@@ -53,6 +60,8 @@ export default async function SearchByMaker() {
 
   if (makers.length === 0) return null;
 
+  const modelsByMake = groupModels(stock);
+
   return (
     <section className="bg-canvas py-24">
       <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
@@ -63,89 +72,61 @@ export default async function SearchByMaker() {
           body="Jump straight to the marque you came for. Every badge here has cars behind it right now."
         />
 
-        {/* 2-up on phones through 6-up on desktop. The tiles are square-ish
-            and equal-weight: no marque is promoted over another, because the
-            ordering is the CRM's own, not a ranking. */}
-        <div className="mt-16 grid grid-cols-2 gap-px overflow-hidden border border-line bg-line sm:grid-cols-3 lg:grid-cols-6">
+        {/* Three across, matching the reference the owner asked for. Six was
+            too many: at that width a marque was a word in a thin strip, and
+            the logos the CRM now serves had nowhere to breathe.
+
+            The car count is gone from the tile. It read as a stock report
+            rather than a way in, and "1 CAR" beside a marque undersells a
+            forecourt — the models shown on hover say far more about what is
+            actually there. */}
+        <div className="mt-16 grid grid-cols-1 gap-px overflow-hidden border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
           {makers.map((maker, i) => (
-            <Reveal key={maker.name} delay={(i % 6) * 60}>
-              {/*
-                The 1px grid: tiles sit on a --color-line ground with a gap-px
-                gutter, so every divider is a true hairline and the block reads
-                as one ruled table rather than as loose cards. This system has
-                no shadows to separate surfaces, so the hairline does that work.
-
-                Hover is a one-step flat lift to surface-2 rather than the ink
-                flood the name-only tiles used to get. An image cannot invert
-                with its ground: a dark mark would vanish on a black hover fill
-                in the light theme, and a light one on the white fill in the
-                dark theme. surface-2 is a tokenised flat step — no shadow, no
-                gradient, no hue — and it gives logo tiles and name tiles the
-                same hover.
-              */}
-              <Link
-                href={`/cars?make=${encodeURIComponent(maker.name)}`}
-                className="group flex h-full flex-col justify-between gap-6 bg-canvas p-6
-                           transition-colors duration-200 hover:bg-surface-2
-                           focus-visible:bg-surface-2 focus-visible:outline-none sm:p-7"
-              >
-                {maker.logoUrl ? (
-                  /* Fixed-height optical box, left-aligned so every mark shares
-                     an edge with the count beneath it and the grid still reads
-                     as a ruled table. The height never depends on the artwork,
-                     so nothing reflows as the logos load. */
-                  <span className="flex h-14 w-full items-center justify-start sm:h-16">
-                    {/* eslint-disable-next-line @next/next/no-img-element --
-                        served straight from the CRM, the same call VehicleCard
-                        documents: next/image would proxy through /_next/image
-                        and pin a logo swapped in the CRM to a stale copy.
-
-                        alt is the marque, never "" — if the CRM is unreachable
-                        or a file 404s the browser prints the name, which is
-                        precisely the fallback tile. */}
-                    <img
-                      src={maker.logoUrl}
-                      alt={maker.displayName}
-                      loading="lazy"
-                      decoding="async"
-                      className={`maker-logo${
-                        maker.logoDarkUrl ? " maker-logo--light" : ""
-                      }`}
-                    />
-
-                    {/* Both grounds ship in the DOM and CSS picks one — the
-                        idiom .theme-icon-sun/.theme-icon-moon already uses, and
-                        for the same reason: the theme lives in localStorage and
-                        is only known in the browser, so choosing here would
-                        hand every visitor on the non-default theme a hydration
-                        mismatch and a visible swap. */}
-                    {maker.logoDarkUrl && (
-                      /* eslint-disable-next-line @next/next/no-img-element -- see above */
-                      <img
-                        src={maker.logoDarkUrl}
-                        alt={maker.displayName}
-                        loading="lazy"
-                        decoding="async"
-                        className="maker-logo maker-logo--dark"
-                      />
-                    )}
-                  </span>
-                ) : (
-                  <span className="display-sm text-ink">
-                    {maker.displayName}
-                  </span>
-                )}
-
-                <span className="text-xs font-light uppercase tracking-[0.18em] text-faint transition-colors group-hover:text-ink group-focus-visible:text-ink">
-                  {maker.count > 0
-                    ? `${maker.count} ${maker.count === 1 ? "car" : "cars"}`
-                    : "In stock"}
-                </span>
-              </Link>
+            <Reveal key={maker.name} delay={(i % 3) * 60}>
+              <MakerTile
+                maker={maker}
+                models={modelsByMake.get(maker.name.toLowerCase()) ?? []}
+              />
             </Reveal>
           ))}
         </div>
       </div>
     </section>
   );
+}
+
+/**
+ * Up to four distinct models per marque, newest first, each with a photograph.
+ *
+ * Distinct by MODEL rather than by car: a forecourt with sixty Toyotas is
+ * mostly Priuses, and four Prius thumbnails tell a visitor nothing. One of
+ * each model is the useful answer to "what do you have in a Toyota?".
+ */
+function groupModels(stock: Vehicle[]): Map<string, MakerModel[]> {
+  const byMake = new Map<string, MakerModel[]>();
+
+  for (const vehicle of stock) {
+    const key = vehicle.make.trim().toLowerCase();
+    if (!key) continue;
+
+    const models = byMake.get(key) ?? [];
+    if (models.length >= 4) continue;
+
+    // The model name as the CRM writes it, trimmed of trim-levels so
+    // "Prius 1.8 VVT-h Excel" and "Prius Hybrid" read as one model.
+    const label = vehicle.model.split(" ").slice(0, 2).join(" ").trim();
+    if (!label || models.some((m) => m.label.toLowerCase() === label.toLowerCase())) {
+      continue;
+    }
+
+    models.push({
+      label,
+      href: vehicleHref(vehicle),
+      thumb: vehicle.featuredImage?.thumb ?? null,
+    });
+
+    byMake.set(key, models);
+  }
+
+  return byMake;
 }
