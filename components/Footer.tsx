@@ -8,6 +8,7 @@ const year = new Date().getFullYear();
 const legal = [
   { label: "Privacy Policy", href: "/privacy" },
   { label: "Terms", href: "/terms" },
+  { label: "Cookies", href: "/cookies" },
 ];
 
 /**

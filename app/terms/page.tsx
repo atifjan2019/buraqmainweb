@@ -117,8 +117,8 @@ export default function TermsPage() {
           you warrant that all data provided by you is accurate.
         </li>
         <li>
-          Our Cookie Policy, which gives you information about the cookies on
-          our site.
+          Our <a href="/cookies">Cookie Policy</a>, which gives you
+          information about the cookies on our site.
         </li>
       </ul>
 

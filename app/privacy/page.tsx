@@ -97,7 +97,7 @@ export default function PrivacyPage() {
         website. This helps us to provide you with a good experience when you
         browse our website and also allows us to improve our site. For detailed
         information on the cookies we use and the purposes for which we use them
-        see our Cookie Policy.
+        see our <a href="/cookies">Cookie Policy</a>.
       </p>
 
       <h2>Uses made of the information</h2>
