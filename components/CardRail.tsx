@@ -3,6 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight } from "./Icons";
 
+/**
+ * Drift speed in pixels per second.
+ *
+ * Was 28; raised 40% at the owner's request. Per second rather than per frame
+ * so a 120Hz laptop and a 60Hz monitor move at the same rate.
+ */
+const SPEED = 39.2;
+
 interface CardRailProps {
   /**
    * The cards. These arrive as already-rendered Server Component output —
@@ -108,7 +116,7 @@ export default function CardRail({
 
       // Pixels per second, not per frame: a 120Hz laptop and a 60Hz monitor
       // must move the rail at the same speed.
-      el.scrollLeft += (elapsed / 1000) * 28;
+      el.scrollLeft += (elapsed / 1000) * SPEED;
 
       // The wrap. The caller renders two identical copies, so scrolling past
       // the first one puts the second in exactly the position the first

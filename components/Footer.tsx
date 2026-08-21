@@ -6,6 +6,7 @@ import Logo from "./Logo";
 const year = new Date().getFullYear();
 
 const legal = [
+  { label: "Auction Sheets", href: "/auction-sheets" },
   { label: "Privacy Policy", href: "/privacy" },
   { label: "Terms", href: "/terms" },
   { label: "Cookies", href: "/cookies" },

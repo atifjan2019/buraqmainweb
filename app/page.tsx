@@ -1,5 +1,4 @@
 import BranchPicker from "@/components/BranchPicker";
-import AuctionSheet from "@/components/AuctionSheet";
 import CtaBanner from "@/components/CtaBanner";
 import FeaturedVehicles from "@/components/FeaturedVehicles";
 import FinanceSection from "@/components/FinanceSection";
@@ -27,7 +26,6 @@ export default function Home() {
       <Marquee />
       <WhyUs />
       <Testimonials />
-      <AuctionSheet />
       {/* Editorial reassurance: after the social proof, before the ask. Renders
           nothing at all when the CRM has no published articles. */}
       <RecentPosts />

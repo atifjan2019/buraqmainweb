@@ -12,6 +12,12 @@ import VehiclePlaceholder from "./VehiclePlaceholder";
 interface VehicleCardProps {
   vehicle: Vehicle;
   /**
+   * Mark the card as live stock — a pulsing dot at the top-left of the
+   * photograph. Set only by the Live Stock rail: on the grid pages every card
+   * is current stock, so a dot on all of them would say nothing.
+   */
+  live?: boolean;
+  /**
    * Set on the first card of the grid only. That card is the page's LCP
    * element, and lazy-loading an LCP image delays it measurably.
    */
@@ -37,7 +43,11 @@ interface VehicleCardProps {
  * being pinned to a stale cached copy. That rules out `next/image`, whose
  * default loader re-fetches and re-encodes through `/_next/image`.
  */
-export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
+export default function VehicleCard({
+  vehicle,
+  priority,
+  live,
+}: VehicleCardProps) {
   const title = vehicleTitle(vehicle);
   const reserved = vehicle.status === "reserved";
   const photo = vehicle.featuredImage;
@@ -86,7 +96,23 @@ export default function VehicleCard({ vehicle, priority }: VehicleCardProps) {
             The row is width-capped because the showroom chip is pinned to the
             top-right of this same photograph; uncapped, a second claim chip
             would slide under it on a narrow card. */}
-        <div className="absolute left-0 top-0 flex max-w-[calc(100%-8rem)] flex-wrap">
+        <div className="absolute left-0 top-0 flex max-w-[calc(100%-8rem)] flex-wrap items-start">
+          {/* The live marker leads the stack, so it reads as a state of the
+              whole card rather than a property of whichever chip follows it.
+              Solid core with a ring expanding behind it: the dot itself never
+              moves, because a throbbing dot on twelve cards at once would be
+              the loudest thing on the page. Reduced-motion gets the core. */}
+          {live && (
+            <span
+              aria-hidden
+              className="relative m-3 flex h-2 w-2 shrink-0"
+              title="In stock now"
+            >
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75 motion-reduce:hidden" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+            </span>
+          )}
+
           {reserved && (
             <span className="border border-ink bg-canvas px-3 py-1.5 label-uppercase-sm text-ink">
               Reserved

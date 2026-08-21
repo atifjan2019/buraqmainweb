@@ -97,7 +97,11 @@ export default async function LiveStock() {
                 className="w-[80%] shrink-0 snap-start sm:w-[45%] lg:w-[31%] xl:w-[23.5%]"
                 {...(copy === 1 ? { "aria-hidden": true, inert: true } : {})}
               >
-                <VehicleCard vehicle={vehicle} priority={copy === 0 && i === 0} />
+                <VehicleCard
+                  vehicle={vehicle}
+                  priority={copy === 0 && i === 0}
+                  live
+                />
               </div>
             )),
           )}

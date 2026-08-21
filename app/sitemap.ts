@@ -33,6 +33,7 @@ const STATIC_ROUTES: Array<{
   { path: "/cars", changeFrequency: "daily", priority: 0.9 },
   { path: "/blog", changeFrequency: "weekly", priority: 0.7 },
   { path: "/finance", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/auction-sheets", changeFrequency: "monthly", priority: 0.7 },
   { path: "/about", changeFrequency: "monthly", priority: 0.6 },
   { path: "/contact", changeFrequency: "monthly", priority: 0.6 },
   { path: "/privacy", changeFrequency: "yearly", priority: 0.2 },
