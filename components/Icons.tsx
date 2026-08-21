@@ -91,6 +91,43 @@ export function Shield(props: IconProps) {
   );
 }
 
+/**
+ * Clasped hands — the finance assurance in the hero.
+ *
+ * Drawn as two forearms meeting at a grip rather than as anatomical hands:
+ * at the 20px this renders at, fingers turn to mush, and the two diagonals
+ * plus a horizontal clasp still read as a handshake at that size.
+ */
+export function Handshake(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M2.5 10.5 6 7a1.8 1.8 0 0 1 2.5 0L11 9.5" />
+      <path d="M21.5 10.5 18 7a1.8 1.8 0 0 0-2.5 0L13 9.5" />
+      <path d="m7 12.5 2.8 2.8a1.7 1.7 0 0 0 2.4 0l3.3-3.3" />
+      <path d="M2.5 10.5v2.8M21.5 10.5v2.8" />
+    </svg>
+  );
+}
+
+/**
+ * Headset — customer support.
+ *
+ * A headset rather than the mockup's "247" roundel: three digits inside a
+ * 20px circle land under 6px tall, which is below the point where the numerals
+ * are legible at all. The wording beside it already says 24/7, so the icon only
+ * has to carry "support", and a headset does that without needing to be read.
+ */
+export function Headset(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M4 13.5v-1.5a8 8 0 0 1 16 0v1.5" />
+      <rect x="2" y="13" width="4.5" height="6" rx="1.8" />
+      <rect x="17.5" y="13" width="4.5" height="6" rx="1.8" />
+      <path d="M19.75 19v.5a2.5 2.5 0 0 1-2.5 2.5H13" />
+    </svg>
+  );
+}
+
 export function Check(props: IconProps) {
   return (
     <svg {...base} {...props}>

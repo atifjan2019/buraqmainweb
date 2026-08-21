@@ -1,38 +1,50 @@
-import HeroCar from "./HeroCar";
+import Image from "next/image";
 import Link from "next/link";
 import { financeDisclaimer } from "@/lib/site";
 import { getFeaturedVehicles } from "@/lib/crm";
 import { formatPrice, vehicleHref, vehicleTitle } from "@/lib/vehicles";
-import { ArrowRight } from "./Icons";
+import { ArrowRight, Handshake, Headset, Shield } from "./Icons";
 import Reveal from "./Reveal";
 
-const heroStats = [
-  { value: "200+", label: "Happy Customers" },
-  { value: "98%", label: "Satisfaction Rate" },
-  { value: "24/7", label: "Support" },
-];
+/**
+ * The showroom, shot in the dealership's own space with the marque wall in
+ * frame. It is doing two jobs: it is the hero image, and it is the only place
+ * on the site that shows the room a customer would actually walk into.
+ */
+const HERO_IMAGE = "/hero/showroom.jpg";
 
 /**
- * The hero: an UPPERCASE display-xl headline on bare canvas, with the car
- * driving in from the right.
+ * The three assurances under the buttons.
  *
- * This was `hero-photo-band` from DESIGN-bmw-m.md — a full-bleed showroom
- * photograph with the type laid over it. The photograph has been taken out, and
- * three things went with it, because all three existed only to rescue type from
- * the image underneath:
+ * These replaced a row of figures — "200+ happy customers", "98% satisfaction
+ * rate", "24/7 support". Two of those three were claims about ourselves that a
+ * visitor cannot check and every dealership makes. These are three things we
+ * actually do, and the first two are the specific worries somebody has before
+ * buying an import. The support line survived the swap because it was already
+ * a fact about availability rather than a self-assessment.
+ */
+const heroAssurances = [
+  { icon: Shield, title: "HPI Checked", note: "For peace of mind" },
+  { icon: Handshake, title: "Finance", note: "Available" },
+  { icon: Headset, title: "24/7", note: "Customer support" },
+] as const;
+
+/**
+ * `hero-photo-band` from DESIGN-bmw-m.md: a full-bleed photograph filling the
+ * frame, an UPPERCASE display-xl h1 sitting left over it, and nothing else. No
+ * card frame — the photo IS the band.
  *
- *   - the two linear scrims, which flattened the photo toward canvas so the
- *     headline could clear 4.5:1 over any crop of it;
- *   - the headline's halo text-shadow, which separated the glyphs from it;
- *   - the ambient glow and film grain, already removed for the same reason.
+ * The two linear scrims are not decoration, and they are the doc's own carve
+ * out. Type over a photograph fails contrast wherever the image runs toward the
+ * headline's own value, and these flatten the left of the photo toward canvas
+ * so it clears 4.5:1 at every crop. They resolve through --color-canvas, so
+ * they lighten on the white surface and darken on the black one without this
+ * component knowing which it is in — the same markup, inverted by the token.
  *
- * Over flat canvas a scrim is a gradient with nothing to correct, and a halo is
- * a bloom behind text that already has full contrast. The doc's Don't list
- * names both. Keeping them "just in case" is how a system accumulates chrome
- * nobody can later justify.
- *
- * Depth now comes from the one thing in the band that has any: the car's own
- * lighting, and the lamps that ignite once it has arrived.
+ * (The revision before this one had no photograph, and therefore no scrims and
+ * no halo: over flat canvas a scrim is a gradient correcting nothing, which the
+ * doc's Don't list rules out. The photograph is back, so they are back with it.
+ * The rule did not change — the thing it applies to did.)
  */
 export default async function Hero() {
   // Same request the featured section makes, so the two share one fetch.
@@ -40,11 +52,34 @@ export default async function Hero() {
 
   return (
     <section className="relative isolate flex min-h-[92svh] items-center overflow-hidden pt-16">
+      {/* Legibility scrims — see the note above.
+
+          The horizontal one carries the type: opaque at the left edge, clearing
+          before the car so the vehicle keeps its own contrast. Its stop moves
+          right as the viewport narrows, because the text column takes a larger
+          share of a phone than of a desktop.
+
+          The vertical one exists only below `lg`. There the column runs the
+          height of the band and the assurances land on the floor tiles, which
+          are light but busy. It settles that end of the frame without touching
+          the desktop composition, where nothing sits that low. */}
+      <div
+        aria-hidden
+        className="absolute inset-0 -z-10 hidden bg-linear-to-r from-canvas from-20% via-canvas/70 via-44% to-transparent to-66% lg:block"
+      />
+
       {/* 64px internal padding, which is the doc's `spacing.xxl` for hero
           bands — tighter than a section gap, because the photograph is doing
           the work the whitespace would otherwise do. */}
       <div className="mx-auto w-full max-w-[90rem] px-5 py-16 sm:px-8">
-        <div className="max-w-3xl">
+        {/* Narrower than the max-w-3xl this column used to be, and the width
+            is set by the scrim rather than by taste: the type has to finish
+            while the scrim is still opaque enough to carry it. At 576px the
+            last glyph lands around 42% of a 1440px viewport, where the scrim
+            still holds ~0.72 alpha — about 10:1 against ink even if the photo
+            behind it were pure black. A wider column pushed the text into the
+            part of the ramp that has to stay clear for the car. */}
+        <div className="max-w-xl">
           <Reveal>
             <span className="eyebrow">Japanese Imports · Manchester</span>
           </Reveal>
@@ -54,9 +89,12 @@ export default async function Hero() {
                 off-brand outright — the all-caps setting is a brand-voice
                 signal here, not a styling preference.
 
-                No halo: it sat here to lift the glyphs off the photograph, and
-                over canvas the text is already at full token contrast. */}
-            <h1 className="display-xl mt-8 text-ink">
+                The halo separates the headline from the photo behind it, so it
+                inverts with the theme: a black bloom under near-black text
+                would smear it rather than lift it. Kept tight — past a few
+                pixels from the glyph edge a wider blur adds no legibility, it
+                just puts a cloud behind the whole word. */}
+            <h1 className="display-xl mt-8 text-ink [text-shadow:var(--hero-text-shadow)]">
               Premium Japanese cars in Manchester
             </h1>
           </Reveal>
@@ -64,7 +102,7 @@ export default async function Hero() {
           <Reveal delay={160}>
             {/* Light (300) against the headline's 700. The gap between the two
                 is the editorial signature the whole system rests on. */}
-            <p className="mt-8 max-w-xl text-base font-light leading-relaxed text-lead sm:text-lg">
+            <p className="mt-8 text-base font-light leading-relaxed text-lead sm:text-lg">
               Browse quality hybrid and imported vehicles, each one HPI checked
               and prepared to a standard we&apos;d happily drive ourselves.
               Finance available on selected cars.
@@ -83,44 +121,44 @@ export default async function Hero() {
             </div>
           </Reveal>
 
-      {/* The car — front end only, and the one part of this band that changes
-          shape between a phone and a desktop.
+          {/* The photograph.
 
-          FRONT HALF, not the whole vehicle. The render's own alpha box puts the
-          car at 6.4%–89% of the image width, so its midpoint is 47.7% across;
-          translating by about that much sends the rear off the right edge and
-          keeps the front. That is the half worth showing — it is the end with
-          the headlights on it, and the entire point of this image is that they
-          light up. Cropping also buys size: only part of it is on screen, so
-          the image can be wider than the viewport without the visible portion
-          swelling to match.
+              It is a background layer from `lg` up and a band in the flow below
+              that, and the reason is the frame, not taste. The shot is 3:2
+              landscape; the hero band on a 375px phone is roughly 375x1100,
+              taller than it is wide. Filling that box keeps the height and
+              throws away the sides — about 31% of the image width survives, so
+              the car stops being a car and becomes an enormous close-up of one
+              headlight, with the showroom gone. No focal point fixes that;
+              there is no crop of a landscape photo that fills a portrait box
+              and still reads as a room.
 
-          WHY IT IS POSITIONED TWO DIFFERENT WAYS. From `xl` up the car is an
-          absolute overlay filling the band, centred, with the headline holding
-          the left half — the composition this hero is built around.
+              So below `lg` the photo takes its own 3:2 band in the flow and the
+              type sits on plain canvas above it — which is also why the scrim
+              is `lg`-only: below that there is no text over the photo for it to
+              correct.
 
-          Below `xl` that does not work, and nudging the numbers does not fix
-          it. The text column is capped at max-w-3xl (768px), so type runs to
-          roughly x=800 no matter how narrow the window gets; the overlay was
-          first tried at `lg` (1024px) and the headline landed squarely on the
-          bonnet, because 1024 minus a 768 column does not leave a car's worth
-          of room. Narrower still and it is worse: on a 375px phone the
-          headline, lede, both buttons, the disclaimer and the stats stack into
-          one full-width column about 1100px tall. There is no free strip to
-          put a car in — centre it and the bonnet lands on the call to action,
-          floor it and it sits below the fold of an 812px screen where nobody
-          sees it at all. With the photograph gone there is no scrim left to
-          rescue type from any of those outcomes.
-
-          So on small screens it stops being an overlay and becomes a band in
-          the flow, sitting between the disclaimer and the stats and bleeding
-          off the right edge. It gets its own room instead of competing for
-          someone else's, and it is on screen without scrolling. */}
-      <div className="pointer-events-none relative -mr-5 mt-10 flex justify-end sm:-mr-8 xl:absolute xl:inset-0 xl:-z-10 xl:m-0 xl:items-center">
-        <div className="w-[112%] max-w-none translate-x-[6%] sm:w-[92%] sm:translate-x-[4%] xl:w-[85%] xl:translate-x-[40%] xl:-translate-y-[6%]">
-          <HeroCar />
-        </div>
-      </div>
+              The box is `top-16` rather than `inset-0` because the header is
+              FIXED and opaque. Fitted against a full-height band the image sits
+              flush to y=0, directly under the header, which then eats the
+              ceiling and the marque wall. Starting below it is what makes the
+              whole photograph actually visible. 16 matches the section's own
+              pt-16. */}
+          <div className="hero-shot-frame relative -mx-5 mt-10 sm:-mx-8 lg:absolute lg:inset-x-0 lg:bottom-0 lg:top-16 lg:-z-20 lg:m-0">
+            <div className="hero-shot overflow-hidden">
+              <Image
+                src={HERO_IMAGE}
+                alt=""
+                fill
+                priority
+                sizes="100vw"
+                /* The box is already the image's own ratio, so cover crops
+                   nothing — it is the fill mode that guarantees no letterbox
+                   if the ratio is ever a rounding hair off. */
+                className="object-cover object-center"
+              />
+            </div>
+          </div>
 
           <Reveal delay={320}>
             <p className="caption mt-6 max-w-lg text-faint">
@@ -129,26 +167,34 @@ export default async function Hero() {
           </Reveal>
 
           <Reveal delay={400}>
-            {/* Spec cells, the same instrument-panel treatment the vehicle
-                detail page uses: value on top at display weight, machined
-                label beneath. Hairline gaps rather than gutters, so the row
-                reads as one panel divided rather than three separate tiles. */}
-            {/* Stacked below `sm`, three-up above. Three columns on a phone
-                left ~66px of text per cell, and "SATISFACTION" at the 10px
-                floor with the system's mandatory 1.5px tracking needs ~90px —
-                so the label overflowed its cell and was silently clipped by
-                the body's overflow-x guard. Tightening the padding doesn't
-                recover 24px; the column count has to give. */}
-            <dl className="mt-14 grid max-w-2xl gap-px border border-line-soft bg-line-soft sm:grid-cols-3">
-              {heroStats.map((s) => (
-                <div key={s.label} className="spec-cell px-5 py-6">
-                  <dt className="display-sm text-ink">{s.value}</dt>
-                  <dd className="mt-2 label-uppercase-sm text-faint">
-                    {s.label}
-                  </dd>
-                </div>
+            {/* Assurances. Stacked below `sm`, a divided row above it.
+
+                The hairline dividers appear only from `sm` up, and that is
+                correctness rather than taste: a wrapped flex row leaves a
+                border-left stranded at the start of the second line, which
+                reads as a rendering fault. Stacking below the breakpoint
+                removes the wrap entirely, so there is no line for a divider to
+                be orphaned on. */}
+            <ul className="mt-12 grid gap-5 sm:grid-cols-3 sm:gap-0">
+              {heroAssurances.map(({ icon: Icon, title, note }, i) => (
+                <li
+                  key={title}
+                  className={`flex items-center gap-3 sm:px-5 ${
+                    i === 0 ? "sm:pl-0" : "sm:border-l sm:border-line-soft"
+                  } ${i === heroAssurances.length - 1 ? "sm:pr-0" : ""}`}
+                >
+                  <Icon className="h-5 w-5 shrink-0 text-ink" />
+                  <span className="min-w-0">
+                    <span className="block label-uppercase-sm text-ink">
+                      {title}
+                    </span>
+                    <span className="block label-uppercase-sm text-faint">
+                      {note}
+                    </span>
+                  </span>
+                </li>
               ))}
-            </dl>
+            </ul>
           </Reveal>
         </div>
       </div>
