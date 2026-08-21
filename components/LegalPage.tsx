@@ -39,19 +39,27 @@ export default function LegalPage({
   return (
     <>
       <section className="border-b border-line-soft bg-canvas pt-32 pb-16">
-        <div className="mx-auto max-w-3xl px-5 sm:px-8">
-          <span className="eyebrow">{eyebrow}</span>
-          <h1 className="display-lg mt-6 text-ink">{title}</h1>
-          <p className="mt-6 text-base font-light leading-relaxed text-muted">
-            {intro}
-          </p>
-          <p className="caption mt-8 text-faint">Last updated: {updated}</p>
+        {/* The site container, then the reading column inside it — the pattern
+            the blog article already uses. Setting the narrow width ON the
+            container instead left this page's gutters narrower than every
+            other band, so its heading did not line up with the header above
+            it. The measure is unchanged; only the alignment is. */}
+        <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
+          <div className="mx-auto max-w-[42rem]">
+            <span className="eyebrow">{eyebrow}</span>
+            <h1 className="display-lg mt-6 text-ink">{title}</h1>
+            <p className="mt-6 text-base font-light leading-relaxed text-muted">
+              {intro}
+            </p>
+            <p className="caption mt-8 text-faint">Last updated: {updated}</p>
+          </div>
         </div>
       </section>
 
       <section className="bg-canvas py-20">
+        <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
         <div
-          className="mx-auto max-w-3xl px-5 text-base font-light leading-relaxed text-muted sm:px-8
+          className="mx-auto max-w-[42rem] text-base font-light leading-relaxed text-muted
             [&_a]:text-ink [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:opacity-70
             [&_h2]:mt-14 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:uppercase [&_h2]:tracking-[-0.015625rem] [&_h2]:text-ink
             [&_h3]:mt-8 [&_h3]:text-base [&_h3]:font-bold [&_h3]:uppercase [&_h3]:tracking-[0.09375rem] [&_h3]:text-ink
@@ -64,6 +72,7 @@ export default function LegalPage({
             [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:pl-5"
         >
           {children}
+        </div>
         </div>
       </section>
     </>
