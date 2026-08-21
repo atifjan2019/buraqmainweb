@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { getVehicles } from "@/lib/crm";
 import { contact, whatsappLink } from "@/lib/site";
-import { vehicleHref, type Vehicle } from "@/lib/vehicles";
 import { ArrowRight, WhatsApp } from "./Icons";
 import Reveal from "./Reveal";
 
@@ -19,22 +17,13 @@ import Reveal from "./Reveal";
  * and promising to translate documents is a commitment to work nobody has
  * agreed to do.
  *
- * The illustration is a real auction sheet from live stock when one has been
- * published, which is why this component reads the CRM rather than shipping a
- * picture. Until then it shows the grading scale instead — true either way,
- * and never a stock photo of somebody else's paperwork.
+ * The illustration is a pair of specimen sheets, captioned as examples. They
+ * show what the paperwork looks like; the sheet for any given car is that
+ * car's own, and the caption says so — an auction sheet is evidence about one
+ * specific vehicle, and a visitor must never take a sample for the record of
+ * the car they are considering.
  */
 export default async function AuctionSheet() {
-  let sheet: { thumb: string; href: string; label: string } | null = null;
-
-  try {
-    const { vehicles } = await getVehicles({ perPage: 50 });
-    sheet = firstPublishedSheet(vehicles);
-  } catch {
-    // A CRM outage costs this section its illustration, never the page.
-    sheet = null;
-  }
-
   const wa = whatsappLink(
     "Hi Burraq Motors, could you send me the auction sheet for a car I'm interested in?",
   );
@@ -61,9 +50,8 @@ export default async function AuctionSheet() {
                 It is the most honest document that exists about an imported
                 car, because it was written before anyone was trying to sell it
                 to you. Ask us for the sheet on any car here and we will send
-                it — and you are welcome to have it checked by anyone you
-                like. We would rather you bought with the evidence in front of
-                you.
+                it — and you are welcome to have it checked by anyone you like.
+                We would rather you bought with the evidence in front of you.
               </p>
 
               <div className="mt-10 flex flex-wrap gap-4">
@@ -92,95 +80,42 @@ export default async function AuctionSheet() {
           </Reveal>
 
           <Reveal delay={120}>
-            {sheet ? (
-              /* A real sheet from real stock, linking to the car it belongs
-                 to. Flat on the canvas with a hairline — the design system has
-                 no shadows, and a document does not need dressing up. */
-              <Link href={sheet.href} className="group block">
-                {/* eslint-disable-next-line @next/next/no-img-element --
-                    served straight from the CRM, as VehicleCard documents. */}
-                <img
-                  src={sheet.thumb}
-                  alt={sheet.label}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full border border-line bg-canvas object-contain transition-opacity group-hover:opacity-90"
-                />
-                <span className="caption mt-4 block text-faint">
-                  A real sheet from our current stock — tap to see the car
-                </span>
-              </Link>
-            ) : (
-              <GradingScale />
-            )}
+            <div>
+              {/* Two sheets rather than one: side by side you can see that the
+                  layout is fixed and only the entries change, which is the
+                  thing that makes a first sheet readable.
+
+                  Captioned as EXAMPLES on purpose. These are specimen
+                  documents showing what the paperwork looks like, not the
+                  record for any car in our stock — and an auction sheet is
+                  evidence about one specific vehicle, so a visitor must never
+                  be left thinking otherwise. */}
+              <div className="grid grid-cols-2 gap-4">
+                {[1, 2].map((n) => (
+                  /* eslint-disable-next-line @next/next/no-img-element --
+                     static assets in /public; next/image would re-encode a
+                     dense monochrome scan and cost legibility for no gain. */
+                  <img
+                    key={n}
+                    src={`/auction-sheets/example-${n}.png`}
+                    alt={`Example Japanese auction sheet ${n}: grades, odometer reading and the inspector's damage diagram`}
+                    width={800}
+                    height={800}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full border border-line bg-white object-contain"
+                  />
+                ))}
+              </div>
+
+              <p className="caption mt-4 text-faint">
+                Example sheets, shown so you know what to expect. The sheet for
+                a car you are looking at will be that car&rsquo;s own.
+              </p>
+            </div>
           </Reveal>
         </div>
       </div>
     </section>
   );
-}
-
-/**
- * What the grades mean, for the case where no sheet has been published yet.
- *
- * This is the part of a sheet a buyer actually needs translating, and it is
- * the same for every car — so it is worth saying plainly rather than filling
- * the space with a picture of a document we do not have.
- */
-function GradingScale() {
-  const grades: Array<[string, string]> = [
-    ["S", "As new. Almost never seen on an imported used car."],
-    ["6 – 5", "Exceptional. Very low mileage, no meaningful faults."],
-    ["4.5 – 4", "Good honest condition. Where most of our stock sits."],
-    ["3.5 – 3", "Visible wear or past repair. Priced accordingly."],
-    ["R", "Repaired accident damage, declared on the sheet."],
-  ];
-
-  return (
-    <div className="border border-line bg-canvas">
-      <div className="border-b border-line px-6 py-4 sm:px-8">
-        <span className="label-uppercase text-ink">The grading scale</span>
-      </div>
-
-      <dl>
-        {grades.map(([grade, meaning], i) => (
-          <div
-            key={grade}
-            className={`flex gap-6 px-6 py-4 sm:px-8 ${
-              i > 0 ? "border-t border-line-soft" : ""
-            }`}
-          >
-            <dt className="w-20 shrink-0 font-mono text-sm font-bold text-ink">
-              {grade}
-            </dt>
-            <dd className="text-sm font-light leading-relaxed text-muted">
-              {meaning}
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </div>
-  );
-}
-
-/** The first published auction sheet across current stock, if there is one. */
-function firstPublishedSheet(
-  vehicles: Vehicle[],
-): { thumb: string; href: string; label: string } | null {
-  for (const vehicle of vehicles) {
-    const doc = vehicle.documents.find(
-      // A PDF has no thumbnail, so it cannot illustrate anything here.
-      (d) => d.kind.startsWith("auction_sheet") && d.thumb,
-    );
-
-    if (doc?.thumb) {
-      return {
-        thumb: doc.thumb,
-        href: vehicleHref(vehicle),
-        label: `${doc.label} — ${vehicle.make} ${vehicle.model}`,
-      };
-    }
-  }
-
-  return null;
 }
