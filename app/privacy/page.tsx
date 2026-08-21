@@ -4,268 +4,358 @@ import { company, contact, site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: `How ${company.legalName}, trading as ${company.tradingAs}, collects, uses and protects your personal data under UK GDPR.`,
+  description: `How ${company.legalName}, trading as ${company.tradingAs}, collects, uses and protects your personal data.`,
 };
 
-const UPDATED = "4 August 2026";
+const UPDATED = "21 August 2026";
 
+/**
+ * The dealership supplied the wording for this notice and asked for it to be
+ * used as written, with the business details changed to theirs. Company name,
+ * registered address, contact email and site URL are therefore rendered from
+ * `lib/site.ts` rather than typed in, so they cannot drift from the details
+ * shown everywhere else on the site.
+ */
 export default function PrivacyPage() {
-  const address = [...contact.addressLines].join(", ");
+  const address = contact.addressLines.join(", ");
 
   return (
     <LegalPage
       eyebrow="LEGAL"
       title="Privacy Policy"
       updated={UPDATED}
-      intro={`This notice explains what personal data ${company.legalName} (trading as ${company.tradingAs}) collects when you use this website or enquire about a vehicle, why we collect it, and what rights you have over it.`}
+      intro={`${company.tradingAs} are committed to protecting and respecting your privacy.`}
     >
-      <h2>1. Who we are</h2>
       <p>
-        {company.legalName}, trading as {company.tradingAs}, is the data
-        controller responsible for the personal data described in this notice.
+        This policy (together with our Terms of Use and any other documents
+        referred to on it) sets out the basis on which any personal data we
+        collect from you, or that you provide to us, will be processed by us.
+        Please read the following carefully to understand our views and
+        practices regarding your personal data and how we will treat it.
       </p>
-      <table>
-        <tbody>
-          <tr>
-            <td>
-              <strong>Registered company</strong>
-            </td>
-            <td>
-              {company.legalName}
-              {company.companyNumber
-                ? ` (company number ${company.companyNumber})`
-                : ""}
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <strong>Trading name</strong>
-            </td>
-            <td>{company.tradingAs}</td>
-          </tr>
-          <tr>
-            <td>
-              <strong>Address</strong>
-            </td>
-            <td>{address}</td>
-          </tr>
-          <tr>
-            <td>
-              <strong>Email</strong>
-            </td>
-            <td>
-              <a href={`mailto:${contact.email}`}>{contact.email}</a>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <strong>Telephone</strong>
-            </td>
-            <td>
-              <a href={`tel:${contact.phoneHref}`}>{contact.phone}</a>
-            </td>
-          </tr>
-          {company.icoNumber ? (
-            <tr>
-              <td>
-                <strong>ICO registration</strong>
-              </td>
-              <td>{company.icoNumber}</td>
-            </tr>
-          ) : null}
-        </tbody>
-      </table>
       <p>
-        If you have any question about this notice or about how we handle your
-        data, contact us at{" "}
-        <a href={`mailto:${contact.email}`}>{contact.email}</a>.
+        For the purpose of the Data Protection Act 2018 (the Act), the data
+        controller is {company.legalName}, trading as {company.tradingAs}, of{" "}
+        {address}.
       </p>
 
-      <h2>2. The data we collect</h2>
-      <h3>Information you give us</h3>
+      <h2>Information we collect from you</h2>
+      <p>We will collect and process the following data about you:</p>
       <p>
-        When you make an enquiry — through a form on this site, by email, by
-        telephone or over WhatsApp — we collect the details you choose to send
-        us. That typically means your name, email address, telephone number and
-        the content of your message, including which vehicle you are interested
-        in.
-      </p>
-      <h3>Finance enquiries</h3>
-      <p>
-        If you use our finance calculator or ask us to look into finance,
-        additional information is involved. The calculator itself is provided by
-        Codeweavers Limited and, in its standalone form, produces illustrative
-        Hire Purchase figures from the vehicle price, deposit and term you
-        enter. Those figures are indicative only and are not an offer of
-        finance.
+        <strong>Information you give us.</strong> This is information about you
+        that you give us by filling in forms on {site.url} (our site) or by
+        corresponding with us by phone, e-mail or otherwise. It includes
+        information you provide when you register to use our site, subscribe to
+        our service, search for a product, place an order on our site,
+        participate in discussion boards or other social media functions on our
+        site, enter a competition, promotion or survey, and when you report a
+        problem with our site. The information you give us may include your
+        name, address, e-mail address and phone number, financial and credit
+        card information, personal description and photograph, date of birth,
+        employment details, and address history.
       </p>
       <p>
-        If you decide to proceed with an application, you will be asked for
-        further details such as your address history, employment and income.
-        That information is used to approach lenders on your behalf and will be
-        shared with them and with credit reference agencies. We will tell you
-        before that happens.
-      </p>
-      <h3>Information collected automatically</h3>
-      <p>
-        Our web server records standard technical information when you visit,
-        including your IP address, browser type and the pages you view. This is
-        used to keep the site running and secure.
-      </p>
-      <p>
-        We do not currently run advertising or analytics tracking on this
-        website.
-      </p>
-
-      <h2>3. Why we use it, and our lawful basis</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Purpose</th>
-            <th>Lawful basis</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Responding to your enquiry about a vehicle</td>
-            <td>
-              Steps taken at your request prior to entering a contract, and our
-              legitimate interest in answering enquiries
-            </td>
-          </tr>
-          <tr>
-            <td>Arranging a sale, part exchange or delivery</td>
-            <td>Performance of a contract with you</td>
-          </tr>
-          <tr>
-            <td>Introducing you to finance lenders at your request</td>
-            <td>
-              Steps taken at your request prior to entering a contract, and
-              compliance with our regulatory obligations
-            </td>
-          </tr>
-          <tr>
-            <td>Keeping records of sales, invoices and warranties</td>
-            <td>Legal obligation, and our legitimate interest</td>
-          </tr>
-          <tr>
-            <td>Keeping the website secure and available</td>
-            <td>Our legitimate interest in protecting our systems</td>
-          </tr>
-        </tbody>
-      </table>
-      <p>
-        We do not sell your personal data, and we do not use it for automated
-        decision-making that produces a legal effect on you. Lenders you are
-        introduced to may carry out automated credit decisions of their own —
-        they will explain that in their own privacy notices.
-      </p>
-
-      <h2>4. Who we share it with</h2>
-      <ul>
-        <li>
-          <strong>Codeweavers Limited</strong> — supplies the finance
-          calculator and finance application journey used on this site.
-        </li>
-        <li>
-          <strong>Finance lenders and brokers</strong> — only where you have
-          asked us to explore finance for you.
-        </li>
-        <li>
-          <strong>Vimeo</strong> — hosts the explainer films on our finance
-          page. These load only when you choose to play them.
-        </li>
-        <li>
-          <strong>Our hosting and email providers</strong> — who process data on
-          our instructions in order to run the site and deliver our email.
-        </li>
-        <li>
-          <strong>Professional advisers and authorities</strong> — where we are
-          required to share information by law.
-        </li>
-      </ul>
-      <p>
-        {company.tradingAs} is a credit broker, not a lender. Where we introduce
-        you to a lender, that lender becomes a data controller in its own right
-        and will handle your data under its own privacy notice.
-      </p>
-
-      <h2>5. Cookies and similar technologies</h2>
-      <p>
-        This website does not set advertising or analytics cookies. Cookies may
-        be set by third-party services when — and only when — you actively use
-        them:
+        <strong>Information we collect about you.</strong> With regard to each
+        of your visits to our site we will automatically collect the following
+        information:
       </p>
       <ul>
         <li>
-          The <strong>finance calculator</strong> may set cookies necessary for
-          it to function once you run a quote.
+          technical information, including the Internet protocol (IP) address
+          used to connect your computer to the Internet, your login information,
+          browser type and version, time zone setting, browser plug-in types and
+          versions, operating system and platform;
         </li>
         <li>
-          <strong>Vimeo</strong> may set cookies once you click to play a video.
-          Videos are not loaded until you do, so no request reaches Vimeo before
-          then.
+          information about your visit, including the full Uniform Resource
+          Locators (URL), clickstream to, through and from our site (including
+          date and time), products you viewed or searched for, page response
+          times, download errors, length of visits to certain pages, page
+          interaction information (such as scrolling, clicks, and mouse-overs),
+          methods used to browse away from the page, and any phone number used
+          to call our customer service number.
         </li>
       </ul>
       <p>
-        You can block or delete cookies in your browser settings. Doing so may
-        stop the finance calculator working.
+        <strong>Information we receive from other sources.</strong> This is
+        information we receive about you if you use any of the other websites we
+        operate or the other services we provide. In this case we will have
+        informed you when we collected that data if we intend to share those
+        data internally and combine it with data collected on this site. We will
+        also have told you for what purpose we will share and combine your data.
+        We are working closely with third parties (including, for example,
+        business partners, sub-contractors in technical, payment and delivery
+        services, advertising networks, analytics providers, search information
+        providers, credit reference agencies). We will notify you when we
+        receive information about you from them and the purposes for which we
+        intend to use that information.
       </p>
 
-      <h2>6. How long we keep it</h2>
+      <h2>Cookies</h2>
       <p>
-        Enquiries that do not lead to a purchase are kept for up to two years so
-        we can pick up the conversation if you come back to us. Records relating
-        to a completed sale, including invoices and finance documentation, are
-        kept for at least six years to meet our tax, warranty and regulatory
-        obligations. After that, data is deleted or anonymised.
+        Our website uses cookies to distinguish you from other users of our
+        website. This helps us to provide you with a good experience when you
+        browse our website and also allows us to improve our site. For detailed
+        information on the cookies we use and the purposes for which we use them
+        see our Cookie Policy.
       </p>
 
-      <h2>7. Where your data is held</h2>
+      <h2>Uses made of the information</h2>
+      <p>We use information held about you in the following ways:</p>
       <p>
-        Your data is stored on servers within the United Kingdom or the European
-        Economic Area. If any provider we use transfers data outside that area,
-        we require appropriate safeguards such as the UK International Data
-        Transfer Agreement or Addendum to be in place.
+        <strong>Information you give to us.</strong> We will use this
+        information:
       </p>
-
-      <h2>8. Your rights</h2>
-      <p>Under UK data protection law you have the right to:</p>
       <ul>
-        <li>ask for a copy of the personal data we hold about you;</li>
-        <li>ask us to correct data that is inaccurate or incomplete;</li>
-        <li>ask us to delete data where we no longer have a reason to keep it;</li>
-        <li>ask us to restrict how we use your data;</li>
-        <li>object to processing carried out on the basis of legitimate interests;</li>
-        <li>ask us to transfer your data to another provider; and</li>
-        <li>withdraw consent at any time, where we relied on consent.</li>
+        <li>
+          to carry out our obligations arising from any contracts entered into
+          between you and us and to provide you with the information, products
+          and services that you request from us;
+        </li>
+        <li>
+          to provide you with information about other goods and services we
+          offer that are similar to those that you have already purchased or
+          enquired about;
+        </li>
+        <li>
+          to provide you with information about goods or services we feel may
+          interest you. We will only contact you by electronic means (email or
+          SMS) if you have consented to this. You may withdraw your consent at
+          any time by contacting us directly at {address} or {contact.email}.
+        </li>
+        <li>to notify you about changes to our service;</li>
+        <li>
+          to ensure that content from our site is presented in the most
+          effective manner for you and for your device.
+        </li>
       </ul>
       <p>
-        To exercise any of these, email{" "}
-        <a href={`mailto:${contact.email}`}>{contact.email}</a>. We will respond
-        within one month. There is normally no charge.
+        <strong>Information we collect about you.</strong> We will use this
+        information:
+      </p>
+      <ul>
+        <li>
+          to administer our site and for internal operations, including
+          troubleshooting, data analysis, testing, research, statistical and
+          survey purposes;
+        </li>
+        <li>
+          to improve our site to ensure that content is presented in the most
+          effective manner for you and for your device;
+        </li>
+        <li>
+          to allow you to participate in interactive features of our service,
+          when you choose to do so;
+        </li>
+        <li>as part of our efforts to keep our site safe and secure;</li>
+        <li>
+          to measure or understand the effectiveness of advertising we serve to
+          you and others, and to deliver relevant advertising to you;
+        </li>
+        <li>
+          to make suggestions and recommendations to you and other users of our
+          site about goods or services that may interest you or them.
+        </li>
+      </ul>
+      <p>
+        <strong>Information we receive from other sources.</strong> We will
+        combine this information with information you give to us and information
+        we collect about you. We will use this information and the combined
+        information for the purposes set out above (depending on the types of
+        information we receive).
       </p>
 
-      <h2>9. Complaints</h2>
+      <h2>Disclosure of your information</h2>
+      <p>We may share your personal information with:</p>
+      <ul>
+        <li>
+          Any member of our group, which means our subsidiaries, our ultimate
+          holding company and its subsidiaries, as defined in section 1159 of
+          the UK Companies Act 2006.
+        </li>
+        <li>
+          Selected third parties including any of our business partners,
+          suppliers and sub-contractors where this is necessary for the
+          performance of any contract we enter into with you; analytics and
+          search engine providers that assist us in the improvement and
+          optimisation of our site; credit reference agencies for the purpose of
+          assessing your credit score where this is a condition of us or any of
+          our business partners, suppliers and sub-contractors entering into a
+          contract with you; and finance brokers and lenders for the purpose of
+          providing requested finance.
+        </li>
+      </ul>
+      <p>We will disclose your personal information to third parties:</p>
+      <ul>
+        <li>
+          In the event that we sell or buy any business or assets, in which case
+          we will disclose your personal data to the prospective seller or buyer
+          of such business or assets.
+        </li>
+        <li>
+          If {company.legalName} or substantially all of its assets are acquired
+          by a third party, in which case personal data held by it about its
+          customers will be one of the transferred assets.
+        </li>
+        <li>
+          If we are under a duty to disclose or share your personal data in
+          order to comply with any legal obligation, or in order to enforce or
+          apply our Terms of Use or terms and conditions of supply and other
+          agreements; or to protect the rights, property, or safety of{" "}
+          {company.legalName}, our customers, or others. This includes
+          exchanging information with other companies and organisations for the
+          purposes of fraud protection and credit risk reduction.
+        </li>
+      </ul>
       <p>
-        If you are unhappy with how we have handled your data, please contact us
-        first so we can put it right. You also have the right to complain to the
-        Information Commissioner&rsquo;s Office at{" "}
-        <a
-          href="https://ico.org.uk/make-a-complaint/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          ico.org.uk
+        We will not disclose your personal information to third parties to
+        enable them to contact you for marketing purposes unless we have your
+        consent to do so.
+      </p>
+
+      <h2>Where we store your personal data</h2>
+      <p>
+        All information you provide to us is stored on our secure servers. Any
+        payment transactions will be encrypted using SSL technology. Where we
+        have given you (or where you have chosen) a password which enables you
+        to access certain parts of our site, you are responsible for keeping
+        this password confidential. We ask you not to share a password with
+        anyone.
+      </p>
+      <p>
+        The data that we collect from you may be transferred to, and stored at,
+        a destination outside the European Economic Area (&ldquo;EEA&rdquo;) by
+        one of our suppliers. It may also be processed by staff operating
+        outside the EEA who work for one of our suppliers. This includes staff
+        engaged in, among other things, the fulfilment of your order, the
+        processing of your payment details and the provision of support
+        services. By submitting your personal data, you agree to this transfer,
+        storing or processing. {company.tradingAs} will take all steps
+        reasonably necessary to ensure that your data is treated securely and in
+        accordance with this privacy policy.
+      </p>
+      <p>
+        Unfortunately, the transmission of information via the internet is not
+        completely secure. Although we will do our best to protect your personal
+        data, we cannot guarantee the security of your data transmitted to our
+        site; any transmission is at your own risk. Once we have received your
+        information, we will use strict procedures and security features to try
+        to prevent unauthorised access.
+      </p>
+
+      <h2>For how long do we retain your personal data?</h2>
+      <p>
+        Unless required to do so by law (eg for the purposes of preventing fraud
+        or tax evasion), we do not retain personal data no longer than is
+        necessary for the purposes for which we originally collected it.
+        Ordinarily, this will be for a period of 7 years if you have purchased a
+        vehicle or services or obtained finance through us, or 6 months if you
+        have not. If you have not objected to our providing you with information
+        about other goods and services we offer that are similar to those that
+        you have already purchased or enquired about, or if you have given and
+        not withdrawn your consent for us to use your personal data for other
+        marketing purposes, we will retain the data for as long as we need it
+        for those purposes.
+      </p>
+      <p>
+        We regularly review the personal data we hold, and delete anything we no
+        longer need. Information that does not need to be accessed regularly,
+        but which still needs to be retained, is safely archived or put offline.
+      </p>
+
+      <h2>Your rights</h2>
+      <p>
+        You have the right to ask us not to process your personal data for
+        marketing purposes. We will ask your consent (before collecting your
+        data) if we intend to use your data for such purposes or if we intend to
+        disclose your information to any third party for such purposes.
+      </p>
+      <p>
+        You can exercise your right to prevent such processing by not checking
+        certain boxes on the forms we use to collect your data. You also have
+        the right to have inaccurate or incomplete data corrected and, in some
+        cases (such as where it is no longer necessary for us to retain the data
+        for the purposes for which it was originally collected/processed, where
+        we need your consent and you have withdrawn such consent, or where you
+        object to the processing and there is no overriding legitimate interest
+        for us to continue with it) to have your personal data removed from our
+        systems.
+      </p>
+      <p>
+        Where you have provided your personal data to us and our processing is
+        carried out by automated means based on your consent or for the
+        performance of a contract, you may ask us to provide you with the data
+        in a structured, commonly used and machine readable form or, if this is
+        technically feasible with our systems, to transmit the data directly to
+        another organisation. Machine readable means that the information is
+        structured so that software can extract specific elements of the data.
+      </p>
+      <p>
+        Unless the decision is necessary for entering into or for the
+        performance of a contract between us, is authorised by law (eg for the
+        purposes of preventing fraud or tax evasion) or you have given your
+        explicit consent for us to do so, you have the right to ask us not to
+        subject you to any decision which produces a legal effect or a similarly
+        significant effect on you on the basis of automated processing.
+      </p>
+      <p>
+        You can exercise any of the above rights at any time by contacting us at{" "}
+        {address} or {contact.email}.
+      </p>
+      <p>
+        Our site may, from time to time, contain links to and from the websites
+        of our partner networks, advertisers and affiliates. If you follow a
+        link to any of these websites, please note that these websites have
+        their own privacy policies and that we do not accept any responsibility
+        or liability for these policies. Please check these policies before you
+        submit any personal data to these websites.
+      </p>
+
+      <h2>Access to information</h2>
+      <p>
+        The Act gives you the right to access information held about you. Your
+        right of access can be exercised in accordance with the Act. We will not
+        charge you for providing you with details of the information we hold
+        about you unless your request is manifestly unfounded or excessive,
+        particularly if it is repetitive, when we will charge you a reasonable
+        fee, based on the administrative cost of providing the information. We
+        may also charge a reasonable fee to comply with multiple requests for
+        further copies of the same information.
+      </p>
+
+      <h2>Changes to our privacy policy</h2>
+      <p>
+        Any changes we make to our privacy policy in the future will be posted
+        on this page and, where appropriate, notified to you by e-mail. Please
+        check back frequently to see any updates or change to our privacy
+        policy.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        Questions, comments and requests regarding this privacy policy are
+        welcomed and should be addressed to {address} or {contact.email}.
+      </p>
+
+      <h2>Complaints</h2>
+      <p>
+        If you have any complaints about how we process your personal data,
+        please contact us at {address} or {contact.email}, and we will do our
+        best to resolve them.
+      </p>
+      <p>
+        If you remain dissatisfied, you may contact the Information
+        Commissioner&rsquo;s Office by writing to it at Wycliffe House, Water
+        Lane, Wilmslow, Cheshire, SK9 5AF, telephoning 0303 123 1113 or 01625
+        545745, or by completing the online email message form at{" "}
+        <a href="https://ico.org.uk/global/contact-us/">
+          ico.org.uk/global/contact-us
+        </a>{" "}
+        or the online complaints form at{" "}
+        <a href="https://ico.org.uk/make-a-complaint/">
+          ico.org.uk/make-a-complaint
         </a>
-        , or by calling 0303 123 1113.
-      </p>
-
-      <h2>10. Changes to this notice</h2>
-      <p>
-        We may update this notice from time to time. The date at the top shows
-        when it was last changed. This notice applies to {site.url} and to
-        enquiries made through it.
+        .
       </p>
     </LegalPage>
   );

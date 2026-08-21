@@ -13,6 +13,7 @@
  * TODO before launch — these are legally required on a UK trading site and on
  * the privacy notice, and nobody has supplied them yet:
  *   companyNumber   Companies House registration number
+ *   vatNumber       VAT registration number
  *   icoNumber       ICO data protection register reference
  *   fcaNumber       FCA firm reference number (the site claims "FCA Authorised")
  */
@@ -20,6 +21,8 @@ export const company = {
   legalName: "Burraq Traders Ltd",
   tradingAs: "Burraq Motors",
   companyNumber: "",
+  /** VAT registration, printed in the Terms only once it is filled in. */
+  vatNumber: "",
   icoNumber: "",
   fcaNumber: "",
 } as const;
