@@ -1,4 +1,3 @@
-import Image from "next/image";
 import HeroCar from "./HeroCar";
 import Link from "next/link";
 import { financeDisclaimer } from "@/lib/site";
@@ -14,28 +13,26 @@ const heroStats = [
 ];
 
 /**
- * Brand photography, not stock — a low-angle shot from the dealership's own
- * library. The car it shows may no longer be for sale, so nothing here claims
- * it is.
- */
-const HERO_IMAGE = "/cars/112-toyota-prius/03.jpeg";
-
-/**
- * `hero-photo-band` from DESIGN-bmw-m.md: a full-bleed photograph filling the
- * frame, an UPPERCASE display-xl h1 sitting left over it, and nothing else. No
- * card frame — the photo IS the band.
+ * The hero: an UPPERCASE display-xl headline on bare canvas, with the car
+ * driving in from the right.
  *
- * The ambient glow and the film grain that used to sit here are gone. Both are
- * named in the doc's Don't list: this system adds no atmospheric backdrops and
- * no decoration, and depth is supposed to come from the photograph's own
- * lighting rather than from chrome laid over it.
+ * This was `hero-photo-band` from DESIGN-bmw-m.md — a full-bleed showroom
+ * photograph with the type laid over it. The photograph has been taken out, and
+ * three things went with it, because all three existed only to rescue type from
+ * the image underneath:
  *
- * The two linear scrims below are not decoration and do stay. Type over a
- * photograph fails contrast wherever the image runs toward the headline's own
- * value, and these flatten the photo toward canvas so it clears 4.5:1 at every
- * crop. They resolve through --color-canvas, so they lighten on the white
- * surface and darken on the black one without the component knowing which it is
- * in — the same markup, inverted by the token.
+ *   - the two linear scrims, which flattened the photo toward canvas so the
+ *     headline could clear 4.5:1 over any crop of it;
+ *   - the headline's halo text-shadow, which separated the glyphs from it;
+ *   - the ambient glow and film grain, already removed for the same reason.
+ *
+ * Over flat canvas a scrim is a gradient with nothing to correct, and a halo is
+ * a bloom behind text that already has full contrast. The doc's Don't list
+ * names both. Keeping them "just in case" is how a system accumulates chrome
+ * nobody can later justify.
+ *
+ * Depth now comes from the one thing in the band that has any: the car's own
+ * lighting, and the lamps that ignite once it has arrived.
  */
 export default async function Hero() {
   // Same request the featured section makes, so the two share one fetch.
@@ -43,41 +40,6 @@ export default async function Hero() {
 
   return (
     <section className="relative isolate flex min-h-[92svh] items-center overflow-hidden pt-16">
-      {/* Photography — full-bleed, edge to edge, never inset into a container.
-          The doc is explicit that it stays that way at every breakpoint. */}
-      <div aria-hidden className="absolute inset-0 -z-30">
-        <Image
-          src={HERO_IMAGE}
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-[62%_center] lg:object-[70%_center]"
-        />
-      </div>
-
-      {/* Legibility scrims — see the note above. */}
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-20 bg-linear-to-r from-canvas via-canvas/85 to-canvas/30 lg:via-canvas/70 lg:to-canvas/10"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-20 bg-linear-to-t from-canvas via-transparent to-canvas/70"
-      />
-
-      {/* The car, sitting on the band's floor above the scrims so its lamps
-          read as light rather than being flattened by them.
-
-          Width is capped and the whole thing is pushed off the right edge on
-          large screens, so the headline keeps the left third to itself — the
-          car is the photograph's subject, not a competitor for the type. */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 flex justify-end">
-        <div className="w-[150%] max-w-none translate-x-[12%] translate-y-[6%] sm:w-[115%] lg:w-[80%] lg:translate-x-[6%] xl:w-[72%]">
-          <HeroCar />
-        </div>
-      </div>
-
       {/* 64px internal padding, which is the doc's `spacing.xxl` for hero
           bands — tighter than a section gap, because the photograph is doing
           the work the whitespace would otherwise do. */}
@@ -92,12 +54,9 @@ export default async function Hero() {
                 off-brand outright — the all-caps setting is a brand-voice
                 signal here, not a styling preference.
 
-                The halo separates the headline from the photo behind it, so it
-                inverts with the theme: a black bloom under near-black text
-                would smear it rather than lift it. Kept tight — past a few
-                pixels from the glyph edge a wider blur adds no legibility, it
-                just puts a cloud behind the whole word. */}
-            <h1 className="display-xl mt-8 text-ink [text-shadow:var(--hero-text-shadow)]">
+                No halo: it sat here to lift the glyphs off the photograph, and
+                over canvas the text is already at full token contrast. */}
+            <h1 className="display-xl mt-8 text-ink">
               Premium Japanese cars in Manchester
             </h1>
           </Reveal>
@@ -123,6 +82,45 @@ export default async function Hero() {
               </Link>
             </div>
           </Reveal>
+
+      {/* The car — front end only, and the one part of this band that changes
+          shape between a phone and a desktop.
+
+          FRONT HALF, not the whole vehicle. The render's own alpha box puts the
+          car at 6.4%–89% of the image width, so its midpoint is 47.7% across;
+          translating by about that much sends the rear off the right edge and
+          keeps the front. That is the half worth showing — it is the end with
+          the headlights on it, and the entire point of this image is that they
+          light up. Cropping also buys size: only part of it is on screen, so
+          the image can be wider than the viewport without the visible portion
+          swelling to match.
+
+          WHY IT IS POSITIONED TWO DIFFERENT WAYS. From `xl` up the car is an
+          absolute overlay filling the band, centred, with the headline holding
+          the left half — the composition this hero is built around.
+
+          Below `xl` that does not work, and nudging the numbers does not fix
+          it. The text column is capped at max-w-3xl (768px), so type runs to
+          roughly x=800 no matter how narrow the window gets; the overlay was
+          first tried at `lg` (1024px) and the headline landed squarely on the
+          bonnet, because 1024 minus a 768 column does not leave a car's worth
+          of room. Narrower still and it is worse: on a 375px phone the
+          headline, lede, both buttons, the disclaimer and the stats stack into
+          one full-width column about 1100px tall. There is no free strip to
+          put a car in — centre it and the bonnet lands on the call to action,
+          floor it and it sits below the fold of an 812px screen where nobody
+          sees it at all. With the photograph gone there is no scrim left to
+          rescue type from any of those outcomes.
+
+          So on small screens it stops being an overlay and becomes a band in
+          the flow, sitting between the disclaimer and the stats and bleeding
+          off the right edge. It gets its own room instead of competing for
+          someone else's, and it is on screen without scrolling. */}
+      <div className="pointer-events-none relative -mr-5 mt-10 flex justify-end sm:-mr-8 xl:absolute xl:inset-0 xl:-z-10 xl:m-0 xl:items-center">
+        <div className="w-[112%] max-w-none translate-x-[6%] sm:w-[92%] sm:translate-x-[4%] xl:w-[85%] xl:translate-x-[40%] xl:-translate-y-[6%]">
+          <HeroCar />
+        </div>
+      </div>
 
           <Reveal delay={320}>
             <p className="caption mt-6 max-w-lg text-faint">

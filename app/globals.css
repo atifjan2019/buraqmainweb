@@ -133,15 +133,6 @@
   */
   --shadow-card: none;
 
-  /*
-    Separates hero type from the photograph behind it. The headline is
-    black on this surface, so a black bloom would smear into the letters
-    instead of lifting them — a tight white halo does the separating.
-    Tight on purpose: past a few pixels from the glyph edge a wider blur
-    adds no legibility, it just puts a cloud behind the whole word.
-  */
-  --hero-text-shadow: 0 1px 14px rgb(255 255 255 / 0.85);
-
   /* --- Spacing -------------------------------------------------- */
   /* The doc's named steps, on a 4px base. Tailwind's own scale already
      covers these numerically (py-24 = 96px = section); these exist so
@@ -197,12 +188,6 @@ html[data-theme="dark"] {
   --ghost-numeral: #262626;
   --ghost-numeral-hover: #3c3c3c;
 
-  /*
-    Display type is white here, so the halo inverts with it: a white
-    bloom under white glyphs would fatten them rather than separate
-    them, and a black one lifts them off the bright parts of a photo.
-  */
-  --hero-text-shadow: 0 1px 14px rgb(0 0 0 / 0.6);
 }
 
 @keyframes marquee {
@@ -1011,6 +996,45 @@ html:not([data-js]) .js-only {
      the rendered photograph, which is what percentage positioning needs. */
   aspect-ratio: 1920 / 1080;
   pointer-events: none;
+
+  /* Two knobs, both read again by the lamp delays in HeroCar.tsx so the
+     headlights can never drift out of step with the car.
+
+     --hero-entry is how long the slide takes. --hero-ignite-beat is the pause
+     between the car stopping and its lamps coming on: without it the lights
+     fire on the same frame the motion ends, which reads as one event rather
+     than a car arriving and then switching them on. */
+  --hero-entry: 900ms;
+  --hero-ignite-beat: 200ms;
+
+  /* ease-out-cubic. The first curve here was ease-out-quint, which put 96% of
+     the travel in the first half — the car effectively stopped at the halfway
+     mark and then crept the last nine pixels, which read as a stall rather
+     than a settle. This one keeps the deceleration visible the whole way. */
+  animation: hero-car-enter var(--hero-entry) cubic-bezier(0.33, 1, 0.68, 1) both;
+}
+
+/* The car drives in from the right.
+   Transform and opacity only — both composite on the GPU, so the entry costs
+   no layout and no repaint, and the headline beside it never reflows.
+   The distance is a percentage of the car's own width rather than a vw or a
+   fixed px, so it is the same gesture on a phone as on a 27in display instead
+   of a crawl on one and a jump on the other. The section's overflow-hidden is
+   what stops the offscreen start from widening the page. */
+@keyframes hero-car-enter {
+  from {
+    transform: translateX(26%);
+    opacity: 0;
+  }
+  /* Opaque well before it stops moving: a fade running the full distance
+     reads as a dissolve, and the ask was for something that arrives. */
+  40% {
+    opacity: 1;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .hero-car__img {
@@ -1148,7 +1172,16 @@ html:not([data-js]) .js-only {
 }
 
 /* Lit and still for anyone who asked for less motion. */
+/* Lit, parked and still for anyone who asked for less motion. The global
+   reduced-motion rule already collapses every animation to 0.001ms, which
+   would land these on their end state anyway — but that leaves a 0-duration
+   animation attached to each layer. Dropping them outright is the same
+   picture with nothing left running. */
 @media (prefers-reduced-motion: reduce) {
+  .hero-car {
+    animation: none;
+  }
+
   .hero-lamp,
   .hero-beam {
     animation: none;
@@ -1164,6 +1197,9 @@ html:not([data-js]) .js-only {
    The frame also takes pointer events back — it is aria-hidden and
    pointer-events:none in normal use, and clicks are the whole interface here. */
 .hero-car.is-calibrating {
+  /* No entry slide while calibrating — you are clicking crosshairs, and a
+     moving target is the one thing this mode must not be. */
+  animation: none;
   pointer-events: auto;
   cursor: crosshair;
   outline: 1px dashed color-mix(in srgb, var(--color-ink) 40%, transparent);

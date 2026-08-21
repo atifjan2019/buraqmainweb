@@ -45,9 +45,17 @@ export default function HeroCar() {
 
     // will-change earns its keep during the ignition burst and becomes a
     // standing cost afterwards, so it is dropped once the intro has settled.
+    //
+    // The lamps wait out the car's slide and the beat after it before they
+    // light, so that burst starts later than it used to. Both durations are
+    // read from the stylesheet rather than written down a second time here,
+    // where a copy would go stale the first time somebody retimes the entry.
+    const css = getComputedStyle(frame);
     const settle = window.setTimeout(
       () => frame.classList.add("has-settled"),
-      1400,
+      readMs(css.getPropertyValue("--hero-entry"), 900) +
+        readMs(css.getPropertyValue("--hero-ignite-beat"), 200) +
+        1400,
     );
 
     const stopCalibrating = setUpCalibration(frame);
@@ -93,8 +101,9 @@ export default function HeroCar() {
                 height: `${beam.h}%`,
                 "--rot": `${beam.rotate}deg`,
                 // A beam follows its own lamp rather than sharing a delay, so
-                // the light reaches the road just after the lamp lights.
-                animationDelay: `${(lamp?.delay ?? 0) + 40}ms`,
+                // the light reaches the road just after the lamp lights — and
+                // both wait for --hero-entry, the car's own arrival.
+                animationDelay: `calc(var(--hero-entry) + var(--hero-ignite-beat) + ${(lamp?.delay ?? 0) + 40}ms)`,
               } as React.CSSProperties
             }
           />
@@ -112,13 +121,30 @@ export default function HeroCar() {
               top: `${lamp.y}%`,
               width: `${lamp.w}%`,
               height: `${lamp.h}%`,
-              animationDelay: `${lamp.delay}ms`,
+              // Offset by the entry duration: headlights that flare while the
+              // car is still sliding read as a rendering fault, not a car
+              // turning its lamps on. It arrives, then it lights up.
+              animationDelay: `calc(var(--hero-entry) + var(--hero-ignite-beat) + ${lamp.delay}ms)`,
             } as React.CSSProperties
           }
         />
       ))}
     </div>
   );
+}
+
+/**
+ * A CSS time value in milliseconds.
+ *
+ * Accepts both units CSS allows, because `1.1s` and `1100ms` are the same
+ * declaration and whoever retimes the entry should not have to know which one
+ * this file happens to parse. Falls back rather than throwing: a mistimed
+ * will-change drop is a wasted layer, not a broken hero.
+ */
+function readMs(value: string, fallback: number): number {
+  const n = parseFloat(value);
+  if (!Number.isFinite(n)) return fallback;
+  return value.trim().endsWith("ms") ? n : n * 1000;
 }
 
 /**
