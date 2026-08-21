@@ -1,4 +1,5 @@
 import Image from "next/image";
+import HeroCar from "./HeroCar";
 import Link from "next/link";
 import { financeDisclaimer } from "@/lib/site";
 import { getFeaturedVehicles } from "@/lib/crm";
@@ -64,6 +65,18 @@ export default async function Hero() {
         aria-hidden
         className="absolute inset-0 -z-20 bg-linear-to-t from-canvas via-transparent to-canvas/70"
       />
+
+      {/* The car, sitting on the band's floor above the scrims so its lamps
+          read as light rather than being flattened by them.
+
+          Width is capped and the whole thing is pushed off the right edge on
+          large screens, so the headline keeps the left third to itself — the
+          car is the photograph's subject, not a competitor for the type. */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 flex justify-end">
+        <div className="w-[150%] max-w-none translate-x-[12%] translate-y-[6%] sm:w-[115%] lg:w-[80%] lg:translate-x-[6%] xl:w-[72%]">
+          <HeroCar />
+        </div>
+      </div>
 
       {/* 64px internal padding, which is the doc's `spacing.xxl` for hero
           bands — tighter than a section gap, because the photograph is doing

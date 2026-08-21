@@ -995,3 +995,216 @@ html:not([data-js]) .js-only {
     transform: none;
   }
 }
+
+/* ==================================================================
+   HERO LAMPS
+   The car in the hero is a transparent cutout, and these are the lit
+   lamps laid over it. Positions live in components/HeroCar.tsx as
+   percentages of this container; nothing here sets a coordinate, so
+   there is exactly one place a lamp can be wrong.
+   ================================================================== */
+
+.hero-car {
+  position: relative;
+  width: 100%;
+  /* The image's own ratio. This is what makes the container the size of
+     the rendered photograph, which is what percentage positioning needs. */
+  aspect-ratio: 1920 / 1080;
+  pointer-events: none;
+}
+
+.hero-car__img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Every overlay: centred on its coordinate, inert, and composited so it
+   adds light to the pixels underneath rather than greying them. */
+.hero-lamp,
+.hero-beam {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0;
+  will-change: opacity;
+  animation: hero-ignite var(--hero-lamp-cycle, 4.2s) ease-in-out infinite;
+}
+
+/* Dropped once the ignition burst is over — a standing will-change on four
+   blurred layers costs memory for the rest of the page's life. */
+.hero-car.has-settled .hero-lamp,
+.hero-car.has-settled .hero-beam {
+  will-change: auto;
+}
+
+.hero-lamp {
+  border-radius: 50%;
+}
+
+/* Core plus halo from one element: the inner stop is the lens, the outer is
+   the bloom around it. A second blurred box is avoided because filter on a
+   large layer is the expensive part. */
+.hero-lamp--warm {
+  background:
+    radial-gradient(
+      closest-side,
+      rgb(255 255 255 / 0.95) 0%,
+      rgb(255 246 214 / 0.75) 32%,
+      rgb(255 214 122 / 0.35) 58%,
+      transparent 78%
+    );
+  filter: blur(0.35vw);
+}
+
+.hero-lamp--amber {
+  background:
+    radial-gradient(
+      closest-side,
+      rgb(255 236 198 / 0.9) 0%,
+      rgb(255 186 82 / 0.7) 34%,
+      rgb(255 148 30 / 0.3) 62%,
+      transparent 80%
+    );
+  filter: blur(0.4vw);
+}
+
+/* The light on the road. Skewed and rotated to sit along the car's own
+   perspective rather than square to the viewport. */
+.hero-beam {
+  background:
+    radial-gradient(
+      ellipse at 20% 50%,
+      rgb(255 240 200 / 0.5) 0%,
+      rgb(255 214 130 / 0.22) 40%,
+      transparent 72%
+    );
+  border-radius: 50%;
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) skewX(-18deg);
+  filter: blur(0.9vw);
+}
+
+/* ── Pattern A: ignition flicker, then a steady breath ──────────────
+   Irregular for the first ~600ms of the cycle, then settles and holds
+   lit. Real easing throughout — no steps(), and never dark for most of
+   the loop. */
+@keyframes hero-ignite {
+  0% { opacity: 0; }
+  3% { opacity: 0.9; }
+  5% { opacity: 0.15; }
+  8% { opacity: 1; }
+  11% { opacity: 0.3; }
+  14% { opacity: 0.95; }
+  17% { opacity: 0.6; }
+  20% { opacity: 1; }
+  55% { opacity: 0.85; }
+  80% { opacity: 1; }
+  100% { opacity: 0.9; }
+}
+
+/* ── Pattern B: flash, hold, fade, dark, repeat ─────────────────────
+   Switch by setting --hero-lamp-anim: hero-flash on .hero-car. */
+@keyframes hero-flash {
+  0% { opacity: 0; }
+  4% { opacity: 1; }
+  7% { opacity: 0.35; }
+  10% { opacity: 1; }
+  45% { opacity: 1; }
+  60% { opacity: 0; }
+  90% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+.hero-car {
+  --hero-lamp-cycle: 4.2s;
+}
+
+.hero-car .hero-lamp,
+.hero-car .hero-beam {
+  animation-name: var(--hero-lamp-anim, hero-ignite);
+}
+
+/* Off screen, stop entirely. Four blurred layers repainting behind the fold
+   is work nobody sees. */
+.hero-car.is-paused .hero-lamp,
+.hero-car.is-paused .hero-beam {
+  animation-play-state: paused;
+}
+
+/* Under 480px the beams are wider than the car is tall on screen and swamp
+   it, so they go. Position is untouched — this is the one thing a media
+   query is allowed to change. */
+@media (max-width: 479px) {
+  .hero-beam { display: none; }
+  .hero-lamp--warm { filter: blur(1.2vw); }
+  .hero-lamp--amber { filter: blur(1.4vw); }
+}
+
+@media (min-width: 1536px) {
+  .hero-lamp--warm { filter: blur(5px); }
+  .hero-lamp--amber { filter: blur(6px); }
+  .hero-beam { filter: blur(14px); }
+}
+
+/* Lit and still for anyone who asked for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-lamp,
+  .hero-beam {
+    animation: none;
+    opacity: 1;
+    will-change: auto;
+  }
+}
+
+/* ── Hero lamp calibration (`?calibrate=1`) ─────────────────────────────────
+   Only reachable by putting the flag in the URL, so none of this can affect a
+   normal visit. The lamps go static and fully lit: a crosshair over a glow
+   that is mid-flicker tells you nothing about whether it is aimed correctly.
+   The frame also takes pointer events back — it is aria-hidden and
+   pointer-events:none in normal use, and clicks are the whole interface here. */
+.hero-car.is-calibrating {
+  pointer-events: auto;
+  cursor: crosshair;
+  outline: 1px dashed color-mix(in srgb, var(--color-ink) 40%, transparent);
+}
+
+.hero-car.is-calibrating .hero-lamp {
+  animation: none;
+  opacity: 1;
+  filter: none;
+  background: color-mix(in srgb, var(--color-m-red) 25%, transparent);
+  outline: 1px solid var(--color-m-red);
+}
+
+/* The centre mark. The LAMPS values are a CENTRE point — the box is drawn from
+   them with translate(-50%,-50%) — so a box outline alone would leave you
+   eyeballing its middle. This is the pixel the number actually refers to. */
+.hero-car.is-calibrating .hero-lamp::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  transform: translate(-50%, -50%);
+  background:
+    linear-gradient(var(--color-m-red), var(--color-m-red)) center / 100% 1px no-repeat,
+    linear-gradient(var(--color-m-red), var(--color-m-red)) center / 1px 100% no-repeat;
+}
+
+.hero-car.is-calibrating .hero-beam { display: none; }
+
+.hero-calibrate__readout {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  padding: 0.35rem 0.6rem;
+  background: var(--color-ink);
+  color: var(--color-on-ink);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
