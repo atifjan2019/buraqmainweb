@@ -56,6 +56,29 @@ const DAMAGE_CODES: Array<[string, string]> = [
   ["Y", "Crack, usually in plastic such as a bumper."],
 ];
 
+/**
+ * The three questions the reference sites all field, answered plainly.
+ *
+ * Written as prose rather than as a JSON-LD FAQ block on purpose: rich-result
+ * markup for FAQs was deprecated for most sites, and marking these up would add
+ * schema that Google no longer surfaces while committing us to keeping it in
+ * sync with the copy. If that changes, the answers are already here to wrap.
+ */
+const FAQS: Array<[string, string]> = [
+  [
+    "Is grade 4 good enough?",
+    "For most buyers, yes — it is the market's sensible default. A 4 means a solid car with minor cosmetic flaws, which is what an honest ten-year-old vehicle looks like. The grade on its own is not the whole answer though: read it with the damage map, because two grade 4 cars can differ by a scuffed bumper versus a repaired wing.",
+  ],
+  [
+    "What do R and RA actually mean?",
+    "Both mean the car has accident or structural repair history. RA is generally the lighter of the two, but neither is a number on the same scale as 4 or 5 — they are a flag. Treat any R or RA car as one you do not buy until somebody has read the full sheet and told you exactly what was repaired and how well.",
+  ],
+  [
+    "Why are there letters as well as a number?",
+    "They measure different things. The number is the inspector's overall verdict on the car. The letters are two separate marks — one for the exterior, one for the interior — so a car can be a 4 overall with a B exterior and a C interior, which tells you the bodywork is tidy and the cabin needs a clean.",
+  ],
+];
+
 export default function AuctionSheetsPage() {
   const wa = whatsappLink(
     "Hi Burraq Motors, could you send me the auction sheet for a car I'm interested in?",
@@ -255,6 +278,31 @@ export default function AuctionSheetsPage() {
               grade is the one that means structural repair.
             </p>
           </Reveal>
+        </div>
+      </section>
+
+      {/* ── Common questions ───────────────────────────────────── */}
+      <section className="bg-canvas py-20">
+        <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
+          <Reveal>
+            <h2 className="display-sm text-ink">Common questions</h2>
+            <p className="mt-4 max-w-2xl text-base font-light leading-relaxed text-muted">
+              The three things people ask us most once they have seen a sheet.
+            </p>
+          </Reveal>
+
+          <dl className="mt-12 max-w-3xl border-t border-line-soft">
+            {FAQS.map(([question, answer], i) => (
+              <Reveal key={question} delay={i * 80}>
+                <div className="border-b border-line-soft py-8">
+                  <dt className="title-lg text-ink">{question}</dt>
+                  <dd className="mt-4 text-base font-light leading-relaxed text-muted">
+                    {answer}
+                  </dd>
+                </div>
+              </Reveal>
+            ))}
+          </dl>
         </div>
       </section>
 

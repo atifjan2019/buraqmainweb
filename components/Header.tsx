@@ -54,7 +54,12 @@ export default function Header() {
         {/* Sentence case, not uppercase: the doc reserves the machined
             all-caps treatment for buttons and labels, and puts nav items in
             `nav-link` — 14px / 400 / 0.5px. */}
-        <nav className="hidden items-center gap-8 lg:flex">
+        {/* gap tightens between lg and xl. The nav gained a seventh item and at
+            gap-8 the row no longer fit the space between the wordmark and the
+            WhatsApp button at 1024 — the labels wrapped to two lines and "Home"
+            ran under the logo. There is room again from xl, so the wider
+            spacing returns there rather than being lost everywhere. */}
+        <nav className="hidden items-center gap-5 lg:flex xl:gap-8">
           {nav.map((item) => (
             <Link
               key={item.href}

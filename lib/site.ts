@@ -149,15 +149,20 @@ export function whatsappLink(message?: string): string | null {
 
 /**
  * The primary navigation, rendered by both `Header` and `Footer` — which is
- * why the blog link is added here rather than typed into the header alone. It
- * sits after Finance and before About: the journal is something a visitor
- * reads while deciding, so it belongs with the shopping links rather than with
- * the company ones.
+ * why links are added here rather than typed into the header alone.
+ *
+ * The ordering is shopping links, then reading, then company. Journal and
+ * Auction Sheets sit in the middle for the same reason: both are things a
+ * visitor reads while deciding, so they belong with the cars rather than with
+ * the About/Contact pair. Auction Sheets leads that pair because it answers a
+ * question specific to buying an import — "can I trust this car's history" —
+ * which is the objection that stops the sale.
  */
 export const nav = [
   { label: "Home", href: "/" },
   { label: "Our Cars", href: "/cars" },
   { label: "Finance", href: "/finance" },
+  { label: "Auction Sheets", href: "/auction-sheets" },
   { label: "Journal", href: "/blog" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
