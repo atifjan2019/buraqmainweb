@@ -840,3 +840,138 @@ export async function submitEnquiry(
   console.error(`[crm] enquiry rejected with status ${response.status}`);
   return { status: "failed" };
 }
+
+/* ---------------------------------------------------------------- */
+/* Bookings (API key required — server-side only)                    */
+/* ---------------------------------------------------------------- */
+
+/** The three things the showroom takes appointments for. */
+export type BookingType = "test_drive" | "viewing" | "handover";
+
+export interface BookingInput {
+  name: string;
+  email: string;
+  /** Required, unlike an enquiry: confirming a booking means ringing back. */
+  phone: string;
+  type: BookingType;
+  /** ISO 8601, local time. The CRM re-checks it against opening hours. */
+  appointmentDate: string;
+  /** The car they want to drive, so the CRM can attach the booking to it. */
+  registration?: string;
+  notes?: string;
+}
+
+/**
+ * Every way a booking can end.
+ *
+ * Same shape as EnquiryOutcome and deliberately a separate type: the two
+ * happen to align today, and merging them would mean a change to one silently
+ * rewrites the other's contract.
+ */
+export type BookingOutcome =
+  | { status: "sent"; reference: string; appointmentDate: string }
+  /** 422 — per-field messages, keyed by the field name the form uses. */
+  | { status: "invalid"; fieldErrors: Record<string, string> }
+  /** 429 — the customer should simply try again shortly. */
+  | { status: "rate_limited" }
+  /** 401/503 — misconfiguration at one end or the other. Needs the team. */
+  | { status: "unavailable" }
+  /** Anything else: network trouble, a 5xx, an unreadable body. */
+  | { status: "failed" };
+
+/**
+ * Requests a test drive, viewing or handover.
+ *
+ * REQUESTS, not books. The CRM files everything from here as `requested` for a
+ * human to confirm — nothing on either side checks whether the car or a
+ * salesperson is actually free. The wording in the UI has to match that, or the
+ * site is promising a slot the business has not agreed to.
+ *
+ * Never called from the browser: the key is read from the server environment
+ * here, and `server-only` at the top of this file enforces it.
+ */
+export async function submitBooking(
+  input: BookingInput,
+): Promise<BookingOutcome> {
+  const apiKey = process.env.FRONTEND_API_KEY;
+
+  if (!apiKey) {
+    console.error(
+      "[crm] FRONTEND_API_KEY is not set — bookings cannot be delivered. " +
+        "Copy it from the CRM under Backend → API & Documentation.",
+    );
+    return { status: "unavailable" };
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(`${BASE_URL}/appointments`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-API-Key": apiKey,
+      },
+      body: JSON.stringify({
+        name: input.name,
+        email: input.email,
+        phone: input.phone,
+        type: input.type,
+        appointment_date: input.appointmentDate,
+        registration: input.registration || undefined,
+        notes: input.notes || undefined,
+      }),
+      // A booking must never be served from cache.
+      cache: "no-store",
+    });
+  } catch (error) {
+    console.error("[crm] booking request failed to send", error);
+    return { status: "failed" };
+  }
+
+  if (response.status === 201) {
+    const payload = (await response.json().catch(() => null)) as {
+      data?: { reference?: string; appointment_date?: string };
+    } | null;
+
+    return {
+      status: "sent",
+      // The booking landed either way; only the confirmation detail is missing.
+      reference: payload?.data?.reference ?? "",
+      appointmentDate: payload?.data?.appointment_date ?? input.appointmentDate,
+    };
+  }
+
+  if (response.status === 422) {
+    const payload = (await response.json().catch(() => null)) as {
+      errors?: Record<string, string[]>;
+    } | null;
+
+    const fieldErrors: Record<string, string> = {};
+    for (const [field, messages] of Object.entries(payload?.errors ?? {})) {
+      if (messages?.[0]) fieldErrors[field] = messages[0];
+    }
+
+    return { status: "invalid", fieldErrors };
+  }
+
+  if (response.status === 429) return { status: "rate_limited" };
+
+  if (response.status === 401) {
+    console.error(
+      "[crm] booking rejected: FRONTEND_API_KEY is invalid or was revoked.",
+    );
+    return { status: "unavailable" };
+  }
+
+  if (response.status === 503) {
+    console.error(
+      "[crm] booking rejected: the CRM has no API key configured. " +
+        "Bookings are down until someone generates one in the CRM.",
+    );
+    return { status: "unavailable" };
+  }
+
+  console.error(`[crm] booking rejected with status ${response.status}`);
+  return { status: "failed" };
+}

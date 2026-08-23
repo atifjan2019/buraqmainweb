@@ -54,12 +54,20 @@ export default function Header() {
         {/* Sentence case, not uppercase: the doc reserves the machined
             all-caps treatment for buttons and labels, and puts nav items in
             `nav-link` — 14px / 400 / 0.5px. */}
-        {/* gap tightens between lg and xl. The nav gained a seventh item and at
-            gap-8 the row no longer fit the space between the wordmark and the
-            WhatsApp button at 1024 — the labels wrapped to two lines and "Home"
-            ran under the logo. There is room again from xl, so the wider
-            spacing returns there rather than being lost everywhere. */}
-        <nav className="hidden items-center gap-5 lg:flex xl:gap-8">
+        {/* The desktop nav starts at xl, not lg.
+
+            It gained a seventh item and then an eighth, and eight labels of
+            this length measure 605px against the 563px between the wordmark and
+            the WhatsApp button at 1024 — the row wrapped to two lines and
+            "Home" ran under the logo. Tightening the gap bought the seventh
+            item and would not buy the eighth without squeezing the labels to
+            the point of looking broken.
+
+            So 1024–1279 gets the full-screen menu instead, which lists all
+            eight comfortably. Raising the breakpoint is the honest fix: the
+            items do not fit, and a nav that technically renders while looking
+            crushed is worse than one tap. */}
+        <nav className="hidden items-center gap-6 xl:flex xl:gap-7">
           {nav.map((item) => (
             <Link
               key={item.href}
@@ -71,7 +79,7 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-4 lg:flex">
+        <div className="hidden items-center gap-4 xl:flex">
           {wa && (
             <a
               href={wa}
@@ -86,7 +94,7 @@ export default function Header() {
           <ThemeToggle />
         </div>
 
-        <div className="flex items-center gap-2 lg:hidden">
+        <div className="flex items-center gap-2 xl:hidden">
           <ThemeToggle />
           <button
             type="button"
@@ -103,7 +111,7 @@ export default function Header() {
       {/* Mobile sheet — a full-screen black overlay carrying the tricolour at
           its top edge, which is the collapse the doc specifies by name. */}
       <div
-        className={`fixed inset-0 top-16 z-40 bg-canvas transition-opacity duration-200 lg:hidden ${
+        className={`fixed inset-0 top-16 z-40 bg-canvas transition-opacity duration-200 xl:hidden ${
           open
             ? "pointer-events-auto opacity-100"
             : "pointer-events-none opacity-0"

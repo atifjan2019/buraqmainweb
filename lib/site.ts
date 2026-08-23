@@ -162,6 +162,7 @@ export const nav = [
   { label: "Home", href: "/" },
   { label: "Our Cars", href: "/cars" },
   { label: "Finance", href: "/finance" },
+  { label: "Test Drive", href: "/book" },
   { label: "Auction Sheets", href: "/auction-sheets" },
   { label: "Journal", href: "/blog" },
   { label: "About", href: "/about" },
