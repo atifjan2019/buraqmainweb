@@ -4,7 +4,9 @@ import FinanceCalculator from "@/components/FinanceCalculator";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import VideoEmbed from "@/components/VideoEmbed";
+import { getVehicle } from "@/lib/crm";
 import { financeDisclaimer, financeSteps, financeVideos } from "@/lib/site";
+import { vehicleHeadline } from "@/lib/vehicles";
 
 export const metadata: Metadata = {
   title: "Car Finance",
@@ -14,7 +16,51 @@ export const metadata: Metadata = {
 
 const HERO_IMAGE = "/cars/107-toyota-prius/01.jpeg";
 
-export default function FinancePage() {
+type SearchParams = Record<string, string | string[] | undefined>;
+
+/** Query strings can repeat a key; the first value wins. */
+function single(value: string | string[] | undefined): string | undefined {
+  const first = Array.isArray(value) ? value[0] : value;
+  return first?.trim() ? first.trim() : undefined;
+}
+
+/**
+ * Price the calculator opens at when no car is named, or when the one named
+ * cannot be found. Roughly mid-forecourt, so the first quote a visitor sees is
+ * in the right region rather than anchored at nothing.
+ */
+const FALLBACK_PRICE = 12900;
+
+export default async function FinancePage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  /*
+   * `?vehicle=<slug>` is set by every card in the stock grid and by the finance
+   * button on each vehicle page — and until now this page ignored it entirely
+   * and opened at a hardcoded 12,900 no matter which car was clicked. Somebody
+   * pressing Finance on a 9,700 Audi was quoted on 12,900: not merely unhelpful
+   * on a regulated product, but wrong in the customer's favour-adjacent
+   * direction, which is worse.
+   *
+   * Failure here is silent by design. A slug that no longer resolves — car
+   * sold, link shared months later — falls back to the default price rather
+   * than 404ing: the calculator is still useful without a specific car, and
+   * an error page helps nobody.
+   */
+  const slug = single((await searchParams).vehicle);
+
+  let vehicle = null;
+  if (slug) {
+    try {
+      vehicle = await getVehicle(slug);
+    } catch (error) {
+      console.error("[finance] could not resolve vehicle for calculator", error);
+    }
+  }
+
+  const initialPrice = vehicle?.price ?? FALLBACK_PRICE;
   return (
     <>
       {/*
@@ -49,9 +95,9 @@ export default function FinancePage() {
               </Reveal>
               <Reveal delay={140}>
                 <p className="mt-6 max-w-lg text-base font-light leading-relaxed text-muted">
-                  Put in a vehicle price and see illustrative Hire Purchase
-                  payments. Figures are for illustration only, carry no
-                  obligation, and are not an offer of finance.
+                  {vehicle
+                    ? `Illustrative Hire Purchase payments for the ${vehicleHeadline(vehicle)}. Figures are for illustration only, carry no obligation, and are not an offer of finance.`
+                    : "Put in a vehicle price and see illustrative Hire Purchase payments. Figures are for illustration only, carry no obligation, and are not an offer of finance."}
                 </p>
               </Reveal>
             </div>
@@ -63,7 +109,10 @@ export default function FinancePage() {
       <section className="bg-canvas py-24">
         <div className="mx-auto max-w-4xl px-5 sm:px-8">
           <Reveal>
-            <FinanceCalculator initialPrice={12900} />
+            <FinanceCalculator
+              initialPrice={initialPrice}
+              vehicleImageUrl={vehicle?.featuredImage?.display}
+            />
           </Reveal>
         </div>
       </section>
