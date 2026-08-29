@@ -53,7 +53,8 @@ export default function Header() {
 
         {/* Sentence case, not uppercase: the doc reserves the machined
             all-caps treatment for buttons and labels, and puts nav items in
-            `nav-link` — 14px / 400 / 0.5px. */}
+            `nav-link` — 14px / 700 / 0.5px. The weight is a deliberate
+            divergence from the doc; see the .nav-link rule in globals.css. */}
         {/* The desktop nav starts at xl, not lg.
 
             It gained a seventh item and then an eighth, and eight labels of

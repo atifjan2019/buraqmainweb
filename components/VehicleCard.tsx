@@ -53,16 +53,17 @@ export default function VehicleCard({
   const photo = vehicle.featuredImage;
 
   // Anything the CRM hasn't recorded is dropped rather than rendered as an
-  // empty entry — a stranded separator reads as a broken card.
+  // empty chip — a blank cell reads as a broken card, and a car with no
+  // recorded fuel type is an ordinary state while stock is being entered.
   const specs = [
     vehicle.year ? String(vehicle.year) : "",
     vehicle.mileage ? formatMileage(vehicle.mileage) : "",
-    vehicle.fuelType,
     vehicle.transmission,
-  ].filter((spec) => spec?.trim());
+    vehicle.fuelType,
+  ].filter((spec): spec is string => Boolean(spec?.trim()));
 
   return (
-    <article className="group flex h-full flex-col">
+    <article className="group relative flex h-full flex-col">
       {/* Media — fixed 16:10 box so mixed-shape photos can't make the grid
           ragged, and so nothing reflows as images arrive. */}
       <div className="photo-frame relative aspect-16/10 overflow-hidden bg-surface-2">
@@ -147,13 +148,43 @@ export default function VehicleCard({
 
       {/* Body */}
       <div className="flex flex-1 flex-col pt-5">
-        <h3 className="title-lg break-words text-ink">{title}</h3>
+        {/* The title IS the card's link, and its ::after is stretched over the
+            whole article — so the photograph, the specs and the price are all
+            clickable without any of them being a link of their own.
 
-        {/* One tracked line rather than an icon grid. The doc keeps chrome off
-            the card and lets type carry the detail; four labelled icons under
-            every photo is exactly the decoration it backs away from. */}
+            One link rather than three. Making the image and the title separate
+            anchors to the same page is the obvious way to do this and it puts
+            two extra stops in the tab order and two duplicate entries in a
+            screen reader's link list, for every card in a grid of twelve. */}
+        <h3 className="title-lg break-words text-ink">
+          <Link
+            href={vehicleHref(vehicle)}
+            className="after:absolute after:inset-0 after:content-[''] hover:text-muted"
+          >
+            {title}
+          </Link>
+        </h3>
+
+        {/* Discrete chips rather than one tracked line. The line read as a
+            sentence and buyers scan these four facts rather than read them —
+            splitting them gives each its own edge to land on.
+
+            Square, hairline, no fill. The reference this was modelled on uses
+            rounded amber pills; this system has a 0px radius everywhere and no
+            hue outside the tricolour, so the shape carries the grouping and the
+            border carries the separation. Still no icons: four labelled icons
+            under every photo is the decoration the doc backs away from. */}
         {specs.length > 0 && (
-          <p className="caption mt-3 text-faint">{specs.join(" · ")}</p>
+          <ul className="mt-4 flex flex-wrap gap-2">
+            {specs.map((spec) => (
+              <li
+                key={spec}
+                className="border border-line-soft px-2.5 py-1 label-uppercase-sm text-muted"
+              >
+                {spec}
+              </li>
+            ))}
+          </ul>
         )}
 
         <p className="display-sm mt-5 text-ink">{formatPrice(vehicle.price)}</p>
@@ -161,13 +192,21 @@ export default function VehicleCard({
         {/* min-h-11 carries both to the 44px touch minimum. These are the
             primary actions on a grid most people meet on a phone. */}
         <div className="mt-auto flex items-center gap-6 border-t border-line-soft pt-5">
-          <Link href={vehicleHref(vehicle)} className="link-m">
+          {/* Not a link. The card overlay above already goes here, and a second
+              anchor to the same page would only add a tab stop. It stays for
+              the affordance — a card with no visible call to action reads as a
+              picture rather than something you can open. aria-hidden because
+              the title link has already announced the destination. */}
+          <span aria-hidden className="link-m">
             View details
             <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
+          </span>
+
+          {/* A different destination, so a real link — and z-10 to lift it out
+              from under the card overlay, which would otherwise swallow it. */}
           <Link
             href={`/finance?vehicle=${vehicle.slug}`}
-            className="inline-flex min-h-11 items-center text-sm font-light text-muted transition-colors hover:text-ink"
+            className="relative z-10 inline-flex min-h-11 items-center text-sm font-light text-muted transition-colors hover:text-ink"
           >
             Finance
           </Link>

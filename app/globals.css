@@ -415,10 +415,16 @@ body {
     letter-spacing: 0.03125rem;
   }
 
-  /* Top-nav menu items — sentence case, regular, lightly tracked. */
+  /* Top-nav menu items — sentence case, bold, lightly tracked.
+     DIVERGENCE FROM DESIGN-bmw-m.md, which specifies 400 here. The doc builds
+     its hierarchy from the 700/300 weight pair and treats the nav as body-side
+     text, so 400 is what it asks for. This is an explicit product decision to
+     the contrary: the nav is now eight items wide and the owner wants it to
+     carry. Kept at 700 rather than an in-between weight, because the system
+     only has two weights and inventing a third is how a type scale rots. */
   .nav-link {
     font-size: clamp(0.8125rem, 0.792rem + 0.093vw, 0.875rem);
-    font-weight: 400;
+    font-weight: 700;
     line-height: 1.4;
     letter-spacing: 0.03125rem;
   }
