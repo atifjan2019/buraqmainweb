@@ -2,6 +2,7 @@ import BranchPicker from "@/components/BranchPicker";
 import CtaBanner from "@/components/CtaBanner";
 import FeaturedVehicles from "@/components/FeaturedVehicles";
 import FinanceSection from "@/components/FinanceSection";
+import RepresentativeExampleBand from "@/components/finance/RepresentativeExampleBand";
 import Hero from "@/components/Hero";
 import LiveStock from "@/components/LiveStock";
 import Marquee from "@/components/Marquee";
@@ -18,6 +19,11 @@ export default function Home() {
       <Hero />
       <TrustBar />
       <FeaturedVehicles />
+      {/* Immediately after the first section that shows a monthly payment.
+          CONC 3.5.5R(5) wants the example no less prominent than the cost
+          information it qualifies, and one parked at the foot of the page is
+          subordinate to twelve cards by construction. */}
+      <RepresentativeExampleBand />
       <LiveStock />
       <SearchByMaker />
       <BranchPicker />

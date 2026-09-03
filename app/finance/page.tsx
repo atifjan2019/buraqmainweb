@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import FinanceCalculator from "@/components/FinanceCalculator";
+import FinancePanel from "@/components/finance/FinancePanel";
+import RepresentativeExampleBand from "@/components/finance/RepresentativeExampleBand";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import VideoEmbed from "@/components/VideoEmbed";
+import { quoteOne } from "@/lib/codeweavers/client";
+import { DEFAULT_PARAMETERS, registrationDate, toFinanceInput } from "@/lib/codeweavers/params";
 import { getVehicle } from "@/lib/crm";
 import { financeDisclaimer, financeSteps, financeVideos } from "@/lib/site";
 import { vehicleHeadline } from "@/lib/vehicles";
@@ -61,6 +64,25 @@ export default async function FinancePage({
   }
 
   const initialPrice = vehicle?.price ?? FALLBACK_PRICE;
+
+  /*
+   * Quote before render so the calculator opens with real figures instead of
+   * an empty panel that only fills in once somebody touches a control.
+   *
+   * When a car was named we quote that exact car — its mileage and age change
+   * the answer. Without one we quote the fallback price against a
+   * representative age, which is what the standalone calculator is for.
+   */
+  const financeInput = vehicle
+    ? toFinanceInput(vehicle)
+    : {
+        id: "calculator",
+        price: initialPrice,
+        mileage: 50000,
+        registrationDate: `${new Date().getFullYear() - 5}-01-01`,
+      };
+
+  const finance = await quoteOne(financeInput);
   return (
     <>
       {/*
@@ -109,13 +131,28 @@ export default async function FinancePage({
       <section className="bg-canvas py-24">
         <div className="mx-auto max-w-4xl px-5 sm:px-8">
           <Reveal>
-            <FinanceCalculator
-              initialPrice={initialPrice}
-              vehicleImageUrl={vehicle?.featuredImage?.display}
+            <FinancePanel
+              price={financeInput.price}
+              mileage={financeInput.mileage}
+              registrationDate={financeInput.registrationDate}
+              registration={vehicle?.registration}
+              initialQuotes={finance?.quotes ?? []}
+              /* The price is the thing being explored here, unlike on a car's
+                 own page where it is a fact about that car. */
+              priceEditable={!vehicle}
+              heading={
+                vehicle
+                  ? `Finance the ${vehicleHeadline(vehicle)}`
+                  : "Work out your monthly payment"
+              }
             />
           </Reveal>
         </div>
       </section>
+
+      {/* Required wherever a monthly payment appears — the calculator above
+          shows one. CONC 3.5.3R is triggered by the figure, not by the page. */}
+      <RepresentativeExampleBand />
 
       {/* Process */}
       <section className="border-y border-line-soft bg-canvas py-24">

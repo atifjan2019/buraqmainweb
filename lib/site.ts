@@ -317,16 +317,6 @@ export const financeFullDisclaimer =
   "conditions apply. Written quotations available on request. Burraq Motors is " +
   "a credit broker, not a lender, and may receive a commission from lenders.";
 
-/** Codeweavers finance plugin. The API key is a public, client-side embed key. */
-export const codeweavers = {
-  apiKey: process.env.NEXT_PUBLIC_CODEWEAVERS_API_KEY ?? "SuvI8TJFiT4Y1i8ff6",
-  scriptBase: "https://plugins.codeweavers.app/scripts/v1/platform/finance",
-} as const;
-
-export function codeweaversScriptUrl(): string {
-  return `${codeweavers.scriptBase}?ApiKey=${codeweavers.apiKey}`;
-}
-
 /** Codeweavers' finance explainer films, embedded on the finance page. */
 export const financeVideos = [
   { id: "866686746", title: "Why finance through a dealership?" },

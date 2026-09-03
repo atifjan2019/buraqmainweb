@@ -3,10 +3,13 @@ import Pagination from "@/components/Pagination";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import StockNotice from "@/components/StockNotice";
+import RepresentativeExampleBand from "@/components/finance/RepresentativeExampleBand";
 import VehicleCard from "@/components/VehicleCard";
 import VehicleFilters, {
   type ActiveFilters,
 } from "@/components/VehicleFilters";
+import { quoteMany } from "@/lib/codeweavers/client";
+import { toFinanceInput } from "@/lib/codeweavers/params";
 import { DEFAULT_PER_PAGE, getStockFilters, getVehicles } from "@/lib/crm";
 import { financeDisclaimer } from "@/lib/site";
 import { stockEmptyState } from "@/lib/vehicles";
@@ -77,6 +80,24 @@ export default async function CarsPage({
   const filters =
     filtersResult.status === "fulfilled" ? filtersResult.value : null;
 
+  /*
+   * Finance for every card on this page in ONE batched request, and the
+   * representative example in a second dedicated one.
+   *
+   * Settled rather than awaited together with the stock read: a lender outage
+   * must cost the monthly figures and nothing else, so neither call can reject
+   * into the page. quoteMany already swallows its own failures and returns an
+   * empty map, and the representative example returns null; both are handled
+   * where they render.
+   *
+   * The example is NOT read off the batch. The API nominates one per response,
+   * so taking it from here would let a legally required figure move with stock
+   * and pagination — see representativeExample() for the full reasoning.
+   */
+  const listed = stock?.vehicles ?? [];
+
+  const quotes = await quoteMany(listed.map(toFinanceInput));
+
   /** Filters minus paging, so page links keep the current search. */
   const linkParams: Record<string, string> = {};
   for (const [key, value] of Object.entries(active)) {
@@ -144,12 +165,24 @@ export default async function CarsPage({
               )}
             </p>
 
+            {/* Above the grid, not below it: CONC 3.5.5R(5) wants the example
+                no less prominent than the cost information it qualifies, and an
+                example a visitor has to scroll past twelve cards to reach is
+                subordinate to them by construction. */}
+            <div className="mt-10">
+              <RepresentativeExampleBand />
+            </div>
+
             <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {stock.vehicles.map((vehicle, index) => (
                 <Reveal key={vehicle.slug} delay={(index % 3) * 90}>
                   {/* The first card is this page's LCP element — it must not
                       be lazy-loaded. */}
-                  <VehicleCard vehicle={vehicle} priority={index === 0} />
+                  <VehicleCard
+                    vehicle={vehicle}
+                    priority={index === 0}
+                    finance={quotes.get(vehicle.slug) ?? null}
+                  />
                 </Reveal>
               ))}
             </div>

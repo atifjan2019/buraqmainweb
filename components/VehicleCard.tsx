@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { VehicleFinance } from "@/lib/codeweavers/types";
 import {
   formatMileage,
   formatPrice,
@@ -7,10 +8,23 @@ import {
   type Vehicle,
 } from "@/lib/vehicles";
 import { ArrowRight } from "./Icons";
+import CardFinanceTerms, { cardMonthlyPayment } from "./finance/CardFinance";
 import VehiclePlaceholder from "./VehiclePlaceholder";
 
 interface VehicleCardProps {
   vehicle: Vehicle;
+  /**
+   * The monthly payment for this car, already fetched.
+   *
+   * Passed in rather than fetched here on purpose: a card that fetched its own
+   * quote would turn a twelve-card grid into twelve requests against a
+   * rate-limited lender. The listings page collects every visible vehicle into
+   * one batched call and hands each card its result.
+   *
+   * Null is ordinary — most of this forecourt fails PCP on age — and renders
+   * no figure rather than a zero.
+   */
+  finance?: VehicleFinance | null;
   /**
    * Mark the card as live stock — a pulsing dot at the top-left of the
    * photograph. Set only by the Live Stock rail: on the grid pages every card
@@ -47,8 +61,10 @@ export default function VehicleCard({
   vehicle,
   priority,
   live,
+  finance = null,
 }: VehicleCardProps) {
   const title = vehicleTitle(vehicle);
+  const monthly = cardMonthlyPayment(finance);
   const reserved = vehicle.status === "reserved";
   const photo = vehicle.featuredImage;
 
@@ -218,16 +234,41 @@ export default function VehicleCard({
 
           {/* A different destination, so a real link — and z-10 to lift it out
               from under the card overlay, which would otherwise swallow it.
-              Deliberately the quieter of the two: most people want the car
-              first and the finance figure second. */}
+
+              The brand blue here is a DELIBERATE DIVERGENCE from
+              DESIGN-bmw-m.md, which reserves the tricolour for identity and
+              rules it out as an action surface. It is the dealership's own
+              call: finance is the thing they want clicked, and the monthly
+              figure is the reason someone clicks it.
+
+              The payment is shown on the control that acts on it rather than
+              floating above the card, so the number and the way to use it are
+              one target. When no lender quotes, the label falls back to plain
+              "Finance" and the button stays — the layout does not move. */}
           <Link
             href={`/finance?vehicle=${vehicle.slug}`}
-            className="relative z-10 inline-flex min-h-11 items-center border border-line px-4
-                       label-uppercase-sm text-muted transition-colors hover:border-ink hover:text-ink"
+            className="relative z-10 flex min-h-11 flex-col items-center justify-center
+                       bg-m-blue px-4 py-2 text-center text-on-ink transition-opacity
+                       hover:opacity-90"
           >
-            Finance
+            {monthly ? (
+              <>
+                <span className="text-sm font-bold tabular-nums leading-none">
+                  {monthly}
+                </span>
+                <span className="mt-1 label-uppercase-sm leading-none opacity-90">
+                  per month
+                </span>
+              </>
+            ) : (
+              <span className="label-uppercase-sm">Finance</span>
+            )}
           </Link>
         </div>
+
+        {/* The APR that makes the figure on the button lawful. Rendered
+            together with it, always. */}
+        <CardFinanceTerms finance={finance} />
       </div>
     </article>
   );

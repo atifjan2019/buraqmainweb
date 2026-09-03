@@ -5,12 +5,16 @@ import AuctionSheets from "@/components/AuctionSheets";
 import EnquiryDialog from "@/components/EnquiryDialog";
 import EnquiryForm from "@/components/EnquiryForm";
 import { ArrowRight, Phone } from "@/components/Icons";
+import FinancePanel from "@/components/finance/FinancePanel";
+import RepresentativeExampleBand from "@/components/finance/RepresentativeExampleBand";
 import Reveal from "@/components/Reveal";
 import StockNotice from "@/components/StockNotice";
 import VehicleDescription from "@/components/VehicleDescription";
 import VehicleGallery from "@/components/VehicleGallery";
 import { CrmError, getVehicle } from "@/lib/crm";
-import { contact, financeDisclaimer, salesContact, site } from "@/lib/site";
+import { quoteOne } from "@/lib/codeweavers/client";
+import { registrationDate, toFinanceInput } from "@/lib/codeweavers/params";
+import { contact, salesContact, site } from "@/lib/site";
 import {
   formatDate,
   formatMileage,
@@ -130,6 +134,13 @@ export default async function VehiclePage({ params }: PageProps) {
   // as permanent and link equity consolidates. Deliberately outside the
   // try/catch above, since this throws to unwind rendering.
   if (slug !== vehicle.slug) permanentRedirect(`/cars/${vehicle.slug}`);
+
+  /*
+   * The car's own quote, fetched server-side so the finance panel arrives with
+   * real figures rather than a spinner. quoteOne swallows its own failures and
+   * returns null, so a lender outage costs the payment and never the page.
+   */
+  const finance = await quoteOne(toFinanceInput(vehicle));
 
   const reserved = vehicle.status === "reserved";
   const motExpiry = formatDate(vehicle.motExpiry);
@@ -306,18 +317,24 @@ export default async function VehiclePage({ params }: PageProps) {
               </Reveal>
             )}
 
+            {/* The real panel, replacing the link that used to send people to
+                /finance to type the price in again. Quotes are fetched on the
+                server so it arrives populated; the controls recalculate through
+                our own route. */}
             <Reveal delay={200}>
-              <div className="mt-16 flex flex-wrap items-center gap-6">
-                <Link
-                  href={`/finance?vehicle=${vehicle.slug}`}
-                  className="btn btn-outline"
-                >
-                  Calculate finance
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-                <p className="caption max-w-sm text-faint">
-                  {financeDisclaimer}
-                </p>
+              <div id="finance" className="mt-16 scroll-mt-24">
+                <FinancePanel
+                  price={vehicle.price}
+                  mileage={vehicle.mileage}
+                  registrationDate={registrationDate(vehicle)}
+                  registration={vehicle.registration}
+                  initialQuotes={finance?.quotes ?? []}
+                />
+
+                {/* The panel above shows a monthly payment, so the example is
+                    required here too. It qualifies the figure; it is not a
+                    duplicate of it. */}
+                <RepresentativeExampleBand />
               </div>
             </Reveal>
           </div>

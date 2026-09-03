@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { quoteMany } from "@/lib/codeweavers/client";
+import { toFinanceInput } from "@/lib/codeweavers/params";
 import { getFeaturedVehicles } from "@/lib/crm";
 import { ArrowRight } from "./Icons";
 import Reveal from "./Reveal";
@@ -7,6 +9,10 @@ import VehicleCard from "./VehicleCard";
 
 export default async function FeaturedVehicles() {
   const vehicles = await getFeaturedVehicles(6);
+
+  // One batched call for the whole section. quoteMany swallows its own
+  // failures, so a lender outage costs the monthly figures and nothing else.
+  const quotes = await quoteMany(vehicles.map(toFinanceInput));
 
   return (
     /* py-24 is the doc's `spacing.section` — 96px between major editorial
@@ -34,7 +40,10 @@ export default async function FeaturedVehicles() {
           <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {vehicles.map((vehicle, i) => (
               <Reveal key={vehicle.slug} delay={(i % 3) * 90}>
-                <VehicleCard vehicle={vehicle} />
+                <VehicleCard
+                  vehicle={vehicle}
+                  finance={quotes.get(vehicle.slug) ?? null}
+                />
               </Reveal>
             ))}
           </div>

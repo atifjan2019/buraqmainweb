@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { quoteMany } from "@/lib/codeweavers/client";
+import { toFinanceInput } from "@/lib/codeweavers/params";
 import { getVehicles } from "@/lib/crm";
 import { selectLiveStock } from "@/lib/live-stock";
 import { ArrowRight } from "./Icons";
@@ -38,6 +40,10 @@ export default async function LiveStock() {
   }
 
   if (vehicles.length === 0) return null;
+
+  // One call for the rail. The stock is rendered twice for the seamless loop
+  // but quoted once — the second copy is the same cars.
+  const quotes = await quoteMany(vehicles.map(toFinanceInput));
 
   return (
     <section className="bg-canvas-deep py-24">
@@ -101,6 +107,7 @@ export default async function LiveStock() {
                   vehicle={vehicle}
                   priority={copy === 0 && i === 0}
                   live
+                  finance={quotes.get(vehicle.slug) ?? null}
                 />
               </div>
             )),
