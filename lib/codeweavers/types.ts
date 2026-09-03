@@ -186,9 +186,29 @@ export interface FinanceQuote {
   totalAmountPayable: number;
   amountOfCredit: number | null;
   totalChargeForCredit: number | null;
-  /** Balloon; null on products that have none. */
+  /**
+   * The last instalment in the schedule — larger than the rest because the
+   * option-to-purchase fee is collected with it. Distinct from `balloon`.
+   */
   finalPayment: number | null;
+  /**
+   * The optional lump sum that buys the car outright at the end of a PCP.
+   * Zero on Conditional Sale, where there is nothing left to pay.
+   *
+   * Kept apart from finalPayment because conflating them is how a fee note
+   * about "the final payment" ends up on a card showing no final payment.
+   */
+  balloon: number | null;
   numberOfPayments: number;
+  /**
+   * The payment schedule, authoritative.
+   *
+   * NOT derived from NumberOfRegularPayments, which does not mean what its name
+   * suggests: on a 60-month agreement the API returns 58 there while Payments[]
+   * returns 59 × £253.26 plus a final £263.26. Only the array reconciles
+   * against TotalAmountPayable.
+   */
+  schedule: Array<{ amount: number; count: number }>;
   /** Already entity-decoded. Safe to render as text. */
   fees: Array<{ amount: number; text: string; profile: string }>;
   /** Things the customer should read — an adjusted term, for instance. */

@@ -323,11 +323,19 @@ export const financeFullDisclaimer =
   "a credit broker, not a lender, and may receive a commission from lenders.";
 
 /** Codeweavers' finance explainer films, embedded on the finance page. */
+/**
+ * Only the products this dealership can actually put a customer into.
+ *
+ * PCP, Personal Contract Hire and Lease Purchase were here and have been cut.
+ * Every one of them fails on this stock — PCP declines on vehicle age and on
+ * CAP identification for the imports, and the other two are not on the panel at
+ * all — so explaining them was promoting finance that cannot be supplied, which
+ * is a financial promotion risk in its own right rather than merely unhelpful.
+ *
+ * Put one back only when a real quote for it comes out of the API.
+ */
 export const financeVideos = [
   { id: "866686746", title: "Why finance through a dealership?" },
   { id: "887241645", title: "What is Conditional Sale?" },
   { id: "838572663", title: "What is Hire Purchase?" },
-  { id: "810874993", title: "What is Personal Contract Purchase?" },
-  { id: "848713929", title: "What is Personal Contract Hire?" },
-  { id: "912895855", title: "What is Lease Purchase?" },
 ] as const;

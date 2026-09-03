@@ -260,6 +260,9 @@ export default function FinancePanel({
                       ...(quote.finalPayment !== null
                         ? ([["Final payment", formatMoney(quote.finalPayment)]] as Array<[string, string]>)
                         : []),
+                      ...(quote.balloon !== null
+                        ? ([["Optional final payment", formatMoney(quote.balloon)]] as Array<[string, string]>)
+                        : []),
                       ...(quote.contractMileage !== null
                         ? ([["Contract mileage", `${quote.contractMileage.toLocaleString("en-GB")} miles`]] as Array<[string, string]>)
                         : []),

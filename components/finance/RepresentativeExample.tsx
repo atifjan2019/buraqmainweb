@@ -17,9 +17,9 @@ import type { FinanceQuote } from "@/lib/codeweavers/types";
  * computed, rounded up or interpolated — the only arithmetic in this feature is
  * currency formatting.
  *
- * The FCA firm reference number is the one value the dealership has not
- * supplied. Rather than invent one or omit the line silently, the statement
- * renders without it and the gap is visible to whoever reviews the page.
+ * The authorisation statement carries the firm reference number, and degrades
+ * to the sentence without it if that value is ever cleared — an invented FRN
+ * would be worse than an incomplete line.
  */
 export default function RepresentativeExample({
   quote,
@@ -28,24 +28,46 @@ export default function RepresentativeExample({
 }) {
   if (!quote) return null;
 
-  /* Deposit is the API's TotalDeposit; the percentage is not recomputed here.
-     Each row is one figure the regulation names, and they share a single
-     type treatment so none reads as the headline. */
+  /*
+   * The schedule, straight from Payments[].
+   *
+   * Rendered as one row per entry and generalised over N of them rather than
+   * assuming the two this lender happens to return. It is NOT built from
+   * NumberOfRegularPayments: that field returns 58 on a 60-month agreement, and
+   * displaying it understated the total by £516.52 against the lender's own
+   * TotalAmountPayable. A representative example that does not reconcile is a
+   * compliance failure, not a rounding quibble.
+   *
+   * A trailing single payment is the final instalment — larger than the rest
+   * because the option-to-purchase fee is collected with it — so it is labelled
+   * as one. That is also what makes the fee note beneath make sense.
+   */
+  const scheduleRows: Array<[string, string]> = quote.schedule.map(
+    (line, index) => {
+      const isFinal =
+        index === quote.schedule.length - 1 && line.count === 1 && index > 0;
+
+      return [
+        isFinal ? "Final payment" : `${line.count} monthly payments`,
+        isFinal
+          ? formatMoney(line.amount)
+          : `${line.count} × ${formatMoney(line.amount)}`,
+      ] as [string, string];
+    },
+  );
+
   const rows: Array<[string, string]> = [
     ["Cash price", formatMoney(quote.cashPrice)],
     ["Deposit", formatMoney(quote.deposit)],
-    [
-      "Monthly payments",
-      `${quote.numberOfPayments} × ${formatMoney(quote.monthlyPayment)}`,
-    ],
+    ...scheduleRows,
     ["Term", `${quote.term} months`],
     ...(quote.amountOfCredit !== null
       ? ([["Amount of credit", formatMoney(quote.amountOfCredit)]] as Array<
           [string, string]
         >)
       : []),
-    ...(quote.finalPayment !== null
-      ? ([["Final payment", formatMoney(quote.finalPayment)]] as Array<
+    ...(quote.balloon !== null
+      ? ([["Optional final payment", formatMoney(quote.balloon)]] as Array<
           [string, string]
         >)
       : []),

@@ -131,11 +131,29 @@ function toQuote(result: CodeweaversProductResult): FinanceQuote | null {
     totalAmountPayable: q.TotalAmountPayable,
     amountOfCredit: q.AmountOfCredit ?? null,
     totalChargeForCredit: q.TotalChargeForCredit ?? null,
-    // Residual is the balloon and is 0 on Conditional Sale. Zero means "this
-    // product has none", so it becomes null rather than a £0.00 line nobody
-    // can interpret.
-    finalPayment: q.Residual && q.Residual > 0 ? q.Residual : null,
+    // FinalPayment is the LAST INSTALMENT — bigger than the others because the
+    // option-to-purchase fee rides with it. Residual is the PCP balloon and is
+    // a different thing entirely. Reading the balloon as the final payment is
+    // how a fee note about "the final payment" ended up on a card that showed
+    // no final payment at all.
+    finalPayment: q.FinalPayment && q.FinalPayment > 0 ? q.FinalPayment : null,
+    balloon: q.Residual && q.Residual > 0 ? q.Residual : null,
+    // Kept for completeness. NOT used to describe the schedule — see below.
     numberOfPayments: q.NumberOfRegularPayments,
+    /*
+     * The authoritative schedule.
+     *
+     * NumberOfRegularPayments does not mean what it says: on a 60-month
+     * agreement it returns 58, while Payments[] returns 59 × £253.26 plus a
+     * final £263.26. Rendering the former produced a representative example
+     * that understated the total by £516.52 and did not reconcile against
+     * TotalAmountPayable — an example whose arithmetic does not add up is
+     * exactly what an FCA audit is looking for.
+     */
+    schedule: (q.Payments ?? []).map((p) => ({
+      amount: p.Amount,
+      count: p.NumberOfPayments,
+    })),
     fees: (q.Fees ?? []).map((fee) => ({
       amount: fee.Amount,
       text: decodeEntities(fee.DisplayText),
@@ -151,6 +169,30 @@ function toQuote(result: CodeweaversProductResult): FinanceQuote | null {
     excessMileageRate:
       q.ExcessMileageRate && q.ExcessMileageRate > 0 ? q.ExcessMileageRate : null,
   };
+}
+
+/**
+ * Does the schedule add up to the total the lender stated?
+ *
+ * sum(payments) + deposit must equal TotalAmountPayable to the penny. This is
+ * not defensive programming for its own sake: the figures in a representative
+ * example are a regulated statement, and one that does not reconcile is both a
+ * compliance failure and a sign we have misread the contract — which is exactly
+ * what happened when the schedule was derived from NumberOfRegularPayments.
+ *
+ * Compared in pence to avoid a float comparison deciding a compliance question.
+ */
+function reconciles(quote: FinanceQuote): boolean {
+  if (quote.schedule.length === 0) return false;
+
+  const pence = (n: number) => Math.round(n * 100);
+
+  const scheduled = quote.schedule.reduce(
+    (total, line) => total + pence(line.amount) * line.count,
+    0,
+  );
+
+  return scheduled + pence(quote.deposit) === pence(quote.totalAmountPayable);
 }
 
 /**
@@ -383,5 +425,20 @@ export async function representativeExample(
     return null;
   }
 
-  return toQuote(nominated);
+  const quote = toQuote(nominated);
+
+  if (quote && !reconciles(quote)) {
+    // Suppressed rather than rendered. A representative example is a regulated
+    // statement of figures; publishing one whose arithmetic does not add up is
+    // worse than publishing none, and the listings page degrades to showing no
+    // payments at all rather than unqualified ones.
+    console.error(
+      "[codeweavers] representative example does not reconcile — " +
+        `schedule ${JSON.stringify(quote.schedule)} plus deposit ${quote.deposit} ` +
+        `does not equal total ${quote.totalAmountPayable}. Suppressed.`,
+    );
+    return null;
+  }
+
+  return quote;
 }
