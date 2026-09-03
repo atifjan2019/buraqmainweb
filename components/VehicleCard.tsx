@@ -191,22 +191,39 @@ export default function VehicleCard({
 
         {/* min-h-11 carries both to the 44px touch minimum. These are the
             primary actions on a grid most people meet on a phone. */}
-        <div className="mt-auto flex items-center gap-6 border-t border-line-soft pt-5">
-          {/* Not a link. The card overlay above already goes here, and a second
-              anchor to the same page would only add a tab stop. It stays for
-              the affordance — a card with no visible call to action reads as a
-              picture rather than something you can open. aria-hidden because
-              the title link has already announced the destination. */}
-          <span aria-hidden className="link-m">
+        <div className="mt-auto flex items-stretch gap-3 border-t border-line-soft pt-5">
+          {/* Reads as a button now, not a caption.
+
+              As a tracked text link beside "Finance" the two carried the same
+              visual weight, so the primary action looked like a footnote and
+              the card looked like a picture. A bordered block that fills the
+              row is unambiguous at a glance, which is the whole job here.
+
+              Still NOT a link. The stretched overlay on the title already goes
+              to this page; a second anchor to the same place would add a tab
+              stop and a duplicate screen-reader entry on every card in the
+              grid. aria-hidden for the same reason — the title has already
+              announced the destination. Hover state is driven by the card's
+              `group`, so it lights up wherever on the card the cursor is,
+              which is honest: the whole card is the target. */}
+          <span
+            aria-hidden
+            className="flex flex-1 items-center justify-center gap-2 border border-ink px-4 py-3
+                       label-uppercase-sm text-ink transition-colors
+                       group-hover:bg-ink group-hover:text-on-ink"
+          >
             View details
             <ArrowRight className="h-3.5 w-3.5" />
           </span>
 
           {/* A different destination, so a real link — and z-10 to lift it out
-              from under the card overlay, which would otherwise swallow it. */}
+              from under the card overlay, which would otherwise swallow it.
+              Deliberately the quieter of the two: most people want the car
+              first and the finance figure second. */}
           <Link
             href={`/finance?vehicle=${vehicle.slug}`}
-            className="relative z-10 inline-flex min-h-11 items-center text-sm font-light text-muted transition-colors hover:text-ink"
+            className="relative z-10 inline-flex min-h-11 items-center border border-line px-4
+                       label-uppercase-sm text-muted transition-colors hover:border-ink hover:text-ink"
           >
             Finance
           </Link>

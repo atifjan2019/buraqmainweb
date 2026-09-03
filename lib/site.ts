@@ -173,7 +173,7 @@ export const nav = [
 export const stats = [
   { value: "200+", label: "Happy Customers" },
   { value: "98%", label: "Satisfaction Rate" },
-  { value: "200+", label: "Cars Sold" },
+  { value: "800+", label: "Cars Sold" },
   { value: "24/7", label: "Support" },
 ] as const;
 
