@@ -24,7 +24,12 @@ export const company = {
   /** VAT registration, printed in the Terms only once it is filled in. */
   vatNumber: "",
   icoNumber: "",
-  fcaNumber: "",
+  /**
+   * Firm reference number, from the FCA's own approval correspondence for
+   * BURRAQ TRADERS LTD. Printed beside every representative example, which is
+   * where CONC requires the authorisation statement to appear.
+   */
+  fcaNumber: "1044050",
 } as const;
 
 /**
