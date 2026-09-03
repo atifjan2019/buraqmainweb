@@ -1,5 +1,4 @@
 import { representativeExample } from "@/lib/codeweavers/client";
-import { REPRESENTATIVE_VEHICLE_PRICE } from "@/lib/codeweavers/params";
 import RepresentativeExample from "./RepresentativeExample";
 
 /**
@@ -19,14 +18,10 @@ import RepresentativeExample from "./RepresentativeExample";
  * batch — see representativeExample() for why that distinction matters.
  */
 export default async function RepresentativeExampleBand() {
-  const quote = await representativeExample({
-    id: "representative-example",
-    price: REPRESENTATIVE_VEHICLE_PRICE,
-    mileage: 50000,
-    // Mid-age for this forecourt. Held relative to the current year so the
-    // example does not quietly become a quote for a fifteen-year-old car.
-    registrationDate: `${new Date().getFullYear() - 5}-01-01`,
-  });
+  // The profile lives in the client module, so this band and the gate that
+  // suppresses payments are asking about the same example rather than two that
+  // could drift apart.
+  const quote = await representativeExample();
 
   if (!quote) return null;
 

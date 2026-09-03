@@ -2,7 +2,12 @@ import "server-only";
 
 import { createHash } from "node:crypto";
 
-import { DEFAULT_PARAMETERS, decodeEntities, productName } from "./params";
+import {
+  DEFAULT_PARAMETERS,
+  REPRESENTATIVE_VEHICLE_PRICE,
+  decodeEntities,
+  productName,
+} from "./params";
 import type {
   CodeweaversProductResult,
   CodeweaversRequest,
@@ -359,6 +364,31 @@ export async function quoteMany(
 
   if (vehicles.length === 0) return results;
 
+  /*
+   * NO PAYMENTS WITHOUT A REPRESENTATIVE EXAMPLE.
+   *
+   * Showing a monthly figure triggers CONC 3.5.3R, and the example that
+   * satisfies it is fetched separately — so anything that stops the example
+   * arriving (a rate change, a lender leaving the panel, a quote that fails the
+   * reconciliation guard) previously left the payments on screen with nothing
+   * qualifying them. Verified: with the example unavailable, the homepage
+   * rendered 58 unqualified payments.
+   *
+   * Coupling them in the component that renders each is the version that rots —
+   * it works until someone adds a third surface. Coupling them HERE means a
+   * payment cannot physically be obtained without an example to sit beside it.
+   *
+   * Both calls are cached for the same six hours, so this costs one cached
+   * fetch, not one per page view.
+   */
+  if (!(await representativeExample(REPRESENTATIVE_VEHICLE, parameters))) {
+    console.error(
+      "[codeweavers] no valid representative example — suppressing all " +
+        "finance figures rather than showing them unqualified.",
+    );
+    return results;
+  }
+
   const response = await call(
     buildRequest(vehicles, parameters),
     cacheKeyFor(vehicles, parameters),
@@ -379,6 +409,24 @@ export async function quoteMany(
 
   return results;
 }
+
+/**
+ * The profile the representative example is calculated from.
+ *
+ * SYNTHETIC ON PURPOSE, not a car in the feed. An example pinned to a real
+ * vehicle disappears the day that vehicle sells, taking the site's compliance
+ * with it — and the FCA's test is that the example represents the agreements
+ * the promotion generates, which is a fact about the business rather than about
+ * whichever car is still in stock. Mid-price and mid-age for this forecourt;
+ * the age is held relative to now so it does not drift into a quote for a
+ * fifteen-year-old car.
+ */
+const REPRESENTATIVE_VEHICLE: FinanceVehicleInput = {
+  id: "representative-example",
+  price: REPRESENTATIVE_VEHICLE_PRICE,
+  mileage: 50000,
+  registrationDate: `${new Date().getFullYear() - 5}-01-01`,
+};
 
 /** One vehicle. Same path, so failure behaves identically. */
 export async function quoteOne(
@@ -405,7 +453,7 @@ export async function quoteOne(
  * would be this site deciding what "representative" means.
  */
 export async function representativeExample(
-  vehicle: FinanceVehicleInput,
+  vehicle: FinanceVehicleInput = REPRESENTATIVE_VEHICLE,
   parameters: FinanceParameters = DEFAULT_PARAMETERS,
 ): Promise<FinanceQuote | null> {
   const response = await call(
