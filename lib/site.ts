@@ -171,7 +171,7 @@ export const nav = [
 
 /** Headline numbers shown in the hero and stat strip. */
 export const stats = [
-  { value: "200+", label: "Happy Customers" },
+  { value: "800+", label: "Happy Customers" },
   { value: "98%", label: "Satisfaction Rate" },
   { value: "800+", label: "Cars Sold" },
   { value: "24/7", label: "Support" },
