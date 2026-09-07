@@ -43,7 +43,7 @@ const fieldErrorTextClass = "text-[color:light-dark(#b91c1c,#fca5a5)]";
 export default function BookingForm({
   registration = "",
   vehicleHeadline,
-  heading = "Book a test drive",
+  heading = "Book an appointment",
   intro = "Pick a day and a time that suits you. We'll call to confirm before you travel.",
   defaultType = "test_drive",
 }: BookingFormProps) {

@@ -10,9 +10,9 @@ import {
 } from "@/lib/booking";
 
 export const metadata: Metadata = {
-  title: "Book a Test Drive",
+  title: "Book an Appointment",
   description:
-    "Book a test drive, a showroom viewing or a collection at Burraq Motors in Bury. Pick a day and time and we'll call to confirm.",
+    "Book an appointment at Burraq Motors in Bury — a test drive, a showroom viewing or a collection. Pick a day and time and we'll call to confirm.",
 };
 
 /**
@@ -35,7 +35,7 @@ export default function BookPage() {
         <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
           <Reveal>
             <span className="eyebrow">Visit Us</span>
-            <h1 className="display-lg mt-6 text-ink">Book a test drive</h1>
+            <h1 className="display-lg mt-6 text-ink">Book an appointment</h1>
             <p className="mt-6 max-w-2xl text-base font-light leading-relaxed text-muted">
               Tell us when suits and we&apos;ll get the car ready. Every booking
               is confirmed by phone first, so you never travel for a car that
