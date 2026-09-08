@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { contact, nav, whatsappLink } from "@/lib/site";
+import { bookingCta, contact, nav, whatsappLink } from "@/lib/site";
 import { Close, Menu, Phone, WhatsApp } from "./Icons";
 import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
@@ -80,22 +80,55 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-4 xl:flex">
+        <div className="hidden items-center gap-3 xl:flex">
           {wa && (
             <a
               href={wa}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-outline h-11 min-h-11 px-6"
+              className="btn btn-outline h-11 min-h-11 px-5"
             >
               <WhatsApp className="h-4 w-4" />
               WhatsApp
             </a>
           )}
+          {/* Solid, because booking is the action this header exists to
+              produce. It was the fourth of eight identical grey nav links. */}
+          <Link href={bookingCta.href} className="btn btn-solid h-11 min-h-11 px-5">
+            {bookingCta.label}
+          </Link>
           <ThemeToggle />
         </div>
 
+        {/*
+          Below 1280px this bar was a logo, a theme toggle and a hamburger —
+          the phone and WhatsApp were two taps and a full-screen overlay away,
+          on the one device where the visitor is already holding the thing they
+          would ring from. Both are icon buttons now, at the 44px touch
+          minimum, and labelled, because here the glyph carries the whole
+          meaning.
+        */}
         <div className="flex items-center gap-2 xl:hidden">
+          {contact.phone && (
+            <a
+              href={`tel:${contact.phoneHref}`}
+              aria-label={`Call ${contact.phone}`}
+              className="grid h-11 w-11 place-items-center border border-line text-ink"
+            >
+              <Phone className="h-5 w-5" />
+            </a>
+          )}
+          {wa && (
+            <a
+              href={wa}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Message us on WhatsApp"
+              className="grid h-11 w-11 place-items-center border border-line text-ink"
+            >
+              <WhatsApp className="h-5 w-5" />
+            </a>
+          )}
           <ThemeToggle />
           <button
             type="button"
@@ -147,9 +180,16 @@ export default function Header() {
 
           <div className="mt-10 flex flex-col gap-3">
             <Link
-              href="/cars"
+              href={bookingCta.href}
               onClick={() => setOpen(false)}
               className="btn btn-solid"
+            >
+              {bookingCta.label}
+            </Link>
+            <Link
+              href="/cars"
+              onClick={() => setOpen(false)}
+              className="btn btn-outline"
             >
               Browse Cars
             </Link>

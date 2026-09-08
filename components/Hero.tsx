@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { financeDisclaimer } from "@/lib/site";
 import { getFeaturedVehicles } from "@/lib/crm";
-import { formatPrice, vehicleHref, vehicleTitle } from "@/lib/vehicles";
+import { formatPrice, vehicleHeadline, vehicleHref } from "@/lib/vehicles";
 import { ArrowRight, Handshake, Shield } from "./Icons";
 import Reveal from "./Reveal";
 
@@ -219,7 +219,7 @@ export default async function Hero() {
                 In the spotlight
               </span>
               <p className="title-lg mt-4 text-ink">
-                {vehicleTitle(spotlight)}
+                {vehicleHeadline(spotlight)}
               </p>
               <p className="mt-2 text-sm font-light text-muted">
                 {spotlight.year} · {spotlight.fuelType} ·{" "}

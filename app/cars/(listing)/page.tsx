@@ -153,7 +153,7 @@ export default async function CarsPage({
           <>
             {/* The result count is chrome, so it takes the machined label
                 voice rather than reading as another line of body copy. */}
-            <p className="label-uppercase mt-16 border-b border-line-soft pb-4 text-ink">
+            <p className="label-uppercase mt-16 text-ink">
               {stock.meta.total === 1
                 ? "1 car available"
                 : `${stock.meta.total} cars available`}
@@ -163,6 +163,25 @@ export default async function CarsPage({
                   · page {stock.meta.currentPage} of {stock.meta.lastPage}
                 </span>
               )}
+            </p>
+
+            {/*
+              The caution the count needs.
+
+              "21 cars available" is a claim, and the feed behind it is cached
+              for two minutes against a CRM where a car stays listed until
+              somebody remembers to change its status. The gap between the
+              sentence above and the truth is measured in hours, not seconds,
+              and the cost of getting it wrong is a customer driving to Bury for
+              a car that sold on Tuesday.
+
+              Directly under the count rather than at the foot of the page: it
+              qualifies that number, and a caveat a screen away from the claim
+              it modifies is decoration.
+            */}
+            <p className="mt-3 border-b border-line-soft pb-4 text-sm font-light leading-relaxed text-muted">
+              Stock is updated regularly. Please confirm availability before
+              travelling.
             </p>
 
             {/* Above the grid, not below it: CONC 3.5.5R(5) wants the example

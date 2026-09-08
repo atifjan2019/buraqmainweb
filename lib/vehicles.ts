@@ -438,8 +438,84 @@ export function formatDate(iso: string | null): string | null {
   return Number.isNaN(parsed.getTime()) ? null : fullDate.format(parsed);
 }
 
+/**
+ * Marques whose names are initialisms and stay upper case. Everything else is
+ * title-cased, so this list only has to hold the exceptions.
+ */
+const ACRONYM_MAKES = new Set(["BMW", "MG", "VW", "DS", "GMC", "RAM", "SEAT"]);
+
+/**
+ * Title-cases one whitespace-separated token, leaving model codes alone.
+ *
+ * A token is left exactly as typed when any hyphen-separated part of it is a
+ * short all-caps run or carries a digit — that is what a trim designation
+ * looks like. It keeps "C-HR", "4WD", "ZX", "GTI" and "A3" intact while still
+ * turning "PRIUS" into "Prius" and "COROLLA" into "Corolla", because those are
+ * too long to be codes.
+ *
+ * Four characters is the cut-off, and it is a judgement rather than a rule:
+ * every trim code in this dealership's stock is shorter, and every model name
+ * is longer. A five-letter code would come through title-cased and would need
+ * adding to the exceptions above.
+ */
+function normaliseToken(token: string): string {
+  const looksLikeCode = token
+    .split("-")
+    .some((part) => /\d/.test(part) || (part.length <= 4 && part === part.toUpperCase() && /[A-Z]/.test(part)));
+
+  if (looksLikeCode) return token;
+
+  return token
+    .split("-")
+    .map((part) => (part ? part[0].toUpperCase() + part.slice(1).toLowerCase() : part))
+    .join("-");
+}
+
+function normaliseWords(value: string): string {
+  return value.trim().split(/\s+/).filter(Boolean).map(normaliseToken).join(" ");
+}
+
+/**
+ * "Toyota Land Cruiser 4WD ZX" — make and model, cleaned up for display.
+ *
+ * The CRM's `make` and `model` are free text typed by whoever entered the car,
+ * and the stock shows it: the same marque arrives as both "TOYOTA" and
+ * "Toyota", models arrive as "PRIUS" and as "Prius", one Land Cruiser has its
+ * make repeated inside its model, and one record has the year sitting in the
+ * model column. Rendered naively that produced "TOYOTA Toyota Land Cruiser
+ * 4WD ZX" and "TOYOTA 2020" on the live site.
+ *
+ * Normalising here rather than in the CRM is deliberate. A one-off data tidy
+ * fixes twenty-one records and nothing else; the twenty-second car is typed by
+ * a human next week. This is the single place every card, heading, page title
+ * and alt text is composed from, so the defect cannot come back through the
+ * front door — and the underlying records stay exactly as the dealership
+ * entered them, which is what the CRM is for.
+ *
+ * What it does NOT do is invent. A model recorded as "2020" carries no model
+ * information, so it is dropped rather than guessed at; that car renders as
+ * "2020 Toyota" until someone fills the field in.
+ */
 export function vehicleTitle(vehicle: Vehicle): string {
-  return `${vehicle.make} ${vehicle.model}`;
+  const rawMake = (vehicle.make ?? "").trim();
+  const make = ACRONYM_MAKES.has(rawMake.toUpperCase())
+    ? rawMake.toUpperCase()
+    : normaliseWords(rawMake);
+
+  let model = normaliseWords(vehicle.model ?? "");
+
+  // The model column sometimes repeats the marque. Compared case-insensitively
+  // on a word boundary, so a "Mini" model under a "Mini" make loses the
+  // duplicate while "Micra" under "Nissan" is untouched.
+  if (make && model.toLowerCase().startsWith(`${make.toLowerCase()} `)) {
+    model = model.slice(make.length + 1).trim();
+  }
+
+  // A purely numeric model is not a model. Dropping it is honest; printing it
+  // gives "Toyota 2020", which reads as a model name and is not one.
+  if (/^\d+$/.test(model)) model = "";
+
+  return [make, model].filter(Boolean).join(" ");
 }
 
 /* ---------------------------------------------------------------- */

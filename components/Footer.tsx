@@ -1,12 +1,17 @@
 import Link from "next/link";
-import { contact, financeDisclaimer, nav, site } from "@/lib/site";
+import { contact, financeDisclaimer, guides, nav, site } from "@/lib/site";
 import { Mail, Phone, Pin } from "./Icons";
 import Logo from "./Logo";
 
 const year = new Date().getFullYear();
 
+/*
+  Auction Sheets used to head this list. It is a buying guide, and filing it
+  with the privacy notice, the terms and the cookie policy both mislabelled it
+  and diluted a column that on an FCA-facing trading site is compliance
+  surface rather than a postscript. It sits in `guides` now.
+*/
 const legal = [
-  { label: "Auction Sheets", href: "/auction-sheets" },
   { label: "Privacy Policy", href: "/privacy" },
   { label: "Terms", href: "/terms" },
   { label: "Cookies", href: "/cookies" },
@@ -32,7 +37,11 @@ export default function Footer() {
       <span aria-hidden className="m-stripe block h-1 w-full" />
 
       <div className="mx-auto max-w-[90rem] px-5 py-16 sm:px-8">
-        <div className="grid gap-12 lg:grid-cols-[1.6fr_1fr_1fr_1.2fr]">
+        {/* Five columns since Guides split out of Legal. The two link lists are
+            the narrowest tracks — their labels are one or two words — so the
+            extra column comes out of the gap rather than out of the brand block
+            or the contact block, both of which carry full sentences. */}
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr_1.2fr]">
           {/* Brand */}
           <div>
             {/* Larger than the header's. The footer has vertical room, and at
@@ -55,6 +64,25 @@ export default function Footer() {
                 the height it needs. */}
             <ul className="mt-4 flex flex-col">
               {nav.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="inline-flex min-h-11 items-center text-sm text-muted transition-colors hover:text-ink"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Guides — reading matter, kept clear of the legal column. Also
+              where Journal now lives, since the main nav is down to the six
+              items the brief asked for. */}
+          <div>
+            <h3 className="label-uppercase text-ink">Guides</h3>
+            <ul className="mt-4 flex flex-col">
+              {guides.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}

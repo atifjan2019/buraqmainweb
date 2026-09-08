@@ -4,24 +4,24 @@ import { notFound, permanentRedirect } from "next/navigation";
 import AuctionSheets from "@/components/AuctionSheets";
 import EnquiryDialog from "@/components/EnquiryDialog";
 import EnquiryForm from "@/components/EnquiryForm";
-import { ArrowRight, Phone } from "@/components/Icons";
+import { ArrowRight, Phone, WhatsApp } from "@/components/Icons";
 import FinancePanel from "@/components/finance/FinancePanel";
 import RepresentativeExampleBand from "@/components/finance/RepresentativeExampleBand";
 import Reveal from "@/components/Reveal";
 import StockNotice from "@/components/StockNotice";
 import VehicleDescription from "@/components/VehicleDescription";
 import VehicleGallery from "@/components/VehicleGallery";
+import VehicleStickyBar from "@/components/VehicleStickyBar";
 import { CrmError, getVehicle } from "@/lib/crm";
 import { quoteOne } from "@/lib/codeweavers/client";
 import { registrationDate, toFinanceInput } from "@/lib/codeweavers/params";
-import { contact, salesContact, site } from "@/lib/site";
+import { bookingCta, contact, salesContact, site, whatsappLink } from "@/lib/site";
 import {
   formatDate,
   formatMileage,
   formatMileageValue,
   formatPrice,
   vehicleHeadline,
-  vehicleTitle,
   type Vehicle,
 } from "@/lib/vehicles";
 
@@ -88,7 +88,7 @@ export async function generateMetadata({
     return { title: "Vehicle no longer available", robots: { index: false } };
   }
 
-  const title = `${vehicle.year} ${vehicleTitle(vehicle)} for sale in Manchester`;
+  const title = `${vehicleHeadline(vehicle)} for sale in Manchester`;
   const description = metaDescription(vehicle);
 
   return {
@@ -143,6 +143,20 @@ export default async function VehiclePage({ params }: PageProps) {
   const finance = await quoteOne(toFinanceInput(vehicle));
 
   const reserved = vehicle.status === "reserved";
+
+  /*
+   * A WhatsApp thread that opens already naming the car. The plate goes in when
+   * there is one — most of this stock is imported and has no UK plate yet — so
+   * the sales team can identify the vehicle from the first message instead of
+   * asking which one, which is the whole difference between this and the
+   * generic link in the header.
+   */
+  const whatsappAboutThisCar = whatsappLink(
+    `Hi, I'm interested in the ${vehicleHeadline(vehicle)}${
+      vehicle.registration?.trim() ? ` (${vehicle.registration.trim()})` : ""
+    } — is it still available?`,
+  );
+
   const motExpiry = formatDate(vehicle.motExpiry);
   const serviceDue = formatDate(vehicle.serviceDue);
 
@@ -176,7 +190,7 @@ export default async function VehiclePage({ params }: PageProps) {
   const mainImage = vehicle.images[0] ?? vehicle.featuredImage;
 
   return (
-    <section className="bg-canvas pt-32 pb-24">
+    <section className="bg-canvas pt-32 pb-40 lg:pb-24">
       {/* Starts the LCP image downloading before the gallery markup is parsed.
           React hoists this into <head>. */}
       {mainImage && (
@@ -206,9 +220,23 @@ export default async function VehiclePage({ params }: PageProps) {
               {/* Square chips in ink and hairline — the system has no pill
                   shape and no accent hue to tint a status with. */}
               <div className="flex flex-wrap items-center gap-2">
-                {reserved && (
+                {/*
+                  Availability, stated rather than implied. Every car the public
+                  feed will ever serve is in stock — sold ones are excluded at
+                  the source and reserved ones carry the chip below — so a
+                  visitor was left to infer "available" from the absence of a
+                  badge. Saying it is the point of the brief's item: the
+                  question "is this still there?" is the one a buyer actually
+                  has, and it deserves an answer on the page rather than a
+                  phone call.
+                */}
+                {reserved ? (
                   <span className="border border-ink px-3 py-1.5 label-uppercase-sm text-ink">
                     Reserved
+                  </span>
+                ) : (
+                  <span className="bg-ink px-3 py-1.5 label-uppercase-sm text-on-ink">
+                    Available
                   </span>
                 )}
                 {vehicle.isFeatured && (
@@ -230,7 +258,7 @@ export default async function VehiclePage({ params }: PageProps) {
               </div>
 
               <h1 className="display-md mt-6 break-words text-ink">
-                {vehicleTitle(vehicle)}
+                {vehicleHeadline(vehicle)}
               </h1>
 
               <div className="mt-8">
@@ -352,10 +380,15 @@ export default async function VehiclePage({ params }: PageProps) {
               <div className="js-only surface-card p-6 sm:p-8">
                 <div className="flex items-center gap-4">
                   {/*
-                    Initials, not a stock portrait. See the note on
-                    `salesContact` in lib/site.ts — until a real photograph of
-                    a real member of staff exists, a monogram makes a far
-                    smaller claim than a stranger's face would.
+                    The monogram is gone. It was a coloured square containing
+                    the letter "A", standing in for a photograph, and the brief
+                    asked for a real face or nothing — which is right, because
+                    an avatar that is not a picture of anybody is decoration
+                    wearing the costume of evidence.
+                    The photo branch stays wired: put a JPEG in /public and set
+                    `salesContact.photo` in lib/site.ts and it renders. The name
+                    and the role remain either way; those are true, and they are
+                    what makes the card worth having.
                   */}
                   {salesContact.photo ? (
                     /* eslint-disable-next-line @next/next/no-img-element --
@@ -368,14 +401,7 @@ export default async function VehiclePage({ params }: PageProps) {
                       height={56}
                       className="h-14 w-14 shrink-0 object-cover"
                     />
-                  ) : (
-                    <span
-                      aria-hidden
-                      className="title-lg grid h-14 w-14 shrink-0 place-items-center bg-ink text-on-ink"
-                    >
-                      {salesContact.name.charAt(0)}
-                    </span>
-                  )}
+                  ) : null}
 
                   <span className="min-w-0">
                     <span className="label-uppercase block truncate text-ink">
@@ -399,6 +425,37 @@ export default async function VehiclePage({ params }: PageProps) {
                     vehicleHeadline={vehicleHeadline(vehicle)}
                   />
 
+                  {/* Booking carried the car with it. /book takes a
+                      registration in the query so the form arrives filled in;
+                      without that the visitor re-types a plate they have just
+                      been looking at, and the sales team gets a booking with
+                      no car attached to it. */}
+                  <Link
+                    href={
+                      vehicle.registration?.trim()
+                        ? `${bookingCta.href}?vehicle=${encodeURIComponent(vehicle.registration.trim())}`
+                        : bookingCta.href
+                    }
+                    className="btn btn-outline w-full"
+                  >
+                    Book a Test Drive
+                  </Link>
+
+                  {/* Named, unlike the header's WhatsApp link, which opens a
+                      thread saying only "I'd like to enquire about a car" — on
+                      a page about one specific car. */}
+                  {whatsappAboutThisCar && (
+                    <a
+                      href={whatsappAboutThisCar}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-outline w-full"
+                    >
+                      <WhatsApp className="h-4 w-4" />
+                      WhatsApp About This Car
+                    </a>
+                  )}
+
                   {contact.phone && (
                     <a
                       href={`tel:${contact.phoneHref}`}
@@ -408,6 +465,17 @@ export default async function VehiclePage({ params }: PageProps) {
                       {contact.phone}
                     </a>
                   )}
+
+                  {/* Part exchange goes to the contact page with the car named,
+                      because there is no valuation flow to send it to and
+                      inventing one would be a bigger promise than the business
+                      has made. */}
+                  <Link
+                    href={`/contact?subject=${encodeURIComponent(`Part exchange against ${vehicleHeadline(vehicle)}`)}`}
+                    className="btn btn-outline w-full"
+                  >
+                    Part Exchange
+                  </Link>
                 </div>
 
                 <p className="caption mt-5 text-faint">
@@ -425,6 +493,11 @@ export default async function VehiclePage({ params }: PageProps) {
           </div>
         </div>
       </div>
+
+      <VehicleStickyBar
+        headline={vehicleHeadline(vehicle)}
+        registration={vehicle.registration}
+      />
     </section>
   );
 }

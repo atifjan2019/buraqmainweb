@@ -4,7 +4,7 @@ import {
   formatMileage,
   formatPrice,
   vehicleHref,
-  vehicleTitle,
+  vehicleHeadline,
   type Vehicle,
 } from "@/lib/vehicles";
 import { ArrowRight } from "./Icons";
@@ -63,7 +63,7 @@ export default function VehicleCard({
   live,
   finance = null,
 }: VehicleCardProps) {
-  const title = vehicleTitle(vehicle);
+  const title = vehicleHeadline(vehicle);
   const monthly = cardMonthlyPayment(finance);
   const reserved = vehicle.status === "reserved";
   const photo = vehicle.featuredImage;

@@ -165,13 +165,38 @@ export function whatsappLink(message?: string): string | null {
  */
 export const nav = [
   { label: "Home", href: "/" },
-  { label: "Our Cars", href: "/cars" },
+  { label: "Cars", href: "/cars" },
   { label: "Finance", href: "/finance" },
-  { label: "Appointment", href: "/book" },
-  { label: "Auction Sheets", href: "/auction-sheets" },
-  { label: "Journal", href: "/blog" },
+  // The auction-sheet explainer, under the name a buyer searches for. The page
+  // is titled "Japanese Auction Sheets Explained" and is the site's account of
+  // how an import is verified, which is what "Japanese Imports" promises.
+  { label: "Japanese Imports", href: "/auction-sheets" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
+] as const;
+
+/**
+ * Booking, kept OUT of `nav` on purpose.
+ *
+ * It is the one thing on this site a visitor can do that commits them to
+ * anything, and as the fourth of eight identical grey nav links it was the
+ * least prominent treatment available — invisible below 1280px until the
+ * hamburger was opened. It renders as a button instead, in the header and in
+ * the mobile sheet, which is why it cannot live in the link array.
+ */
+export const bookingCta = { label: "Book an Appointment", href: "/book" } as const;
+
+/**
+ * Reading, not navigation and not legal.
+ *
+ * The footer used to file the auction-sheet guide under "Legal", heading a
+ * column whose other members are the privacy notice, the terms and the cookie
+ * policy. A buying guide is not a legal notice, and on a site where those
+ * links are compliance surface it should not be sitting among them.
+ */
+export const guides = [
+  { label: "Japanese Imports", href: "/auction-sheets" },
+  { label: "Journal", href: "/blog" },
 ] as const;
 
 /** Headline numbers shown in the hero and stat strip. */
