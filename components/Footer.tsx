@@ -164,26 +164,24 @@ export default function Footer() {
 
           {/*
             Set in the machined label voice so it reads as chrome rather than
-            as another sentence. That makes the whole line 700, so bolding
-            "Webspires" would no longer distinguish it — the emphasis moves to
-            colour instead, which is how this system separates things anyway:
-            it has no accent hue, only ink against muted.
+            as another sentence.
+
+            Phase 1 asked for this to be removed or made discreet, and discreet
+            is the right end of that: the credit stays, but it stops competing.
+            The link was the one thing down here painted in ink, which made the
+            agency's name the highest-contrast text in the footer of the
+            client's own site. It now resolves to the same faint token as the
+            words around it and separates on hover instead. The heart went with
+            it — a coloured emoji is not chrome, and it was the only thing in
+            the footer not resolving through a token.
           */}
-          <p className="label-uppercase-sm flex items-center gap-2 text-faint">
-            Developed with
-            {/* The emoji carries its own colour, so it is the one thing in the
-                footer that doesn't resolve through a token. Labelled, because
-                a bare ❤️ is announced as "red heart" by screen readers and
-                that reads as noise mid-sentence. */}
-            <span role="img" aria-label="love" className="text-sm">
-              ❤️
-            </span>
-            by
+          <p className="label-uppercase-sm text-faint">
+            Developed by{" "}
             <a
               href="https://webspires.co.uk?utm_source=burraqmotors"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-ink transition-opacity hover:opacity-70"
+              className="transition-colors hover:text-ink"
             >
               Webspires
             </a>

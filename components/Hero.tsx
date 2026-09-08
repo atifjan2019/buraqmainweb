@@ -3,7 +3,7 @@ import Link from "next/link";
 import { financeDisclaimer } from "@/lib/site";
 import { getFeaturedVehicles } from "@/lib/crm";
 import { formatPrice, vehicleHref, vehicleTitle } from "@/lib/vehicles";
-import { ArrowRight, Handshake, Headset, Shield } from "./Icons";
+import { ArrowRight, Handshake, Shield } from "./Icons";
 import Reveal from "./Reveal";
 
 /**
@@ -17,16 +17,24 @@ const HERO_IMAGE = "/hero/showroom.jpg";
  * The three assurances under the buttons.
  *
  * These replaced a row of figures — "200+ happy customers", "98% satisfaction
- * rate", "24/7 support". Two of those three were claims about ourselves that a
- * visitor cannot check and every dealership makes. These are three things we
- * actually do, and the first two are the specific worries somebody has before
- * buying an import. The support line survived the swap because it was already
- * a fact about availability rather than a self-assessment.
+ * rate", "24/7 support". Those were claims about ourselves that a visitor
+ * cannot check and every dealership makes. These are things we actually do,
+ * and both are specific worries somebody has before buying an import.
+ *
+ * The 24/7 line was the last of the old set and went in Phase 1. It had been
+ * kept on the grounds that availability is a fact rather than a
+ * self-assessment, which is true of a phone that can be rung and false of the
+ * phrase "24/7 customer support", because that promises someone is there.
+ * Nobody has evidenced that, so it is not claimed.
+ *
+ * Two rather than three is deliberate and not a gap to be filled with
+ * whatever fits: a third belongs here only when there is a third thing that is
+ * true, specific, and checkable. The layout below is driven by the array
+ * length, so adding one is a one-line change.
  */
 const heroAssurances = [
   { icon: Shield, title: "HPI Checked", note: "For peace of mind" },
   { icon: Handshake, title: "Finance", note: "Available" },
-  { icon: Headset, title: "24/7", note: "Customer support" },
 ] as const;
 
 /**

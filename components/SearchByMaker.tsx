@@ -67,8 +67,8 @@ export default async function SearchByMaker() {
       <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
         <SectionHeading
           eyebrow="Browse The Range"
-          title="Search By"
-          accent="Maker"
+          title="Shop by"
+          accent="Make"
           body="Jump straight to the marque you came for. Every badge here has cars behind it right now."
         />
 

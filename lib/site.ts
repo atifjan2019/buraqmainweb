@@ -175,11 +175,21 @@ export const nav = [
 ] as const;
 
 /** Headline numbers shown in the hero and stat strip. */
+/*
+ * Phase 1 removed the "24/7 Support" figure. It is a claim about a service
+ * level nobody has evidenced, and a dealership that answers a WhatsApp message
+ * in the evening is not the same thing as staffed round-the-clock support —
+ * which is what the words promise. Removing an unverifiable claim cannot make
+ * the page less accurate; leaving it in could.
+ *
+ * The two figures above it are self-assessments of the same kind and were left
+ * alone only because the brief did not raise them. They are worth the same
+ * question.
+ */
 export const stats = [
   { value: "800+", label: "Happy Customers" },
   { value: "98%", label: "Satisfaction Rate" },
   { value: "800+", label: "Cars Sold" },
-  { value: "24/7", label: "Support" },
 ] as const;
 
 /** Trust badges under the hero. */
