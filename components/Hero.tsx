@@ -84,7 +84,7 @@ export default async function Hero() {
             <span className="eyebrow">Japanese Imports · Manchester</span>
           </Reveal>
 
-          <Reveal delay={80}>
+          <Reveal>
             {/* UPPERCASE display-xl. The doc treats sentence-case display as
                 off-brand outright — the all-caps setting is a brand-voice
                 signal here, not a styling preference.
@@ -99,7 +99,7 @@ export default async function Hero() {
             </h1>
           </Reveal>
 
-          <Reveal delay={160}>
+          <Reveal>
             {/* Light (300) against the headline's 700. The gap between the two
                 is the editorial signature the whole system rests on. */}
             <p className="mt-8 text-base font-light leading-relaxed text-lead sm:text-lg">
@@ -109,7 +109,7 @@ export default async function Hero() {
             </p>
           </Reveal>
 
-          <Reveal delay={240}>
+          <Reveal>
             <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <Link href="/cars" className="btn btn-solid">
                 Browse Cars

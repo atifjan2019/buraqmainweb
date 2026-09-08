@@ -979,7 +979,19 @@ html:not([data-js]) .js-only {
   Native <dialog> is immune to this — the top layer escapes containing blocks
   entirely — which is one more reason the enquiry modal is built on it.
 */
-[data-js] [data-reveal] {
+/*
+  Only `pending` hides, and only Reveal.tsx sets it — after it has measured
+  that the element is below the fold and attached the observer that will
+  bring it back. A bare [data-reveal] is visible.
+
+  This is the inversion described at length in Reveal.tsx. Hiding on
+  [data-js] instead meant that from the pre-paint stamp until hydration
+  finished, the whole page was opacity:0 — a blank screen for the length of
+  the bundle download, which on mobile data is seconds. The [data-js] guard
+  only ever covered scripting being BLOCKED. It being merely slow is the
+  common case, and that is the one that showed the visitor nothing.
+*/
+[data-js] [data-reveal="pending"] {
   opacity: 0;
   transform: translateY(18px);
   transition:
@@ -991,6 +1003,10 @@ html:not([data-js]) .js-only {
 [data-js] [data-reveal="shown"] {
   opacity: 1;
   transform: none;
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
 }
 
 /* Anyone who asks for less motion gets none of it. */
