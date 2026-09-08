@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useId } from "react";
+import { useActionState, useId, useState } from "react";
 import { requestBooking } from "@/app/actions/booking";
 import {
   BOOKING_TYPES,
   dateBounds,
   formatSlot,
+  isClosedDay,
   slotTimes,
 } from "@/lib/booking";
 import {
@@ -51,6 +52,20 @@ export default function BookingForm({
     BookingFormState,
     FormData
   >(requestBooking, initialBookingState);
+
+  /*
+   * The chosen day, held here so the time list and the closed-day warning can
+   * both react to it. It was an uncontrolled input whose value nothing else on
+   * the form could see, which is why every date-dependent rule could only be
+   * applied after submission.
+   */
+  const [date, setDate] = useState(state.values?.date ?? "");
+
+  // Slots that have already passed are dropped for today; a future day keeps
+  // the full list. Recomputed per render rather than memoised — it is a loop
+  // over nine strings, and memoising it against the clock would be worse.
+  const times = slotTimes(date);
+  const closed = Boolean(date) && isClosedDay(date);
 
   const ids = useId();
   const fieldId = (name: string) => `${ids}-${name}`;
@@ -119,6 +134,52 @@ export default function BookingForm({
       {/* Context for the sales team — set by the page, not the customer. */}
       <input type="hidden" name="registration" value={registration} />
 
+      {/*
+        Which car this is about, said out loud.
+
+        The registration has always travelled as a hidden field, so a customer
+        arriving from a vehicle page had no way of telling whether the car came
+        with them — and if they had opened three tabs, no way of telling WHICH
+        one. Showing it turns a hidden field into a confirmation, and the link
+        out is there so a wrong car is one click to fix rather than a booking
+        made against the wrong vehicle.
+      */}
+      {registration && (
+        <p className="mt-6 border border-line-soft bg-canvas-deep px-4 py-3 text-sm font-light text-muted">
+          Booking about{" "}
+          <strong className="font-normal text-ink">
+            {vehicleHeadline ?? registration}
+          </strong>
+          {vehicleHeadline && (
+            <span className="text-faint"> · {registration}</span>
+          )}
+          <Link
+            href="/cars"
+            className="mt-1 block text-xs font-bold uppercase tracking-wider text-ink underline-offset-4 hover:underline"
+          >
+            Choose a different car
+          </Link>
+        </p>
+      )}
+
+      {/*
+        Honeypot. Not `type="hidden"` — plenty of bots skip those — but a real
+        text input pushed out of the viewport, taken out of the tab order and
+        hidden from assistive tech, with autocomplete off so no password
+        manager fills it for a human by accident. Anything in it and the Server
+        Action drops the submission without telling the sender why.
+      */}
+      <div aria-hidden className="absolute left-[-9999px] top-0 h-0 w-0 overflow-hidden">
+        <label htmlFor={fieldId("company")}>Company (leave this empty)</label>
+        <input
+          id={fieldId("company")}
+          type="text"
+          name="company"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
+
       {state.message && (
         <p
           role="alert"
@@ -174,12 +235,31 @@ export default function BookingForm({
             required
             min={min}
             max={max}
-            defaultValue={state.values?.date}
-            aria-invalid={Boolean(errors.date)}
-            aria-describedby={errors.date ? errorId("date") : undefined}
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            aria-invalid={Boolean(errors.date) || closed}
+            aria-describedby={
+              errors.date ? errorId("date") : closed ? errorId("closed") : undefined
+            }
             className="field mt-3"
           />
           <FieldError id={errorId("date")} message={errors.date} />
+          {/*
+            Said the moment the date is chosen, not after the form is filled in
+            and submitted. The rule was always enforced — the CRM refuses a
+            Sunday — but the customer found out last, which is the part the
+            brief is actually complaining about.
+
+            A native date input cannot grey out individual days without being
+            replaced by a custom calendar, and that trade (keyboard support, screen
+            readers, the OS picker every phone user already knows) is not worth
+            making for one day a week. Telling them immediately is.
+          */}
+          {closed && !errors.date && (
+            <p id={errorId("closed")} className={`caption mt-2 ${alertTextClass}`}>
+              We're closed on Sundays — please choose another day.
+            </p>
+          )}
         </div>
 
         <div>
@@ -198,9 +278,9 @@ export default function BookingForm({
             className="field mt-3"
           >
             <option value="" disabled>
-              Choose a time
+              {times.length === 0 ? "No slots left today" : "Choose a time"}
             </option>
-            {slotTimes().map((time) => (
+            {times.map((time) => (
               <option key={time} value={time}>
                 {formatSlot(time)}
               </option>

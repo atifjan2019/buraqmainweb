@@ -31,7 +31,31 @@ export const metadata: Metadata = {
  * again on the confirmation — because the failure mode of getting this wrong is
  * somebody driving to Bury for an appointment nobody knew about.
  */
-export default function BookPage() {
+/*
+ * `searchParams` is a Promise in this version of Next — see AGENTS.md. The page
+ * becomes async purely to await it.
+ */
+export default async function BookPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+
+  /*
+   * The car this booking is about, arriving as ?vehicle=<registration> from a
+   * vehicle page's Book a Test Drive button.
+   *
+   * A registration rather than a slug because that is what the CRM matches on
+   * — AppointmentController already looks a booking's registration up against
+   * stock, case- and space-insensitively, and links the appointment to the car.
+   * That path was built and tested and nothing on the website ever sent it
+   * anything: the customer's only way to name a car was to type it into the
+   * free-text notes box, so the link was made by hand or not at all.
+   */
+  const raw = Array.isArray(params.vehicle) ? params.vehicle[0] : params.vehicle;
+  const vehicle = typeof raw === "string" ? raw.trim().slice(0, 20) : "";
+
   const opens = formatSlot(`${String(OPENS_AT).padStart(2, "0")}:00`);
   const last = formatSlot(`${String(LAST_SLOT).padStart(2, "0")}:00`);
 
@@ -110,7 +134,7 @@ export default function BookPage() {
             </Reveal>
 
             <Reveal delay={100}>
-              <BookingForm />
+              <BookingForm registration={vehicle} />
             </Reveal>
           </div>
         </div>

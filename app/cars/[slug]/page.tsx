@@ -109,6 +109,24 @@ export async function generateMetadata({
       description,
       url: `/cars/${vehicle.slug}`,
       type: "website",
+      /*
+        The car's own photograph. A vehicle page can carry ten images in its
+        JSON-LD and still declare no og:image, which is what it did — so
+        sharing a specific car to WhatsApp or Facebook produced a bare text
+        card for the one page on the site where the picture IS the pitch.
+        Omitted rather than defaulted when the car is unphotographed; the
+        layout's site-wide card takes over.
+      */
+      ...(vehicle.images[0]
+        ? {
+            images: [
+              {
+                url: vehicle.images[0].full,
+                alt: vehicle.images[0].alt ?? vehicleHeadline(vehicle),
+              },
+            ],
+          }
+        : {}),
     },
   };
 }
@@ -214,6 +232,36 @@ export default async function VehiclePage({ params }: PageProps) {
       {mainImage && (
         <link rel="preload" as="image" href={mainImage.display} fetchPriority="high" />
       )}
+
+      {/*
+        Breadcrumbs. Vehicle pages sit three levels deep and are the ones that
+        win long-tail search, so without this the SERP shows a bare URL where
+        it could show Home › Cars › the car.
+      */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: site.url },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Cars",
+                item: `${site.url}/cars`,
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: vehicleHeadline(vehicle),
+                item: `${site.url}/cars/${vehicle.slug}`,
+              },
+            ],
+          }),
+        }}
+      />
 
       <script
         type="application/ld+json"

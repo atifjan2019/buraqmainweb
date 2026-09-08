@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { site } from "@/lib/site";
+import { contact, showrooms, site } from "@/lib/site";
 import "./globals.css";
 
 /*
@@ -101,6 +101,59 @@ export default function RootLayout({
         />
       </head>
       <body className="flex min-h-full flex-col bg-canvas text-ink">
+        {/*
+          Who this business is, in the one vocabulary search engines read.
+
+          There was no Organization node anywhere on the site — no address, no
+          telephone, no opening hours, no branches. For a local dealership that
+          is the highest-value structured data there is, and it was the only
+          one of the four types the brief asked for with nothing at all behind
+          it.
+
+          Every field is drawn from lib/site.ts, so a branch with no verified
+          address contributes no PostalAddress rather than a guessed one, and
+          nothing here asserts FCA authorisation — that claim lives beside the
+          representative example, where CONC expects it and where the finance
+          machinery can suppress it. A footer-wide version would keep asserting
+          it on pages where the finance code has deliberately gone quiet.
+        */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "AutoDealer",
+              name: site.name,
+              description: site.description,
+              url: site.url,
+              telephone: contact.phone || undefined,
+              email: contact.email || undefined,
+              areaServed: contact.city,
+              ...(contact.trustpilot ? { sameAs: [contact.trustpilot] } : {}),
+              department: showrooms.map((showroom) => ({
+                "@type": "AutoDealer",
+                name: `${site.name} — ${showroom.name}`,
+                telephone: showroom.phone,
+                url: `${site.url}/cars?branch=${encodeURIComponent(showroom.slug)}`,
+                ...(showroom.addressLines.length > 0
+                  ? {
+                      address: {
+                        "@type": "PostalAddress",
+                        streetAddress: showroom.addressLines
+                          .slice(0, -1)
+                          .join(", "),
+                        addressLocality: showroom.name,
+                        addressCountry: "GB",
+                      },
+                    }
+                  : {}),
+                ...(showroom.openingHours
+                  ? { openingHours: showroom.openingHours }
+                  : {}),
+              })),
+            }),
+          }}
+        />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

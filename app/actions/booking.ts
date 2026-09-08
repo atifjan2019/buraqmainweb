@@ -45,6 +45,26 @@ export async function requestBooking(
 
   // Comes from the page, not the customer, so it is never echoed back into the
   // form or shown as a field error.
+  /*
+   * Honeypot. A field no human can see, no keyboard can reach and no password
+   * manager will fill; a bot walking the DOM fills everything and gives itself
+   * away. Anything in it is dropped silently with a success-shaped response, so
+   * the bot has no signal to tune against — telling it "rejected" is how it
+   * learns which field to skip.
+   *
+   * This is not a replacement for the CRM's rate limit, it is the other half.
+   * That bucket throttles by the site's egress IP, which is shared by every
+   * genuine customer, so a script hammering this action locks real people out.
+   * Cheap junk needs turning away before it ever reaches the CRM.
+   */
+  if (text(formData, "company")) {
+    // `sent` with no confirmation object. The component renders its confirmation
+    // panel only when both are present, so a bot gets a form that quietly
+    // resets and no error to learn from, while a human — who cannot have
+    // filled this field — never reaches this branch.
+    return { status: "sent" };
+  }
+
   const registration = text(formData, "registration");
 
   const fieldErrors: Record<string, string> = {};

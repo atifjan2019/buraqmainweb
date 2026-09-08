@@ -53,13 +53,51 @@ export const BOOKING_TYPES: ReadonlyArray<{
   },
 ];
 
-/** Every bookable start time, as 24-hour "HH:MM". */
-export function slotTimes(): string[] {
+/**
+ * Every bookable start time, as 24-hour "HH:MM".
+ *
+ * Pass the chosen date and the times that have already gone are left out.
+ * Offering 9am at half past four in the afternoon is the same failure as
+ * offering a Sunday: the customer fills the form in, submits, and is told no
+ * by a rule the page knew about before they started.
+ *
+ * Only ever narrows for TODAY. A future date returns the full list, and a date
+ * that cannot be parsed also returns the full list — a broken narrowing must
+ * fail open and let the server reject, never silently hide every slot and make
+ * the showroom look shut.
+ */
+export function slotTimes(date?: string, now: Date = new Date()): string[] {
   const times: string[] = [];
   for (let hour = OPENS_AT; hour <= LAST_SLOT; hour++) {
     times.push(`${String(hour).padStart(2, "0")}:00`);
   }
-  return times;
+
+  if (!date) return times;
+
+  const [y, m, d] = date.split("-").map(Number);
+  if (!y || !m || !d) return times;
+
+  const isToday =
+    y === now.getFullYear() && m === now.getMonth() + 1 && d === now.getDate();
+  if (!isToday) return times;
+
+  // Same arithmetic the CRM applies, so the two agree on the boundary rather
+  // than disagreeing by an hour and bouncing a slot the page just offered.
+  const earliest = new Date(now.getTime() + MIN_NOTICE_HOURS * 60 * 60 * 1000);
+
+  return times.filter((time) => {
+    const hour = Number(time.slice(0, 2));
+    const slot = new Date(now);
+    slot.setHours(hour, 0, 0, 0);
+    return slot.getTime() >= earliest.getTime();
+  });
+}
+
+/** True when the date falls on the day the showroom is shut. */
+export function isClosedDay(date: string): boolean {
+  const [y, m, d] = date.split("-").map(Number);
+  if (!y || !m || !d) return false;
+  return new Date(y, m - 1, d).getDay() === CLOSED_DAY;
 }
 
 /** "17:00" → "5:00pm", for labels. */
