@@ -115,10 +115,15 @@ export default async function CarsPage({
     <section className="bg-canvas pt-32 pb-24">
       <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
         <SectionHeading
+          as="h1"
           eyebrow="Our Collection"
           title="Current"
           accent="Stock"
-          body="Every car below is available right now and prepared to a standard we'd happily drive ourselves."
+          /* Was "Every car below is available right now", which is a stronger
+             claim than a feed cached for two minutes can support, and which
+             contradicted the "confirm availability before travelling" line
+             this page now carries under its result count. */
+          body="Our current forecourt, each car prepared to a standard we'd happily drive ourselves."
         />
 
         {/* With no stock at all there is nothing to filter by, and an empty

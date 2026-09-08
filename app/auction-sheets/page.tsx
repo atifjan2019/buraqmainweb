@@ -6,6 +6,12 @@ import AuctionGradePicker from "@/components/AuctionGradePicker";
 import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
+  // Self-referencing canonical, and an og:url that is this page rather
+  // than the site root — the layout sets og:url to the homepage for
+  // everything, so sharing any of these posted a card describing the
+  // homepage.
+  alternates: { canonical: "/auction-sheets" },
+  openGraph: { url: "/auction-sheets" },
   title: "Japanese Auction Sheets Explained",
   description:
     "What a Japanese auction sheet is, what every grade means, and how to read the inspector's damage codes — from an importer who hands you the sheet for every car.",

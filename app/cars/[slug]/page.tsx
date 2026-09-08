@@ -15,7 +15,14 @@ import VehicleStickyBar from "@/components/VehicleStickyBar";
 import { CrmError, getVehicle } from "@/lib/crm";
 import { quoteOne } from "@/lib/codeweavers/client";
 import { registrationDate, toFinanceInput } from "@/lib/codeweavers/params";
-import { bookingCta, contact, salesContact, site, whatsappLink } from "@/lib/site";
+import {
+  bookingCta,
+  contact,
+  salesContact,
+  showroomBySlug,
+  site,
+  whatsappLink,
+} from "@/lib/site";
 import {
   formatDate,
   formatMileage,
@@ -156,6 +163,17 @@ export default async function VehiclePage({ params }: PageProps) {
       vehicle.registration?.trim() ? ` (${vehicle.registration.trim()})` : ""
     } — is it still available?`,
   );
+
+  /*
+   * The showroom this car is actually standing in, and the number that reaches
+   * it. Both branches have stock allocated in the CRM, so a single published
+   * number sent a caller asking about an Ashton car through to Bury half the
+   * time. Falls back to the site-wide details when a car has no branch or the
+   * branch is one the website does not know about yet.
+   */
+  const showroom = showroomBySlug(vehicle.branch?.slug);
+  const callPhone = showroom?.phone ?? contact.phone;
+  const callHref = showroom?.phoneHref ?? contact.phoneHref;
 
   const motExpiry = formatDate(vehicle.motExpiry);
   const serviceDue = formatDate(vehicle.serviceDue);
@@ -405,10 +423,12 @@ export default async function VehiclePage({ params }: PageProps) {
 
                   <span className="min-w-0">
                     <span className="label-uppercase block truncate text-ink">
-                      {salesContact.name}
+                      {showroom?.contactName ?? salesContact.name}
                     </span>
                     <span className="label-uppercase-sm mt-1 block truncate text-faint">
-                      {salesContact.role}
+                      {showroom
+                        ? `${showroom.name} showroom`
+                        : salesContact.role}
                     </span>
                   </span>
                 </div>
@@ -456,13 +476,10 @@ export default async function VehiclePage({ params }: PageProps) {
                     </a>
                   )}
 
-                  {contact.phone && (
-                    <a
-                      href={`tel:${contact.phoneHref}`}
-                      className="btn btn-outline w-full"
-                    >
+                  {callPhone && (
+                    <a href={`tel:${callHref}`} className="btn btn-outline w-full">
                       <Phone className="h-4 w-4" />
-                      {contact.phone}
+                      {callPhone}
                     </a>
                   )}
 
@@ -479,7 +496,7 @@ export default async function VehiclePage({ params }: PageProps) {
                 </div>
 
                 <p className="caption mt-5 text-faint">
-                  {contact.openingHours}
+                  {showroom?.openingHours || contact.openingHours}
                 </p>
               </div>
 
@@ -497,6 +514,7 @@ export default async function VehiclePage({ params }: PageProps) {
       <VehicleStickyBar
         headline={vehicleHeadline(vehicle)}
         registration={vehicle.registration}
+        branchSlug={vehicle.branch?.slug}
       />
     </section>
   );

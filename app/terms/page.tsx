@@ -3,6 +3,12 @@ import LegalPage from "@/components/LegalPage";
 import { company, contact, site } from "@/lib/site";
 
 export const metadata: Metadata = {
+  // Self-referencing canonical, and an og:url that is this page rather
+  // than the site root — the layout sets og:url to the homepage for
+  // everything, so sharing any of these posted a card describing the
+  // homepage.
+  alternates: { canonical: "/terms" },
+  openGraph: { url: "/terms" },
   title: "Terms of Use",
   description: `The rules for using the ${company.tradingAs} website, including reserving a vehicle and booking a test drive.`,
 };

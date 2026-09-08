@@ -1,11 +1,13 @@
 import Link from "next/link";
-import { bookingCta, contact, whatsappLink } from "@/lib/site";
+import { bookingCta, contact, showroomBySlug, whatsappLink } from "@/lib/site";
 import { Phone, WhatsApp } from "./Icons";
 
 interface VehicleStickyBarProps {
   /** Used to name the car in the WhatsApp message and prefill the booking. */
   headline: string;
   registration?: string | null;
+  /** CRM branch slug, so Call reaches the showroom holding this car. */
+  branchSlug?: string | null;
 }
 
 /**
@@ -30,8 +32,14 @@ interface VehicleStickyBarProps {
 export default function VehicleStickyBar({
   headline,
   registration,
+  branchSlug,
 }: VehicleStickyBarProps) {
   const plate = registration?.trim();
+
+  // Same rule as the sidebar: ring the branch the car is standing in.
+  const showroom = showroomBySlug(branchSlug);
+  const phone = showroom?.phone ?? contact.phone;
+  const phoneHref = showroom?.phoneHref ?? contact.phoneHref;
   const wa = whatsappLink(
     `Hi, I'm interested in the ${headline}${plate ? ` (${plate})` : ""} — is it still available?`,
   );
@@ -47,9 +55,9 @@ export default function VehicleStickyBar({
       className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-canvas pb-[env(safe-area-inset-bottom)] lg:hidden"
     >
       <div className="grid grid-cols-3 gap-2 p-3">
-        {contact.phone && (
+        {phone && (
           <a
-            href={`tel:${contact.phoneHref}`}
+            href={`tel:${phoneHref}`}
             className="btn btn-outline h-12 min-h-12 w-full px-2 text-xs"
           >
             <Phone className="h-4 w-4" />

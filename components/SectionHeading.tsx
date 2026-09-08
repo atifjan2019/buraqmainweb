@@ -14,6 +14,16 @@ interface SectionHeadingProps {
   accent?: string;
   body?: string;
   align?: "left" | "center";
+  /**
+   * The heading level. `h2` by default, because most callers are a section
+   * inside a page that already has an h1 above them.
+   *
+   * `/cars` is the exception and the reason this exists: it is the site's most
+   * commercially important indexable page and its masthead was an h2, leaving
+   * the page with no h1 at all. The visual treatment is identical either way —
+   * this changes the tag, not the type.
+   */
+  as?: "h1" | "h2";
 }
 
 /**
@@ -26,6 +36,7 @@ export default function SectionHeading({
   accent,
   body,
   align = "center",
+  as: Heading = "h2",
 }: SectionHeadingProps) {
   const centered = align === "center";
 
@@ -40,9 +51,9 @@ export default function SectionHeading({
       </Reveal>
 
       <Reveal delay={80}>
-        <h2 className="display-lg mt-6 text-ink">
+        <Heading className="display-lg mt-6 text-ink">
           {accent ? `${title} ${accent}` : title}
-        </h2>
+        </Heading>
       </Reveal>
 
       {body && (

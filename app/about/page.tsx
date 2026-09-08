@@ -9,6 +9,12 @@ import WhyUs from "@/components/WhyUs";
 import { company, contact, site } from "@/lib/site";
 
 export const metadata: Metadata = {
+  // Self-referencing canonical, and an og:url that is this page rather
+  // than the site root — the layout sets og:url to the homepage for
+  // everything, so sharing any of these posted a card describing the
+  // homepage.
+  alternates: { canonical: "/about" },
+  openGraph: { url: "/about" },
   title: "About Us",
   description:
     "Burraq Motors is a Manchester dealership specialising in Japanese imports and hybrids. Every car HPI checked, warranty options available, nationwide delivery from our Bury showroom.",

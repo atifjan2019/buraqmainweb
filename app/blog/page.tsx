@@ -8,6 +8,12 @@ import { DEFAULT_POSTS_PER_PAGE, getPosts } from "@/lib/crm";
 import type { PostPage } from "@/lib/posts";
 
 export const metadata: Metadata = {
+  // Self-referencing canonical, and an og:url that is this page rather
+  // than the site root — the layout sets og:url to the homepage for
+  // everything, so sharing any of these posted a card describing the
+  // homepage.
+  alternates: { canonical: "/blog" },
+  openGraph: { url: "/blog" },
   title: "Journal",
   description:
     "Buying guides, import notes and dealership news from Burraq Motors in Manchester — how Japanese auction grades work, what an import actually costs, and what to check before you buy.",

@@ -10,6 +10,12 @@ import {
 } from "@/lib/booking";
 
 export const metadata: Metadata = {
+  // Self-referencing canonical, and an og:url that is this page rather
+  // than the site root — the layout sets og:url to the homepage for
+  // everything, so sharing any of these posted a card describing the
+  // homepage.
+  alternates: { canonical: "/book" },
+  openGraph: { url: "/book" },
   title: "Book an Appointment",
   description:
     "Book an appointment at Burraq Motors in Bury — a test drive, a showroom viewing or a collection. Pick a day and time and we'll call to confirm.",

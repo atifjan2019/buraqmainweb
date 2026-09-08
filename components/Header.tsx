@@ -145,6 +145,21 @@ export default function Header() {
       {/* Mobile sheet — a full-screen black overlay carrying the tricolour at
           its top edge, which is the collapse the doc specifies by name. */}
       <div
+        /*
+          `inert` when closed, and this is a real accessibility fix rather than
+          a tidy-up. The panel is display:block and visibility:visible at all
+          times — only opacity and pointer-events change — so a keyboard user
+          below 1280px tabbed off "Open menu" and then pressed Tab a dozen more
+          times through links that were painting nothing at all, with the focus
+          ring drawn on a fully transparent element. That is a WCAG 2.4.7 Focus
+          Visible failure at every mobile and tablet width, and it was the only
+          hard failure on the site.
+
+          `inert` rather than aria-hidden: aria-hidden would quieten a screen
+          reader while leaving the same links in the tab order, which is the
+          worse half of the bug.
+        */
+        inert={!open}
         className={`fixed inset-0 top-16 z-40 bg-canvas transition-opacity duration-200 xl:hidden ${
           open
             ? "pointer-events-auto opacity-100"

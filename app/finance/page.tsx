@@ -12,6 +12,12 @@ import { financeDisclaimer, financeSteps, financeVideos } from "@/lib/site";
 import { vehicleHeadline } from "@/lib/vehicles";
 
 export const metadata: Metadata = {
+  // Self-referencing canonical, and an og:url that is this page rather
+  // than the site root — the layout sets og:url to the homepage for
+  // everything, so sharing any of these posted a card describing the
+  // homepage.
+  alternates: { canonical: "/finance" },
+  openGraph: { url: "/finance" },
   title: "Car Finance",
   description:
     "Calculate illustrative monthly payments on any vehicle price. Finance available on selected cars at Burraq Motors Manchester, subject to status.",

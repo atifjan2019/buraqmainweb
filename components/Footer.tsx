@@ -1,6 +1,13 @@
 import Link from "next/link";
-import { contact, financeDisclaimer, guides, nav, site } from "@/lib/site";
-import { Mail, Phone, Pin } from "./Icons";
+import {
+  contact,
+  financeDisclaimer,
+  guides,
+  nav,
+  showrooms,
+  site,
+} from "@/lib/site";
+import { Mail, Phone } from "./Icons";
 import Logo from "./Logo";
 
 const year = new Date().getFullYear();
@@ -37,11 +44,11 @@ export default function Footer() {
       <span aria-hidden className="m-stripe block h-1 w-full" />
 
       <div className="mx-auto max-w-[90rem] px-5 py-16 sm:px-8">
-        {/* Five columns since Guides split out of Legal. The two link lists are
-            the narrowest tracks — their labels are one or two words — so the
-            extra column comes out of the gap rather than out of the brand block
-            or the contact block, both of which carry full sentences. */}
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr_1.2fr]">
+        {/* Six blocks now — Guides split out of Legal, and Showrooms arrived
+            carrying two branches. Six tracks at 1280 crushes the two that hold
+            full sentences, so they wrap into three columns over two rows
+            instead, which stays legible from 1024 up. */}
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
           {/* Brand */}
           <div>
             {/* Larger than the header's. The footer has vertical room, and at
@@ -115,23 +122,70 @@ export default function Footer() {
             </ul>
           </div>
 
+          {/*
+            Showrooms — both of them, each with the person who answers its
+            phone. The footer used to publish one number for a two-branch
+            business, so a caller asking about a car standing in Ashton reached
+            Bury, or the other way round.
+
+            Ashton has no address block because none has been supplied. It
+            renders with its name, its contact and its number, and the address
+            appears the moment `showrooms` has one — nothing here invents a
+            building.
+          */}
+          <div>
+            <h3 className="label-uppercase text-ink">Showrooms</h3>
+            <ul className="mt-4 flex flex-col gap-5 text-sm text-muted">
+              {showrooms.map((showroom) => (
+                <li key={showroom.name}>
+                  <p className="label-uppercase-sm text-ink">{showroom.name}</p>
+
+                  {showroom.addressLines.length > 0 && (
+                    <address className="mt-1.5 not-italic leading-relaxed">
+                      {showroom.addressLines.map((line) => (
+                        <span key={line} className="block">
+                          {line}
+                        </span>
+                      ))}
+                    </address>
+                  )}
+
+                  <a
+                    href={`tel:${showroom.phoneHref}`}
+                    className="mt-1 flex min-h-11 items-center gap-2.5 transition-colors hover:text-ink"
+                  >
+                    <Phone className="h-4 w-4 shrink-0 text-faint" />
+                    <span>
+                      {showroom.phone}
+                      <span className="block text-xs text-faint">
+                        {showroom.contactName}
+                      </span>
+                    </span>
+                  </a>
+
+                  <Link
+                    href={`/cars?branch=${encodeURIComponent(showroom.slug)}`}
+                    className="inline-flex min-h-11 items-center text-xs font-bold uppercase tracking-wider transition-colors hover:text-ink"
+                  >
+                    View stock
+                  </Link>
+
+                  {showroom.openingHours && (
+                    <p className="caption mt-1 text-faint">
+                      {showroom.openingHours}
+                    </p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+
           {/* Contact */}
           <div>
             <h3 className="label-uppercase text-ink">Get in touch</h3>
 
             {hasContactDetails ? (
               <ul className="mt-4 flex flex-col gap-1 text-sm text-muted">
-                {contact.phone && (
-                  <li>
-                    <a
-                      href={`tel:${contact.phoneHref}`}
-                      className="flex min-h-11 items-center gap-2.5 transition-colors hover:text-ink"
-                    >
-                      <Phone className="h-4 w-4 shrink-0 text-faint" />
-                      {contact.phone}
-                    </a>
-                  </li>
-                )}
                 {contact.email && (
                   <li>
                     <a
@@ -141,18 +195,6 @@ export default function Footer() {
                       <Mail className="h-4 w-4 shrink-0 text-faint" />
                       {contact.email}
                     </a>
-                  </li>
-                )}
-                {contact.addressLines.length > 0 && (
-                  <li className="flex items-start gap-2.5">
-                    <Pin className="mt-0.5 h-4 w-4 shrink-0 text-faint" />
-                    <address className="not-italic leading-relaxed">
-                      {contact.addressLines.map((line) => (
-                        <span key={line} className="block">
-                          {line}
-                        </span>
-                      ))}
-                    </address>
                   </li>
                 )}
               </ul>

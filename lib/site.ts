@@ -100,13 +100,84 @@ interface ContactDetails {
   trustpilot: string;
 }
 
+export interface Showroom {
+  /**
+   * The CRM branch slug, and the value `/cars?branch=` filters on.
+   *
+   * Bury's is `manchester` and that is NOT a typo to be tidied up. The branch
+   * was seeded as "Manchester" and later renamed to "Bury" in the CRM without
+   * the slug following. Renaming it now would break every indexed and shared
+   * /cars?branch=manchester link, and the listing would render an empty
+   * forecourt rather than a 404 — a silent failure. The displayed name is
+   * already right everywhere; the slug is an opaque key.
+   */
+  slug: string;
+  name: string;
+  /** The person who answers this branch's phone. */
+  contactName: string;
+  phone: string;
+  phoneHref: string;
+  /** Empty until verified. Every consumer hides the block rather than guessing. */
+  addressLines: string[];
+  openingHours: string;
+}
+
 /**
- * Taken verbatim from the current live site. An empty string means the detail
- * is unverified — the UI hides that control rather than showing a guess.
+ * The two showrooms.
  *
- * Note: the live site's footer links WhatsApp to 07414 984700 while its
- * confirmation email uses 07462 187617. We use the publicly displayed number;
- * worth confirming with the client which one is monitored.
+ * Both already exist in the CRM and already have stock allocated to them —
+ * Bury 14 cars, Ashton Under Lyne 7 — so this is the website catching up with
+ * data that was already there, not new information.
+ *
+ * Ashton's address and opening hours are deliberately empty. They have not been
+ * supplied, and the rule this file has always followed is that an empty string
+ * means unverified and the UI hides the control rather than showing a guess. An
+ * invented address on a showroom page is worse than a missing one: it sends
+ * somebody to a building.
+ */
+export const showrooms: Showroom[] = [
+  {
+    slug: "manchester",
+    name: "Bury",
+    contactName: "Aimen Shahid",
+    phone: "07477 665230",
+    phoneHref: "+447477665230",
+    addressLines: ["Unit 3 Fern Street", "Bury", "Lancashire BL9 5BP"],
+    // Taken from the showroom signage in the dealership's own photography.
+    openingHours: "Monday to Saturday, 9am – 6pm",
+  },
+  {
+    slug: "ashton-under-lyne",
+    name: "Ashton-under-Lyne",
+    contactName: "Aman Singh",
+    phone: "07462 187617",
+    phoneHref: "+447462187617",
+    // ⚠ NOT SUPPLIED. Until these are filled in the branch renders with its
+    // name, its contact and its phone, and no address block at all.
+    addressLines: [],
+    openingHours: "",
+  },
+];
+
+/** The showroom a CRM branch slug refers to, or null if we don't know it. */
+export function showroomBySlug(slug: string | null | undefined): Showroom | null {
+  if (!slug) return null;
+  return showrooms.find((s) => s.slug === slug) ?? null;
+}
+
+/**
+ * Site-wide contact details — the switchboard, not a branch.
+ *
+ * `phone` here is Ashton's number, which is the one that has always been
+ * published as the site's main line. The per-branch numbers live in
+ * `showrooms` above and are what a vehicle page and the footer now use, so a
+ * caller reaches the showroom the car is actually standing in.
+ *
+ * An empty string means the detail is unverified — the UI hides that control
+ * rather than showing a guess.
+ *
+ * ⚠ UNCONFIRMED: 07414 984700 is used for WhatsApp because that is what the
+ * live site publishes, but nobody has confirmed which handset monitors it.
  */
 export const contact: ContactDetails = {
   phone: "07462 187617",
@@ -123,23 +194,24 @@ export const contact: ContactDetails = {
 };
 
 /**
- * The named contact shown beside a car on its detail page.
+ * The contact shown beside a car on its detail page.
  *
- * ⚠ PLACEHOLDER. The name below is invented, and it should be replaced with a
- * real member of staff before this gets much traffic. A named person on a
- * vehicle page reads as "this is who you'll be dealing with", and a customer
- * who rings up asking for someone who doesn't exist is a worse first
- * impression than no name at all. It also sits oddly next to the deliberate
- * decision on the About page not to invent staff biographies.
+ * It used to name an invented person. That was flagged in this comment as a
+ * placeholder and it reached production anyway, where every vehicle page
+ * introduced a salesperson who does not work here — so a customer ringing up
+ * and asking for them by name got a worse first impression than no name would
+ * have given. It also sat badly beside the deliberate decision on the About
+ * page not to invent staff biographies.
  *
- * `photo` is null until a real photograph exists at `public/team/…`. The card
- * falls back to initials rather than a stock portrait on purpose: a
- * stranger's face captioned with an invented name is a bigger claim than no
- * face, and a harder one to walk back.
+ * It now names the team rather than a person, which is true. Put a real name
+ * and a photograph at `public/team/…` here when the dealership supplies them:
+ * a named, pictured human converts better than a department, and the card is
+ * built for it — the photo branch on the vehicle page renders the moment
+ * `photo` is a string.
  */
 export const salesContact = {
-  name: "Adam Rashid",
-  role: "Sales Specialist",
+  name: "Burraq Motors",
+  role: "Sales Team",
   blurb:
     "Happy to talk this one through, arrange a viewing, or run the finance figures for you — no pressure either way.",
   photo: null as string | null,

@@ -3,6 +3,12 @@ import LegalPage from "@/components/LegalPage";
 import { company, contact } from "@/lib/site";
 
 export const metadata: Metadata = {
+  // Self-referencing canonical, and an og:url that is this page rather
+  // than the site root — the layout sets og:url to the homepage for
+  // everything, so sharing any of these posted a card describing the
+  // homepage.
+  alternates: { canonical: "/cookies" },
+  openGraph: { url: "/cookies" },
   title: "Cookie Policy",
   description: `The cookies and similar technologies used on the ${company.tradingAs} website, and how to control them.`,
 };

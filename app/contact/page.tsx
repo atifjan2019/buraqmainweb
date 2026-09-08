@@ -6,6 +6,12 @@ import SectionHeading from "@/components/SectionHeading";
 import { contact, whatsappLink } from "@/lib/site";
 
 export const metadata: Metadata = {
+  // Self-referencing canonical, and an og:url that is this page rather
+  // than the site root — the layout sets og:url to the homepage for
+  // everything, so sharing any of these posted a card describing the
+  // homepage.
+  alternates: { canonical: "/contact" },
+  openGraph: { url: "/contact" },
   title: "Contact",
   description:
     "Call, WhatsApp or message Burraq Motors in Manchester. Showroom in Bury, open Monday to Saturday. We'll come back to you on availability, finance and part-exchange.",
