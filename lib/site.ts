@@ -176,14 +176,16 @@ export function showroomBySlug(slug: string | null | undefined): Showroom | null
  * An empty string means the detail is unverified — the UI hides that control
  * rather than showing a guess.
  *
- * ⚠ UNCONFIRMED: 07414 984700 is used for WhatsApp because that is what the
- * live site publishes, but nobody has confirmed which handset monitors it.
+ * WhatsApp goes to 07462 187617, confirmed by the dealership. The site
+ * previously published 07414 984700 there — inherited from the old site, and
+ * never confirmed as a handset anybody watched. Messages sent to it may have
+ * gone unanswered, so it is worth someone checking that number for a backlog.
  */
 export const contact: ContactDetails = {
   phone: "07462 187617",
   phoneHref: "+447462187617",
-  whatsappDisplay: "+44 7414 984700",
-  whatsapp: "447414984700",
+  whatsappDisplay: "+44 7462 187617",
+  whatsapp: "447462187617",
   email: "contactus@burraqmotors.co.uk",
   addressLines: ["Unit 3 Fern Street", "Bury", "Lancashire BL9 5BP"],
   city: "Manchester",

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getBranches } from "@/lib/crm";
 import {
   contact,
   financeDisclaimer,
@@ -25,15 +26,55 @@ const legal = [
 ];
 
 /**
+ * Showrooms for the footer, live from the CRM with the built-in list behind it.
+ *
+ * Same source as the contact page, so the two cannot disagree — which they did
+ * while both kept their own copy. Falls back rather than failing: a footer with
+ * no address is worse than one a day out of date.
+ */
+async function footerShowrooms() {
+  try {
+    const live = await getBranches();
+
+    if (live.length > 0) {
+      return live.map((branch) => {
+        const digits = branch.phone.replace(/[^0-9]/g, "");
+        return {
+          name: branch.name,
+          slug: branch.slug,
+          // The static list carries the person who answers each phone; the CRM
+          // has no such column, so it is matched on slug and simply omitted for
+          // a branch the website does not know by name.
+          contactName:
+            showrooms.find((s) => s.slug === branch.slug)?.contactName ?? "",
+          phone: branch.phone,
+          phoneHref: digits.startsWith("0") ? `+44${digits.slice(1)}` : `+${digits}`,
+          addressLines: [
+            ...branch.addressLines,
+            [branch.city, branch.postcode].filter(Boolean).join(" "),
+          ].filter(Boolean),
+          openingHours: branch.openingHours,
+        };
+      });
+    }
+  } catch (error) {
+    console.error("[footer] showrooms unavailable, using built-in list", error);
+  }
+
+  return showrooms;
+}
+
+/**
  * Closes every page. Per DESIGN-bmw-m.md the footer never inverts and never
  * lifts off the canvas — it is the same black as the page floor, separated only
  * by the tricolour at its top edge and by hairlines between its rows.
  *
- * Four columns at desktop, which is the structure the doc specifies. The legal
- * links are a column of their own rather than a row of small print at the
- * bottom: on an FCA-facing trading site they are navigation, not a postscript.
+ * The legal links are a column of their own rather than a row of small print at
+ * the bottom: on an FCA-facing trading site they are navigation, not a
+ * postscript.
  */
-export default function Footer() {
+export default async function Footer() {
+  const branches = await footerShowrooms();
   const hasContactDetails =
     contact.phone || contact.email || contact.addressLines.length > 0;
 
@@ -124,19 +165,20 @@ export default function Footer() {
 
           {/*
             Showrooms — both of them, each with the person who answers its
-            phone. The footer used to publish one number for a two-branch
-            business, so a caller asking about a car standing in Ashton reached
-            Bury, or the other way round.
+            phone. This footer used to publish one address and one number for a
+            two-branch business, so a caller asking about a car standing in
+            Ashton reached Bury about half the time.
 
-            Ashton has no address block because none has been supplied. It
-            renders with its name, its contact and its number, and the address
-            appears the moment `showrooms` has one — nothing here invents a
-            building.
+            Addresses come from the CRM, which is where the dealership already
+            maintains them, so a correction there reaches the site without a
+            deploy. Every field is gated: a branch whose address has not been
+            filled in yet still shows its name, contact and number rather than
+            printing an empty block.
           */}
           <div>
             <h3 className="label-uppercase text-ink">Showrooms</h3>
             <ul className="mt-4 flex flex-col gap-5 text-sm text-muted">
-              {showrooms.map((showroom) => (
+              {branches.map((showroom) => (
                 <li key={showroom.name}>
                   <p className="label-uppercase-sm text-ink">{showroom.name}</p>
 

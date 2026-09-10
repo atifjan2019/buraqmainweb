@@ -975,3 +975,67 @@ export async function submitBooking(
   console.error(`[crm] booking rejected with status ${response.status}`);
   return { status: "failed" };
 }
+
+/* ---------------------------------------------------------------- */
+/* Showrooms                                                         */
+/* ---------------------------------------------------------------- */
+
+/** A showroom as the CRM describes it. Every field may be blank. */
+export interface CrmBranch {
+  name: string;
+  slug: string;
+  addressLines: string[];
+  city: string;
+  postcode: string;
+  phone: string;
+  email: string;
+  openingHours: string;
+  blurb: string;
+}
+
+/**
+ * The showrooms, live from the CRM.
+ *
+ * The dealership maintains its branches in one screen already, and until now
+ * the website carried its own copy of the same details in source. Two copies of
+ * an address is one too many — the CRM's was right and the website's was a year
+ * out of date on a phone number.
+ *
+ * THROWS on failure rather than returning an empty list, and that is the
+ * important part: a contact page that renders no showrooms because a fetch
+ * failed is worse than one showing slightly stale details. Callers catch this
+ * and fall back to the built-in list.
+ */
+export async function getBranches(): Promise<CrmBranch[]> {
+  const payload = await readJson<{
+    data?: {
+      name?: string;
+      slug?: string;
+      address_lines?: string[];
+      city?: string;
+      postcode?: string;
+      phone?: string;
+      email?: string;
+      opening_hours?: string;
+      blurb?: string;
+    }[];
+  }>("/branches");
+
+  return (payload.data ?? [])
+    .filter((branch) => branch.name?.trim())
+    .map((branch) => ({
+      name: branch.name!.trim(),
+      slug: branch.slug?.trim() ?? "",
+      // Blank lines dropped here rather than at every render site — a branch
+      // with only one address line must not print an empty row.
+      addressLines: (branch.address_lines ?? [])
+        .map((line) => line?.trim() ?? "")
+        .filter(Boolean),
+      city: branch.city?.trim() ?? "",
+      postcode: branch.postcode?.trim() ?? "",
+      phone: branch.phone?.trim() ?? "",
+      email: branch.email?.trim() ?? "",
+      openingHours: branch.opening_hours?.trim() ?? "",
+      blurb: branch.blurb?.trim() ?? "",
+    }));
+}

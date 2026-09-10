@@ -189,14 +189,6 @@ export default async function CarsPage({
               travelling.
             </p>
 
-            {/* Above the grid, not below it: CONC 3.5.5R(5) wants the example
-                no less prominent than the cost information it qualifies, and an
-                example a visitor has to scroll past twelve cards to reach is
-                subordinate to them by construction. */}
-            <div className="mt-10">
-              <RepresentativeExampleBand />
-            </div>
-
             <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {stock.vehicles.map((vehicle, index) => (
                 <Reveal key={vehicle.slug} delay={(index % 3) * 90}>
@@ -209,6 +201,38 @@ export default async function CarsPage({
                   />
                 </Reveal>
               ))}
+            </div>
+
+            {/*
+              Below the grid, at the dealership's instruction.
+
+              It sat above the grid until now, and the reason is worth keeping on
+              the record rather than deleting with the code: every card above
+              carries a monthly payment, a monthly payment is an amount relating
+              to the cost of credit, and CONC 3.5.5R(5) asks for the
+              representative example to be no less prominent than the cost
+              information it qualifies. An example a visitor reaches only after
+              scrolling the whole grid is, on the face of it, subordinate to the
+              figures it exists to qualify. The dealership was told this in
+              writing and has asked for the move anyway; it is their promotion
+              and their permission.
+
+              So this is the least-lossy version of that instruction rather than
+              a literal reading of it. It stays ON this page — moving it to
+              /finance would leave a page of payments with no example at all,
+              which is a different and much clearer problem. It stays open, at
+              body size, full width, with every figure at equal weight. And it
+              sits directly beneath the last card and ABOVE the pager, so it is
+              still attached to the grid it qualifies rather than stranded at the
+              foot of the page under the pagination.
+
+              If the motive was that the block looked heavy at the top, the
+              compact-in-place version — a summary line that expands — gives the
+              same visual relief without moving it at all, and remains the better
+              answer.
+            */}
+            <div className="mt-14">
+              <RepresentativeExampleBand />
             </div>
 
             <Pagination meta={stock.meta} params={linkParams} />
