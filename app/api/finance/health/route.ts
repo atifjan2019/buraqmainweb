@@ -59,7 +59,10 @@ export async function GET() {
     // Different numbers here mean whitespace came in with the paste.
     rawLength: raw.length,
     trimmedLength: key.length,
-    // First 12 hex of sha256. Enough to compare two values, useless to reverse.
+    // First 12 hex of sha256 — enough to compare the deployed value against a
+    // known-good one without either party handling the key, and useless to
+    // reverse. Published, therefore NOT a credential: /api/finance/revalidate
+    // authorises on the key itself for exactly that reason.
     fingerprint: key
       ? createHash("sha256").update(key).digest("hex").slice(0, 12)
       : null,
