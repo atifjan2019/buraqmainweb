@@ -20,10 +20,10 @@
 export const company = {
   legalName: "Burraq Traders Ltd",
   tradingAs: "Burraq Motors",
-  companyNumber: "",
+  companyNumber: "14917732",
   /** VAT registration, printed in the Terms only once it is filled in. */
-  vatNumber: "",
-  icoNumber: "",
+  vatNumber: "492360972",
+  icoNumber: "C1889666",
   /**
    * Firm reference number, from the FCA's own approval correspondence for
    * BURRAQ TRADERS LTD. Printed beside every representative example, which is

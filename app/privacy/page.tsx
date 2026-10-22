@@ -43,6 +43,9 @@ export default function PrivacyPage() {
         For the purpose of the Data Protection Act 2018 (the Act), the data
         controller is {company.legalName}, trading as {company.tradingAs}, of{" "}
         {address}.
+        {company.icoNumber
+          ? ` We are registered with the Information Commissioner's Office under registration number ${company.icoNumber}.`
+          : ""}
       </p>
 
       <h2>Information we collect from you</h2>

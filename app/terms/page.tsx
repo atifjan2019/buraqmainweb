@@ -69,8 +69,7 @@ export default function TermsPage() {
         {company.tradingAs}. We are a limited company registered in England and
         Wales
         {company.companyNumber ? ` under company number ${company.companyNumber}` : ""}
-        {company.companyNumber ? "" : ""} and have our registered office at{" "}
-        {address}. Our main trading address is {address}.
+        . Our main trading address is {address}.
         {company.vatNumber
           ? ` We are registered for VAT and our VAT number is ${company.vatNumber}.`
           : ""}
