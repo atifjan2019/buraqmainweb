@@ -41,9 +41,10 @@ const BASE_URL = (
 
 /**
  * Stock does not change second to second, and the CRM rate-limits reads at
- * 120/min. Two minutes keeps pages fresh enough while leaving huge headroom.
+ * 120/min. Fifteen minutes: every refresh of a cached read is an ISR write on
+ * Vercel, and at two minutes the site used 2.4x the free plan's allowance.
  */
-const READ_REVALIDATE_SECONDS = 120;
+const READ_REVALIDATE_SECONDS = 900;
 
 /** Cache tag for every stock read, so it can all be dropped in one call. */
 export const VEHICLES_CACHE_TAG = "crm-vehicles";

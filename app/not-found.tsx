@@ -93,7 +93,7 @@ export default async function NotFound() {
             </p>
 
             <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link href="/cars" className="btn btn-solid">
+              <Link prefetch={false} href="/cars" className="btn btn-solid">
                 Browse all cars
                 <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
@@ -128,7 +128,7 @@ export default async function NotFound() {
               <ul className="mt-5 flex flex-wrap justify-center gap-3">
                 {BUDGETS.map((budget) => (
                   <li key={budget.href}>
-                    <Link href={budget.href} className="btn btn-quiet px-6">
+                    <Link prefetch={false} href={budget.href} className="btn btn-quiet px-6">
                       {budget.label}
                     </Link>
                   </li>
@@ -159,7 +159,7 @@ export default async function NotFound() {
             </ul>
 
             <div className="mt-12 flex justify-center">
-              <Link href="/cars" className="btn btn-outline">
+              <Link prefetch={false} href="/cars" className="btn btn-outline">
                 View all cars
                 <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
@@ -187,7 +187,7 @@ export default async function NotFound() {
           </p>
 
           <div className="mt-10 flex justify-center">
-            <Link href="/" className="link-m">
+            <Link prefetch={false} href="/" className="link-m">
               Back to home
             </Link>
           </div>

@@ -87,7 +87,7 @@ export default function Showcase() {
             </ul>
 
             <Reveal delay={480}>
-              <Link href="/cars" className="btn btn-outline mt-10">
+              <Link prefetch={false} href="/cars" className="btn btn-outline mt-10">
                 See what&apos;s in stock
                 <ArrowRight className="h-4 w-4" />
               </Link>

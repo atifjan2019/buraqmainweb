@@ -58,7 +58,7 @@ export default function CtaBanner() {
 
           <Reveal delay={210}>
             <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link href="/cars" className="btn btn-solid">
+              <Link prefetch={false} href="/cars" className="btn btn-solid">
                 Browse All Cars
                 <ArrowRight className="h-4 w-4" />
               </Link>
@@ -73,7 +73,7 @@ export default function CtaBanner() {
                   WhatsApp Us
                 </a>
               ) : (
-                <Link href="/contact" className="btn btn-outline">
+                <Link prefetch={false} href="/contact" className="btn btn-outline">
                   Contact Us
                 </Link>
               )}

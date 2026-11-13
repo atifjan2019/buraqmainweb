@@ -43,7 +43,7 @@ const STATIC_ROUTES: Array<{
 ];
 
 /** Matches the CRM read cache, so the sitemap can't be fresher than the data. */
-export const revalidate = 120;
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();

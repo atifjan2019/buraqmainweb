@@ -44,7 +44,7 @@ export default async function RecentPosts() {
 
         <Reveal delay={120}>
           <div className="mt-16 flex justify-center">
-            <Link href="/blog" className="btn btn-outline">
+            <Link prefetch={false} href="/blog" className="btn btn-outline">
               Read the journal
               <ArrowRight className="h-4 w-4" />
             </Link>

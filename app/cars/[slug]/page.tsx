@@ -85,6 +85,20 @@ function metaDescription(vehicle: Vehicle): string {
   return `${(lastSpace > 60 ? clipped.slice(0, lastSpace) : clipped).trimEnd()}…`;
 }
 
+/**
+ * Incremental static regeneration: with an empty list, each page is rendered on
+ * its first visit, then served from Vercel's CDN and refreshed in the
+ * background at most every 900 seconds. Before this the route ran a server
+ * function on every visit and every link prefetch, which was the bulk of the
+ * project's CPU and function usage. A slug the CRM no longer knows still 404s
+ * on its next refresh.
+ */
+export const revalidate = 900;
+
+export async function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
@@ -274,7 +288,7 @@ export default async function VehiclePage({ params }: PageProps) {
       />
 
       <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
-        <Link href="/cars" className="link-m">
+        <Link prefetch={false} href="/cars" className="link-m">
           <ArrowRight className="h-3.5 w-3.5 rotate-180" />
           All cars
         </Link>
@@ -498,7 +512,7 @@ export default async function VehiclePage({ params }: PageProps) {
                       without that the visitor re-types a plate they have just
                       been looking at, and the sales team gets a booking with
                       no car attached to it. */}
-                  <Link
+                  <Link prefetch={false}
                     href={
                       vehicle.registration?.trim()
                         ? `${bookingCta.href}?vehicle=${encodeURIComponent(vehicle.registration.trim())}`
@@ -535,7 +549,7 @@ export default async function VehiclePage({ params }: PageProps) {
                       because there is no valuation flow to send it to and
                       inventing one would be a bigger promise than the business
                       has made. */}
-                  <Link
+                  <Link prefetch={false}
                     href={`/contact?subject=${encodeURIComponent(`Part exchange against ${vehicleHeadline(vehicle)}`)}`}
                     className="btn btn-outline w-full"
                   >

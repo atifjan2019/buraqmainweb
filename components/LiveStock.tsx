@@ -68,7 +68,7 @@ export default async function LiveStock() {
               </p>
             </div>
 
-            <Link href="/cars" className="btn btn-outline shrink-0">
+            <Link prefetch={false} href="/cars" className="btn btn-outline shrink-0">
               View All Cars
               <ArrowRight className="h-4 w-4" />
             </Link>

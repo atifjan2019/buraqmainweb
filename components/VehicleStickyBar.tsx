@@ -78,7 +78,7 @@ export default function VehicleStickyBar({
         )}
 
         {/* The solid one: booking is the outcome this page exists to produce. */}
-        <Link
+        <Link prefetch={false}
           href={bookHref}
           className="btn btn-solid h-12 min-h-12 w-full px-2 text-center text-xs"
         >

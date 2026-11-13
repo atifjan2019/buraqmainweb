@@ -53,7 +53,7 @@ export default function FinanceSection() {
         <Reveal delay={140}>
           <div className="mt-16 flex flex-col items-center gap-6">
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Link href="/finance" className="btn btn-solid">
+              <Link prefetch={false} href="/finance" className="btn btn-solid">
                 Apply for Finance
                 <ArrowRight className="h-4 w-4" />
               </Link>

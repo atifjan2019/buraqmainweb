@@ -49,7 +49,7 @@ export default async function BranchPicker() {
         <div className="mt-16 grid grid-cols-1 gap-px overflow-hidden border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
           {branches.map((branch, i) => (
             <Reveal key={branch.slug} delay={(i % 3) * 60}>
-              <Link
+              <Link prefetch={false}
                 href={`/cars?branch=${encodeURIComponent(branch.slug)}`}
                 className="group flex h-full flex-col justify-between gap-6 bg-canvas p-6
                            transition-colors duration-200 hover:bg-ink

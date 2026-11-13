@@ -95,7 +95,7 @@ export default async function Footer() {
             {/* Larger than the header's. The footer has vertical room, and at
                 this size the roundel's own "BurraqMotors Manchester" is
                 readable rather than implied. */}
-            <Link href="/" className="inline-block">
+            <Link prefetch={false} href="/" className="inline-block">
               <Logo markClassName="h-20" />
             </Link>
 
@@ -113,7 +113,7 @@ export default async function Footer() {
             <ul className="mt-4 flex flex-col">
               {nav.map((item) => (
                 <li key={item.href}>
-                  <Link
+                  <Link prefetch={false}
                     href={item.href}
                     className="inline-flex min-h-11 items-center text-sm text-muted transition-colors hover:text-ink"
                   >
@@ -132,7 +132,7 @@ export default async function Footer() {
             <ul className="mt-4 flex flex-col">
               {guides.map((item) => (
                 <li key={item.href}>
-                  <Link
+                  <Link prefetch={false}
                     href={item.href}
                     className="inline-flex min-h-11 items-center text-sm text-muted transition-colors hover:text-ink"
                   >
@@ -152,7 +152,7 @@ export default async function Footer() {
             <ul className="mt-4 flex flex-col">
               {legal.map((item) => (
                 <li key={item.href}>
-                  <Link
+                  <Link prefetch={false}
                     href={item.href}
                     className="inline-flex min-h-11 items-center text-sm text-muted transition-colors hover:text-ink"
                   >
@@ -205,7 +205,7 @@ export default async function Footer() {
                     </span>
                   </a>
 
-                  <Link
+                  <Link prefetch={false}
                     href={`/cars?branch=${encodeURIComponent(showroom.slug)}`}
                     className="inline-flex min-h-11 items-center text-xs font-bold uppercase tracking-wider transition-colors hover:text-ink"
                   >
@@ -242,7 +242,7 @@ export default async function Footer() {
               </ul>
             ) : (
               <p className="mt-6 text-sm text-muted">
-                <Link href="/contact" className="link-m">
+                <Link prefetch={false} href="/contact" className="link-m">
                   Send us a message →
                 </Link>
               </p>

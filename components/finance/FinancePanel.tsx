@@ -228,7 +228,7 @@ export default function FinancePanel({
                 ? "We couldn't get finance figures just now. Please try again, or ask us and we'll quote you directly."
                 : "No lender on our panel will quote on this car at these terms. Try a different deposit or term — or ask us and we'll look at it for you."}
             </p>
-            <Link href="/contact" className="btn btn-outline mt-5">
+            <Link prefetch={false} href="/contact" className="btn btn-outline mt-5">
               Ask about finance
             </Link>
           </div>

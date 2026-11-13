@@ -51,7 +51,7 @@ export default async function FeaturedVehicles() {
 
         <Reveal delay={120}>
           <div className="mt-16 flex justify-center">
-            <Link href="/cars" className="btn btn-outline">
+            <Link prefetch={false} href="/cars" className="btn btn-outline">
               View All Cars
               <ArrowRight className="h-4 w-4" />
             </Link>

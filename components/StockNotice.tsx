@@ -34,7 +34,7 @@ export default function StockNotice({ title, body, action }: StockNoticeProps) {
 
       <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
         {action && (
-          <Link href={action.href} className="btn btn-solid">
+          <Link prefetch={false} href={action.href} className="btn btn-solid">
             {action.label}
           </Link>
         )}

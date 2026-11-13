@@ -98,12 +98,12 @@ export default async function ThankYouPage() {
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
           {receipt?.slug && (
-            <Link href={`/cars/${receipt.slug}`} className="link-m">
+            <Link prefetch={false} href={`/cars/${receipt.slug}`} className="link-m">
               Back to the car
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           )}
-          <Link href="/cars" className="link-m">
+          <Link prefetch={false} href="/cars" className="link-m">
             Browse more cars
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>

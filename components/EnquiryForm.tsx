@@ -177,7 +177,7 @@ export default function EnquiryForm({
 
       <p className="caption mt-5 leading-relaxed text-faint">
         We&apos;ll only use your details to answer this enquiry. Read our{" "}
-        <Link
+        <Link prefetch={false}
           href="/privacy"
           className="underline decoration-line underline-offset-2 transition-colors hover:text-ink"
         >

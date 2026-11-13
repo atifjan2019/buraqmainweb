@@ -173,7 +173,7 @@ export default function VehicleCard({
             two extra stops in the tab order and two duplicate entries in a
             screen reader's link list, for every card in a grid of twelve. */}
         <h3 className="title-lg break-words text-ink">
-          <Link
+          <Link prefetch={false}
             href={vehicleHref(vehicle)}
             className="after:absolute after:inset-0 after:content-[''] hover:text-muted"
           >
@@ -245,7 +245,7 @@ export default function VehicleCard({
               floating above the card, so the number and the way to use it are
               one target. When no lender quotes, the label falls back to plain
               "Finance" and the button stays — the layout does not move. */}
-          <Link
+          <Link prefetch={false}
             href={`/finance?vehicle=${vehicle.slug}`}
             className="relative z-10 flex min-h-11 flex-col items-center justify-center
                        bg-m-blue px-4 py-2 text-center text-on-ink transition-opacity

@@ -285,7 +285,7 @@ export default function VehicleFilters({
         </p>
 
         {hasActiveFilters && (
-          <Link
+          <Link prefetch={false}
             href="/cars"
             scroll={false}
             className="link-m"

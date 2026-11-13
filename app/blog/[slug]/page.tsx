@@ -19,9 +19,9 @@ interface PageProps {
 }
 
 /**
- * No `generateStaticParams`: posts appear, change and are unpublished from the
- * CRM without a deploy, so this route stays dynamic-with-revalidation exactly
- * like `/cars/[slug]`. `cacheComponents` is off, so the `next: { revalidate,
+ * `generateStaticParams` returns no paths: posts appear, change and are
+ * unpublished from the CRM without a deploy, so each is rendered on first visit
+ * and kept as ISR, exactly like `/cars/[slug]`. `cacheComponents` is off, so the `next: { revalidate,
  * tags }` options on the fetch in `lib/crm.ts` are the current caching model —
  * confirmed against
  * `node_modules/next/dist/docs/01-app/02-guides/caching-without-cache-components.md`.
@@ -63,6 +63,20 @@ function documentTitle(post: Post): Metadata["title"] {
   return title.toLowerCase().includes(site.name.toLowerCase())
     ? { absolute: title }
     : title;
+}
+
+/**
+ * Incremental static regeneration: with an empty list, each page is rendered on
+ * its first visit, then served from Vercel's CDN and refreshed in the
+ * background at most every 900 seconds. Before this the route ran a server
+ * function on every visit and every link prefetch, which was the bulk of the
+ * project's CPU and function usage. A slug the CRM no longer knows still 404s
+ * on its next refresh.
+ */
+export const revalidate = 900;
+
+export async function generateStaticParams() {
+  return [];
 }
 
 export async function generateMetadata({
@@ -172,7 +186,7 @@ export default async function PostPage({ params }: PageProps) {
         />
 
         <div className="mx-auto max-w-[90rem] px-5 sm:px-8">
-          <Link href="/blog" className="link-m">
+          <Link prefetch={false} href="/blog" className="link-m">
             <ArrowRight className="h-3.5 w-3.5 rotate-180" />
             The journal
           </Link>
@@ -248,7 +262,7 @@ export default async function PostPage({ params }: PageProps) {
               )}
 
               <div className="mt-6">
-                <Link href="/blog" className="link-m">
+                <Link prefetch={false} href="/blog" className="link-m">
                   <ArrowRight className="h-3.5 w-3.5 rotate-180" />
                   Back to the journal
                 </Link>

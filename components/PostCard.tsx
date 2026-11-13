@@ -36,7 +36,7 @@ export default function PostCard({ post, priority }: PostCardProps) {
 
   return (
     <article className="group flex h-full flex-col">
-      <Link href={href} tabIndex={-1} aria-hidden className="block">
+      <Link prefetch={false} href={href} tabIndex={-1} aria-hidden className="block">
         <div className="photo-frame relative aspect-16/9 overflow-hidden bg-surface-2">
           {post.hero ? (
             /* eslint-disable-next-line @next/next/no-img-element --
@@ -76,7 +76,7 @@ export default function PostCard({ post, priority }: PostCardProps) {
         {/* Two lines, then an ellipsis: a long headline must not be allowed to
             push the excerpt out of alignment across a three-up grid. */}
         <h3 className="title-lg mt-3 line-clamp-2 text-ink">
-          <Link href={href}>{post.title}</Link>
+          <Link prefetch={false} href={href}>{post.title}</Link>
         </h3>
 
         {post.excerpt && (
@@ -87,7 +87,7 @@ export default function PostCard({ post, priority }: PostCardProps) {
 
         {/* min-h from `link-m` carries this to the 44px touch minimum. */}
         <div className="mt-auto flex items-center border-t border-line-soft pt-5">
-          <Link href={href} className="link-m" tabIndex={-1} aria-hidden>
+          <Link prefetch={false} href={href} className="link-m" tabIndex={-1} aria-hidden>
             Read the article
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>

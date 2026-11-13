@@ -47,7 +47,7 @@ export default function Header() {
       {/* 64px per the doc's `top-nav`. The max width is 1440px rather than the
           usual SaaS 1280 — the system wants photography to breathe. */}
       <div className="mx-auto flex h-16 max-w-[90rem] items-center justify-between px-5 sm:px-8">
-        <Link href="/" onClick={() => setOpen(false)}>
+        <Link prefetch={false} href="/" onClick={() => setOpen(false)}>
           <Logo />
         </Link>
 
@@ -70,7 +70,7 @@ export default function Header() {
             crushed is worse than one tap. */}
         <nav className="hidden items-center gap-6 xl:flex xl:gap-7">
           {nav.map((item) => (
-            <Link
+            <Link prefetch={false}
               key={item.href}
               href={item.href}
               className="nav-link text-muted transition-colors hover:text-ink"
@@ -94,7 +94,7 @@ export default function Header() {
           )}
           {/* Solid, because booking is the action this header exists to
               produce. It was the fourth of eight identical grey nav links. */}
-          <Link href={bookingCta.href} className="btn btn-solid h-11 min-h-11 px-5">
+          <Link prefetch={false} href={bookingCta.href} className="btn btn-solid h-11 min-h-11 px-5">
             {bookingCta.label}
           </Link>
           <ThemeToggle />
@@ -183,7 +183,7 @@ export default function Header() {
           {/* Full-screen menus are the one place the system lets nav labels go
               display-weight: at this size they are headlines, not chrome. */}
           {nav.map((item) => (
-            <Link
+            <Link prefetch={false}
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
@@ -194,14 +194,14 @@ export default function Header() {
           ))}
 
           <div className="mt-10 flex flex-col gap-3">
-            <Link
+            <Link prefetch={false}
               href={bookingCta.href}
               onClick={() => setOpen(false)}
               className="btn btn-solid"
             >
               {bookingCta.label}
             </Link>
-            <Link
+            <Link prefetch={false}
               href="/cars"
               onClick={() => setOpen(false)}
               className="btn btn-outline"

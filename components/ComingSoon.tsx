@@ -31,7 +31,7 @@ export default function ComingSoon({ eyebrow, title, body }: ComingSoonProps) {
         </p>
 
         <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link href="/" className="btn btn-solid">
+          <Link prefetch={false} href="/" className="btn btn-solid">
             Back to Home
             <ArrowRight className="h-4 w-4" />
           </Link>

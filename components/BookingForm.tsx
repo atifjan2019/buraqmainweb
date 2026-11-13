@@ -116,7 +116,7 @@ export default function BookingForm({
         )}
 
         <div className="mt-8 flex flex-wrap gap-4">
-          <Link href="/cars" className="btn btn-outline">
+          <Link prefetch={false} href="/cars" className="btn btn-outline">
             Keep browsing
           </Link>
         </div>
@@ -153,7 +153,7 @@ export default function BookingForm({
           {vehicleHeadline && (
             <span className="text-faint"> · {registration}</span>
           )}
-          <Link
+          <Link prefetch={false}
             href="/cars"
             className="mt-1 block text-xs font-bold uppercase tracking-wider text-ink underline-offset-4 hover:underline"
           >
@@ -389,7 +389,7 @@ export default function BookingForm({
       <p className="caption mt-5 leading-relaxed text-faint">
         We&apos;ll call to confirm before you travel. Your details are only used
         to arrange this appointment — read our{" "}
-        <Link
+        <Link prefetch={false}
           href="/privacy"
           className="underline decoration-line underline-offset-2 transition-colors hover:text-ink"
         >

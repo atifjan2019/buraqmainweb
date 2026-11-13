@@ -295,7 +295,7 @@ export default function AuctionSheetsPage() {
               </p>
 
               <div className="mt-8 flex flex-wrap gap-4">
-                <Link href="/cars" className="btn btn-solid">
+                <Link prefetch={false} href="/cars" className="btn btn-solid">
                   Browse our stock
                   <ArrowRight className="h-4 w-4" />
                 </Link>

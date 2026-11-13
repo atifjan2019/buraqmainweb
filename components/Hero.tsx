@@ -119,11 +119,11 @@ export default async function Hero() {
 
           <Reveal>
             <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-              <Link href="/cars" className="btn btn-solid">
+              <Link prefetch={false} href="/cars" className="btn btn-solid">
                 Browse Cars
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/finance" className="btn btn-outline">
+              <Link prefetch={false} href="/finance" className="btn btn-outline">
                 Calculate Finance
               </Link>
             </div>
@@ -211,7 +211,7 @@ export default async function Hero() {
       {spotlight && (
         <div className="absolute right-8 bottom-14 z-10 hidden xl:block">
           <Reveal delay={520}>
-            <Link
+            <Link prefetch={false}
               href={vehicleHref(spotlight)}
               className="surface-card group block w-72 p-6 transition-colors hover:border-ink"
             >

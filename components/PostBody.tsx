@@ -80,7 +80,7 @@ function renderSpan(span: Span, key: number): ReactNode {
   // Site-relative: client-side navigation, and no `target`/`rel` needed.
   if (span.href.startsWith("/")) {
     return (
-      <Link key={key} href={span.href} className={linkClass}>
+      <Link prefetch={false} key={key} href={span.href} className={linkClass}>
         {content}
       </Link>
     );

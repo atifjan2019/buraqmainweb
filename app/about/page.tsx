@@ -125,11 +125,11 @@ export default function AboutPage() {
                 </dl>
 
                 <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                  <Link href="/cars" className="btn btn-solid">
+                  <Link prefetch={false} href="/cars" className="btn btn-solid">
                     See what&apos;s in stock
                     <ArrowRight className="h-4 w-4" />
                   </Link>
-                  <Link href="/contact" className="btn btn-outline">
+                  <Link prefetch={false} href="/contact" className="btn btn-outline">
                     Get in touch
                   </Link>
                 </div>

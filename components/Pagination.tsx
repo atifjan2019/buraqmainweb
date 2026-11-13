@@ -61,7 +61,7 @@ export default function Pagination({
       className="mt-16 flex flex-wrap items-center justify-center gap-2"
     >
       {currentPage > 1 ? (
-        <Link href={href(currentPage - 1)} rel="prev" className={stepClass}>
+        <Link prefetch={false} href={href(currentPage - 1)} rel="prev" className={stepClass}>
           <ArrowRight className="h-3.5 w-3.5 rotate-180" />
           Previous
         </Link>
@@ -84,7 +84,7 @@ export default function Pagination({
             </li>
           ) : (
             <li key={page}>
-              <Link
+              <Link prefetch={false}
                 href={href(page)}
                 aria-current={page === currentPage ? "page" : undefined}
                 aria-label={`Page ${page}`}
@@ -102,7 +102,7 @@ export default function Pagination({
       </ul>
 
       {currentPage < lastPage ? (
-        <Link href={href(currentPage + 1)} rel="next" className={stepClass}>
+        <Link prefetch={false} href={href(currentPage + 1)} rel="next" className={stepClass}>
           Next
           <ArrowRight className="h-3.5 w-3.5" />
         </Link>

@@ -40,7 +40,7 @@ export default function MakerTile({ maker, models }: MakerTileProps) {
       onFocusCapture={() => setOpen(true)}
       onBlurCapture={() => setOpen(false)}
     >
-      <Link
+      <Link prefetch={false}
         href={`/cars?make=${encodeURIComponent(maker.name)}`}
         className="group flex h-full min-h-[11rem] flex-col items-center justify-center gap-5 bg-canvas p-8
                    transition-colors duration-200 hover:bg-surface-2
@@ -96,7 +96,7 @@ export default function MakerTile({ maker, models }: MakerTileProps) {
         >
           <div className="grid grid-cols-4 gap-3">
             {models.map((model) => (
-              <Link
+              <Link prefetch={false}
                 key={model.label}
                 href={model.href}
                 className="group/model flex flex-col items-center gap-1.5 text-center"
@@ -123,7 +123,7 @@ export default function MakerTile({ maker, models }: MakerTileProps) {
             ))}
           </div>
 
-          <Link
+          <Link prefetch={false}
             href={`/cars?make=${encodeURIComponent(maker.name)}`}
             className="caption mt-4 block text-center text-ink underline underline-offset-4"
           >
