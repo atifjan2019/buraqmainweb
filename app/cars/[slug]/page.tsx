@@ -220,6 +220,8 @@ export default async function VehiclePage({ params }: PageProps) {
    * not a fact about the car, and would otherwise print "0 miles".
    */
   const specs = [
+    // The stock reference staff use for this car, so a caller can quote it.
+    { label: "Stock ID", value: vehicle.stockId },
     { label: "Year", value: vehicle.year ? String(vehicle.year) : "" },
     {
       label: "Mileage",

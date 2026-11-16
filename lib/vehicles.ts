@@ -139,6 +139,12 @@ export interface Vehicle {
    * plate badge, spec table, and the enquiry payload — but no longer the URL.
    */
   registration: string;
+  /**
+   * The dealership's own stock reference from the CRM, e.g. "IMP-0271" — the
+   * yellow plate on the stock list. Shown on the site so a caller can quote it
+   * (16 Nov 2026). Empty when the CRM has none.
+   */
+  stockId: string;
   make: string;
   model: string;
   year: number;

@@ -111,6 +111,8 @@ interface RawDocument {
 interface RawVehicle {
   slug: string;
   registration: string;
+  /** The CRM's stock reference, e.g. "IMP-0271". */
+  custom_id?: string | null;
   make: string;
   model: string;
   year: number;
@@ -250,6 +252,7 @@ function toVehicle(raw: RawVehicle): Vehicle {
     documents,
     slug: raw.slug,
     registration: raw.registration,
+    stockId: (raw.custom_id ?? "").trim(),
     make: raw.make,
     model: raw.model,
     year: raw.year,

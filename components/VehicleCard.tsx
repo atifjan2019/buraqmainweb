@@ -180,6 +180,11 @@ export default function VehicleCard({
             {title}
           </Link>
         </h3>
+        {vehicle.stockId && (
+          <p className="mt-1 text-xs tracking-wide text-muted">
+            Stock ID {vehicle.stockId}
+          </p>
+        )}
 
         {/* Discrete chips rather than one tracked line. The line read as a
             sentence and buyers scan these four facts rather than read them —
